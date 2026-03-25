@@ -14,7 +14,7 @@
 import { BoloClient } from '@bolospot/sdk'
 
 const POLL_INTERVAL = 15_000 // 15 seconds
-const WIDGET_SLUG = 'bomed'
+const WIDGET_SLUG = process.env.BOLO_WIDGET_SLUG || 'bomed'
 
 interface Policy {
   autoApprove: boolean
@@ -84,15 +84,12 @@ async function checkAndBook() {
     const inbox = await bolo.relayInbox()
     const messages = inbox?.messages || []
 
-    // Also check for new grants by looking at relay messages about grants
-    // The real flow: poll grants API for new active grants with auto-book policies
-    const API_KEY = process.env.BOLO_API_KEY || ''
-    const BASE_URL = process.env.BOLO_API_URL || 'https://api.bolospot.com'
-
-    const grantsRes = await fetch(`${BASE_URL}/api/grants?direction=received`, {
+    // Poll the grants API for new active grants with auto-book policies
+    // In production this would use webhooks — here we poll for demo theater
+    const grantsRes = await fetch(`${process.env.BOLO_API_URL || 'https://api.bolospot.com'}/api/grants?direction=received`, {
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`,
+        'Authorization': `Bearer ${process.env.BOLO_API_KEY || ''}`,
       },
     })
 
