@@ -14,6 +14,8 @@ export default function Home() {
   const [verified, setVerified] = useState(false)
   const [nullifierHash, setNullifierHash] = useState<string | null>(null)
   const [handle, setHandle] = useState('')
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [handleInput, setHandleInput] = useState('')
   const [handleError, setHandleError] = useState('')
   const [handleLoading, setHandleLoading] = useState(false)
@@ -83,31 +85,50 @@ export default function Home() {
     setHandleError('')
     setHandleLoading(true)
 
-    const cleanHandle = handleInput.startsWith('@') ? handleInput : `@${handleInput}`
+    let cleanHandle = handleInput.startsWith('@') ? handleInput : `@${handleInput}`
+    let attempt = 0
+    const maxAttempts = 10
+    const baseHandle = cleanHandle.replace(/\d+$/, '') // Remove trailing numbers if any
 
-    try {
-      const res = await fetch('/api/handle/link', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          handle: cleanHandle,
-          nullifierHash,
-        }),
-      })
+    while (attempt < maxAttempts) {
+      const tryHandle = attempt === 0 ? cleanHandle : `${baseHandle}${attempt + 1}`
 
-      const data = await res.json()
+      try {
+        const res = await fetch('/api/handle/link', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            handle: tryHandle,
+            nullifierHash,
+          }),
+        })
 
-      if (data.success) {
-        setHandle(data.handle)
-        setStep('dashboard')
-      } else {
-        setHandleError(data.error || 'Could not link handle')
+        const data = await res.json()
+
+        if (data.success) {
+          setHandle(data.handle)
+          setStep('dashboard')
+          return
+        } else if (data.error?.includes('already exists') || data.error?.includes('taken') || data.error?.includes('conflict')) {
+          // Handle is taken, try next variation
+          attempt++
+          continue
+        } else {
+          // Other error, show it
+          setHandleError(data.error || 'Could not link handle')
+          setHandleLoading(false)
+          return
+        }
+      } catch {
+        setHandleError('Network error. Please try again.')
+        setHandleLoading(false)
+        return
       }
-    } catch {
-      setHandleError('Network error. Please try again.')
-    } finally {
-      setHandleLoading(false)
     }
+
+    // Tried all variations, still failed
+    setHandleError('Handle is taken. Please try a different one.')
+    setHandleLoading(false)
   }
 
   // Welcome / Verify screen
@@ -124,14 +145,13 @@ export default function Home() {
             <p className="text-sm text-[#888]">Patient Portal</p>
           </div>
 
-          {/* Description */}
+          {/* Onboarding Explainer Card */}
           <div className="glass-card p-6 space-y-4">
             <h2 className="text-lg font-semibold text-white">
-              Your health data, your rules
+              Your verified health identity
             </h2>
-            <p className="text-sm text-[#888] leading-relaxed">
-              Verify your identity with World ID to manage who can access your
-              healthcare information. Grant and revoke permissions instantly.
+            <p className="text-sm text-[#888] leading-relaxed text-left">
+              BoMed uses Bolospot to connect your verified identity to healthcare providers — like Stripe connects your bank to merchants. Your @handle is your address. Providers request access, you approve it. Nothing moves without your say-so.
             </p>
             <div className="space-y-2 text-left text-sm">
               <div className="flex items-center gap-3 text-[#888]">
@@ -180,6 +200,18 @@ export default function Home() {
 
   // Handle linking screen
   if (step === 'handle') {
+    // Auto-generate suggested handle from name
+    const suggestedHandle = firstName && lastName
+      ? `${firstName}${lastName}`.toLowerCase().replace(/\s+/g, '')
+      : ''
+
+    // Update handle input when names change (only if user hasn't manually edited it)
+    useEffect(() => {
+      if (suggestedHandle && !handleInput) {
+        setHandleInput(suggestedHandle)
+      }
+    }, [suggestedHandle])
+
     return (
       <main className="min-h-screen flex flex-col items-center justify-center px-6">
         <div className="w-full max-w-sm space-y-8">
@@ -194,32 +226,76 @@ export default function Home() {
             <p className="text-sm text-[#888]">Choose your Bolospot handle</p>
           </div>
 
-          {/* Handle input */}
+          {/* Name inputs and Handle input */}
           <div className="glass-card p-6 space-y-4">
-            <label className="block text-sm font-medium text-[#888]">
-              Your @handle
-            </label>
-            <div className="flex gap-2">
-              <div className="flex-1 relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]">@</span>
+            {/* Name inputs */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-[#888] mb-2">
+                  First name
+                </label>
                 <input
                   type="text"
-                  value={handleInput}
+                  value={firstName}
                   onChange={(e) => {
-                    setHandleInput(e.target.value.replace(/^@/, ''))
+                    setFirstName(e.target.value)
                     setHandleError('')
                   }}
-                  placeholder="yourhandle"
-                  className="w-full pl-8 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#27d558]/50 transition-colors"
+                  placeholder="Alison"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#27d558]/50 transition-colors"
                   autoFocus
                 />
               </div>
+              <div>
+                <label className="block text-xs font-medium text-[#888] mb-2">
+                  Last name
+                </label>
+                <input
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => {
+                    setLastName(e.target.value)
+                    setHandleError('')
+                  }}
+                  placeholder="Park"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#27d558]/50 transition-colors"
+                />
+              </div>
             </div>
+
+            {/* Handle input */}
+            <div>
+              <label className="block text-xs font-medium text-[#888] mb-2">
+                Your @handle
+              </label>
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#555]">@</span>
+                  <input
+                    type="text"
+                    value={handleInput}
+                    onChange={(e) => {
+                      setHandleInput(e.target.value.replace(/^@/, ''))
+                      setHandleError('')
+                    }}
+                    placeholder="yourhandle"
+                    className="w-full pl-8 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#27d558]/50 transition-colors"
+                  />
+                </div>
+              </div>
+              {handleInput && (
+                <p className="text-xs text-[#555] mt-2">
+                  Your handle will be @{handleInput} — change it if you like
+                </p>
+              )}
+            </div>
+
             {handleError && (
               <p className="text-sm text-[#ef4444]">{handleError}</p>
             )}
+
             <p className="text-xs text-[#555]">
-              Choose your @handle. This creates your Bolospot identity, verified by World ID.
+              This creates your Bolospot identity, verified by World ID.
               Healthcare providers will send permission requests here.
             </p>
           </div>

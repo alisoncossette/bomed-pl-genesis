@@ -61,6 +61,11 @@ export const SCOPE_LABELS: Record<string, { label: string; description: string; 
     description: 'View your insurance card details',
     icon: '🏥',
   },
+  'insurance:transmit': {
+    label: 'Transmit Insurance',
+    description: 'Send your health insurance info to a third party',
+    icon: '📤',
+  },
   'demographics:read': {
     label: 'Demographics',
     description: 'View your name, contact info',
