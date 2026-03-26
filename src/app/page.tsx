@@ -337,7 +337,7 @@ function Dashboard({ handle, nullifierHash }: { handle: string; nullifierHash: s
   return (
     <main className="min-h-screen pb-24">
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#02043D]/80 border-b border-white/5 px-4 py-3">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#141440]/80 border-b border-white/5 px-4 py-3">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/logo-icon.png" alt="BoMed" className="w-8 h-8 rounded-lg cursor-pointer select-none" onClick={handleLogoTap} />
