@@ -25,6 +25,17 @@ export default function Home() {
     setIsMiniApp(MiniKit.isInstalled())
   }, [])
 
+  // Auto-generate suggested handle from name (must be at top level, not inside conditional)
+  const suggestedHandle = firstName && lastName
+    ? `${firstName}${lastName}`.toLowerCase().replace(/\s+/g, '')
+    : ''
+
+  useEffect(() => {
+    if (suggestedHandle && !handleInput) {
+      setHandleInput(suggestedHandle)
+    }
+  }, [suggestedHandle])
+
   async function handleVerify() {
     setStep('verifying')
 
@@ -134,17 +145,19 @@ export default function Home() {
   // Welcome / Verify screen
   if (step === 'welcome' || step === 'verifying') {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-6">
-        <div className="w-full max-w-sm text-center space-y-8">
+      <main className="min-h-screen flex flex-col items-center justify-center px-5">
+        <div className="w-full max-w-sm mx-auto text-center space-y-6">
           {/* Logo */}
-          <div className="space-y-2">
-            <img src="/logo-icon.png" alt="BoMed" className="w-16 h-16 mx-auto rounded-2xl" />
-            <h1 className="text-2xl font-bold text-white">BoMed</h1>
-            <p className="text-sm text-[#888]">Patient Portal</p>
+          <div className="space-y-3 mb-2">
+            <img src="/logo-icon.png" alt="BoMed" className="w-20 h-20 mx-auto rounded-2xl" />
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold text-white">BoMed</h1>
+              <p className="text-sm text-[#888]">Patient Portal</p>
+            </div>
           </div>
 
           {/* Onboarding Explainer Card */}
-          <div className="glass-card p-6 space-y-4">
+          <div className="glass-card p-5 space-y-4">
             <h2 className="text-lg font-semibold text-white">
               Your verified health identity
             </h2>
@@ -198,34 +211,24 @@ export default function Home() {
 
   // Handle linking screen
   if (step === 'handle') {
-    // Auto-generate suggested handle from name
-    const suggestedHandle = firstName && lastName
-      ? `${firstName}${lastName}`.toLowerCase().replace(/\s+/g, '')
-      : ''
-
-    // Update handle input when names change (only if user hasn't manually edited it)
-    useEffect(() => {
-      if (suggestedHandle && !handleInput) {
-        setHandleInput(suggestedHandle)
-      }
-    }, [suggestedHandle])
-
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-6">
-        <div className="w-full max-w-sm space-y-8">
+      <main className="min-h-screen flex flex-col items-center justify-center px-5">
+        <div className="w-full max-w-sm mx-auto space-y-6">
           {/* Verified badge */}
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-3">
             <div className="w-14 h-14 mx-auto rounded-full bg-[#F4A63C]/20 flex items-center justify-center pulse-orange">
               <svg className="w-7 h-7 text-[#F4A63C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-white">Identity Verified</h2>
-            <p className="text-sm text-[#888]">Choose your Bolospot handle</p>
+            <div className="space-y-1">
+              <h2 className="text-xl font-bold text-white">Identity Verified</h2>
+              <p className="text-sm text-[#888]">Choose your Bolospot handle</p>
+            </div>
           </div>
 
           {/* Name inputs and Handle input */}
-          <div className="glass-card p-6 space-y-4">
+          <div className="glass-card p-5 space-y-4">
             {/* Name inputs */}
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -337,8 +340,8 @@ function Dashboard({ handle, nullifierHash }: { handle: string; nullifierHash: s
   return (
     <main className="min-h-screen pb-24">
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#141440]/80 border-b border-white/5 px-4 py-3">
-        <div className="max-w-lg mx-auto flex items-center justify-between">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#141440]/80 border-b border-white/5 px-5 py-3">
+        <div className="max-w-sm mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img src="/logo-icon.png" alt="BoMed" className="w-8 h-8 rounded-lg cursor-pointer select-none" onClick={handleLogoTap} />
             <div>
@@ -350,7 +353,7 @@ function Dashboard({ handle, nullifierHash }: { handle: string; nullifierHash: s
         </div>
       </header>
 
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-sm mx-auto px-5 py-5 space-y-5">
         {/* Agent Activity Feed */}
         <AutoBookFeed handle={handle} />
 
