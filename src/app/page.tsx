@@ -138,8 +138,8 @@ export default function Home() {
         <div className="w-full max-w-sm text-center space-y-8">
           {/* Logo */}
           <div className="space-y-2">
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-[#27d558] to-[#14b8a6] flex items-center justify-center text-2xl font-bold text-[#08090d]">
-              B
+            <div className="w-16 h-16 mx-auto rounded-2xl bg-[#0a1628] border border-[#f97316]/30 flex items-center justify-center text-2xl font-bold text-[#f97316]">
+              B+
             </div>
             <h1 className="text-2xl font-bold text-white">BoMed</h1>
             <p className="text-sm text-[#888]">Patient Portal</p>
@@ -155,15 +155,15 @@ export default function Home() {
             </p>
             <div className="space-y-2 text-left text-sm">
               <div className="flex items-center gap-3 text-[#888]">
-                <span className="text-[#27d558]">&#10003;</span>
+                <span className="text-[#f97316]">&#10003;</span>
                 Proof of personhood — no passwords
               </div>
               <div className="flex items-center gap-3 text-[#888]">
-                <span className="text-[#27d558]">&#10003;</span>
+                <span className="text-[#f97316]">&#10003;</span>
                 Scoped permissions — share only what you choose
               </div>
               <div className="flex items-center gap-3 text-[#888]">
-                <span className="text-[#27d558]">&#10003;</span>
+                <span className="text-[#f97316]">&#10003;</span>
                 Instant revocation — always in control
               </div>
             </div>
@@ -173,7 +173,7 @@ export default function Home() {
           <button
             onClick={handleVerify}
             disabled={step === 'verifying'}
-            className="w-full py-4 rounded-2xl font-semibold text-[#08090d] bg-gradient-to-r from-[#27d558] to-[#14b8a6] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-[#f97316] to-[#14b8a6] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {step === 'verifying' ? (
               <span className="flex items-center justify-center gap-2">
@@ -217,8 +217,8 @@ export default function Home() {
         <div className="w-full max-w-sm space-y-8">
           {/* Verified badge */}
           <div className="text-center space-y-2">
-            <div className="w-14 h-14 mx-auto rounded-full bg-[#27d558]/20 flex items-center justify-center pulse-green">
-              <svg className="w-7 h-7 text-[#27d558]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <div className="w-14 h-14 mx-auto rounded-full bg-[#f97316]/20 flex items-center justify-center pulse-orange">
+              <svg className="w-7 h-7 text-[#f97316]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
@@ -242,7 +242,7 @@ export default function Home() {
                     setHandleError('')
                   }}
                   placeholder="Alison"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#27d558]/50 transition-colors"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#f97316]/50 transition-colors"
                   autoFocus
                 />
               </div>
@@ -258,7 +258,7 @@ export default function Home() {
                     setHandleError('')
                   }}
                   placeholder="Park"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#27d558]/50 transition-colors"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#f97316]/50 transition-colors"
                 />
               </div>
             </div>
@@ -279,7 +279,7 @@ export default function Home() {
                       setHandleError('')
                     }}
                     placeholder="yourhandle"
-                    className="w-full pl-8 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#27d558]/50 transition-colors"
+                    className="w-full pl-8 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-[#555] focus:outline-none focus:border-[#f97316]/50 transition-colors"
                   />
                 </div>
               </div>
@@ -303,7 +303,7 @@ export default function Home() {
           <button
             onClick={handleLinkHandle}
             disabled={!handleInput.trim() || handleLoading}
-            className="w-full py-4 rounded-2xl font-semibold text-[#08090d] bg-gradient-to-r from-[#27d558] to-[#14b8a6] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-[#f97316] to-[#14b8a6] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {handleLoading ? 'Creating...' : 'Create & Link Handle'}
           </button>
@@ -339,21 +339,21 @@ function Dashboard({ handle, nullifierHash }: { handle: string; nullifierHash: s
   return (
     <main className="min-h-screen pb-24">
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#08090d]/80 border-b border-white/5 px-4 py-3">
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#0a1628]/80 border-b border-white/5 px-4 py-3">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
               onClick={handleLogoTap}
-              className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#27d558] to-[#14b8a6] flex items-center justify-center text-xs font-bold text-[#08090d] cursor-pointer select-none"
+              className="w-8 h-8 rounded-lg bg-[#0a1628] border border-[#f97316]/30 flex items-center justify-center text-xs font-bold text-[#f97316] cursor-pointer select-none"
             >
-              B
+              B+
             </div>
             <div>
               <p className="text-sm font-semibold text-white">{handle}</p>
-              <p className="text-xs text-[#27d558]">Verified</p>
+              <p className="text-xs text-[#f97316]">Verified</p>
             </div>
           </div>
-          <div className="w-2 h-2 rounded-full bg-[#27d558]" title="Connected" />
+          <div className="w-2 h-2 rounded-full bg-[#f97316]" title="Connected" />
         </div>
       </header>
 
@@ -499,7 +499,7 @@ function RequestCard({
               type="checkbox"
               checked={selectedScopes.has(scope)}
               onChange={() => toggleScope(scope)}
-              className="accent-[#27d558] w-4 h-4"
+              className="accent-[#f97316] w-4 h-4"
             />
             <span className="text-sm text-[#ccc]">
               {scope.replace(/[_:]/g, ' ')}
@@ -520,7 +520,7 @@ function RequestCard({
         <button
           onClick={() => onRespond(request.id, true, Array.from(selectedScopes), policy)}
           disabled={selectedScopes.size === 0}
-          className="flex-1 py-2 rounded-xl text-sm font-medium bg-[#27d558]/15 text-[#27d558] border border-[#27d558]/30 hover:bg-[#27d558]/25 transition-colors disabled:opacity-40"
+          className="flex-1 py-2 rounded-xl text-sm font-medium bg-[#f97316]/15 text-[#f97316] border border-[#f97316]/30 hover:bg-[#f97316]/25 transition-colors disabled:opacity-40"
         >
           Grant
         </button>
