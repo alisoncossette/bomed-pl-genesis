@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getBoloClient } from '@/lib/bolo'
+import { getBoloClient, boloFetch } from '@/lib/bolo'
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,10 +19,24 @@ export async function POST(req: NextRequest) {
     try {
       const lookup = await bolo.lookupHandle(cleanHandle)
       if (!lookup.exists) {
-        return NextResponse.json(
-          { success: false, error: 'Handle not found on Bolospot. Please register at bolospot.com first.' },
-          { status: 404 }
-        )
+        // Auto-create the handle with World ID verification
+        try {
+          await boloFetch('/users/create', {
+            method: 'POST',
+            body: {
+              handle: cleanHandle,
+              worldIdNullifier: nullifierHash,
+              isHumanVerified: true,
+              verificationLevel: 'VERIFIED',
+            },
+          })
+        } catch (createError) {
+          console.error('Handle creation error:', createError)
+          return NextResponse.json(
+            { success: false, error: 'Could not create handle. Please try a different handle or contact support.' },
+            { status: 500 }
+          )
+        }
       }
     } catch {
       // If lookup fails, we'll still try to proceed — handle may exist but lookup API may be down

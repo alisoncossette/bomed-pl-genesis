@@ -191,7 +191,7 @@ export default function Home() {
               </svg>
             </div>
             <h2 className="text-xl font-bold text-white">Identity Verified</h2>
-            <p className="text-sm text-[#888]">Now link your Bolospot handle</p>
+            <p className="text-sm text-[#888]">Choose your Bolospot handle</p>
           </div>
 
           {/* Handle input */}
@@ -219,8 +219,8 @@ export default function Home() {
               <p className="text-sm text-[#ef4444]">{handleError}</p>
             )}
             <p className="text-xs text-[#555]">
-              This links your verified World ID to your Bolospot identity.
-              Your healthcare providers will send permission requests to this handle.
+              Choose your @handle. This creates your Bolospot identity, verified by World ID.
+              Healthcare providers will send permission requests here.
             </p>
           </div>
 
@@ -229,7 +229,7 @@ export default function Home() {
             disabled={!handleInput.trim() || handleLoading}
             className="w-full py-4 rounded-2xl font-semibold text-[#08090d] bg-gradient-to-r from-[#27d558] to-[#14b8a6] hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {handleLoading ? 'Linking...' : 'Link Handle'}
+            {handleLoading ? 'Creating...' : 'Create & Link Handle'}
           </button>
         </div>
       </main>
