@@ -2,8 +2,8 @@
 
 :root {
   --bg-primary: #02043D;
-  --bg-card: rgba(34, 51, 153, 0.08);
-  --bg-card-hover: rgba(34, 51, 153, 0.12);
+  --bg-card: rgba(255, 255, 255, 0.04);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
   --border-color: rgba(255, 255, 255, 0.08);
   --text-primary: #F7F8FB;
   --text-secondary: #888;
