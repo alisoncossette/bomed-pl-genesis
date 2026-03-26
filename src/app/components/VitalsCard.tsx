@@ -51,7 +51,7 @@ export function VitalsCard({ handle }: { handle: string }) {
   return (
     <section className="glass-card p-5">
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-6 h-6 rounded-full bg-[#f97316]/20 flex items-center justify-center text-xs">
+        <div className="w-6 h-6 rounded-full bg-[#F4A63C]/20 flex items-center justify-center text-xs">
           {'\u{1F41E}'}
         </div>
         <h3 className="text-sm font-semibold text-[#888] uppercase tracking-wider">
@@ -88,7 +88,7 @@ export function VitalsCard({ handle }: { handle: string }) {
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-lg font-semibold text-[#f97316]">
+                <p className="text-lg font-semibold text-[#F4A63C]">
                   {vital.value}<span className="text-xs text-[#888] ml-1">{vital.unit}</span>
                 </p>
                 <p className="text-xs text-[#555]">

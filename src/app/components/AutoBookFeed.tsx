@@ -39,7 +39,7 @@ export function AutoBookFeed({ handle }: { handle: string }) {
   return (
     <section className="glass-card p-5">
       <div className="flex items-center gap-2 mb-3">
-        <div className="w-2 h-2 rounded-full bg-[#14b8a6] animate-pulse" />
+        <div className="w-2 h-2 rounded-full bg-[#285661] animate-pulse" />
         <h3 className="text-sm font-semibold text-[#888] uppercase tracking-wider">
           Agent Activity
         </h3>
@@ -61,7 +61,7 @@ export function AutoBookFeed({ handle }: { handle: string }) {
               key={event.id}
               className={`rounded-xl p-4 border space-y-1 ${
                 event.type === 'auto_booked'
-                  ? 'bg-[#14b8a6]/5 border-[#14b8a6]/20'
+                  ? 'bg-[#285661]/5 border-[#285661]/20'
                   : event.type === 'policy_blocked'
                   ? 'bg-[#ef4444]/5 border-[#ef4444]/20'
                   : 'bg-white/3 border-white/5'

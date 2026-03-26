@@ -37,7 +37,7 @@ export function PolicyControls({
 
   return (
     <div className="space-y-3 pt-2 border-t border-white/5">
-      <p className="text-xs font-medium text-[#14b8a6]">Scheduling Policy</p>
+      <p className="text-xs font-medium text-[#285661]">Scheduling Policy</p>
 
       {/* Auto-approve toggle */}
       <ToggleRow
@@ -71,7 +71,7 @@ export function PolicyControls({
                 step={15}
                 value={policy.minBufferMinutes}
                 onChange={(e) => onChange({ ...policy, minBufferMinutes: Number(e.target.value) })}
-                className="flex-1 accent-[#14b8a6] h-1"
+                className="flex-1 accent-[#285661] h-1"
               />
               <span className="text-xs text-white w-14 text-right">
                 {policy.minBufferMinutes} min
@@ -105,7 +105,7 @@ export function PolicyControls({
                 max={10}
                 value={policy.maxPerWeek}
                 onChange={(e) => onChange({ ...policy, maxPerWeek: Number(e.target.value) })}
-                className="flex-1 accent-[#14b8a6] h-1"
+                className="flex-1 accent-[#285661] h-1"
               />
               <span className="text-xs text-white w-8 text-right">{policy.maxPerWeek}</span>
             </div>
@@ -126,7 +126,7 @@ export function PolicyControls({
                   }}
                   className={`px-2 py-1 rounded-lg text-xs transition-colors ${
                     policy.allowedDays.includes(i)
-                      ? 'bg-[#14b8a6]/20 text-[#14b8a6] border border-[#14b8a6]/30'
+                      ? 'bg-[#285661]/20 text-[#285661] border border-[#285661]/30'
                       : 'bg-white/5 text-[#555] border border-white/5'
                   }`}
                 >
@@ -161,7 +161,7 @@ function ToggleRow({
       <button
         onClick={() => onChange(!checked)}
         className={`relative w-11 h-6 rounded-full transition-colors ${
-          checked ? 'bg-[#14b8a6]' : 'bg-white/10'
+          checked ? 'bg-[#285661]' : 'bg-white/10'
         }`}
       >
         <span
@@ -179,7 +179,7 @@ function TimeSelect({ value, onChange }: { value: number; onChange: (v: number) 
     <select
       value={value}
       onChange={(e) => onChange(Number(e.target.value))}
-      className="bg-white/5 border border-white/10 rounded-lg text-xs text-white px-2 py-1.5 focus:outline-none focus:border-[#14b8a6]/50"
+      className="bg-white/5 border border-white/10 rounded-lg text-xs text-white px-2 py-1.5 focus:outline-none focus:border-[#285661]/50"
     >
       {Array.from({ length: 24 }, (_, i) => (
         <option key={i} value={i} className="bg-[#08090d]">

@@ -101,7 +101,7 @@ export function DemoPanel({ handle, onClose }: { handle: string; onClose: () => 
           <button
             onClick={simulateAutoBook}
             disabled={sending}
-            className="w-full py-3 rounded-xl text-sm font-medium bg-[#14b8a6]/15 text-[#14b8a6] border border-[#14b8a6]/30 hover:bg-[#14b8a6]/25 transition-colors disabled:opacity-40"
+            className="w-full py-3 rounded-xl text-sm font-medium bg-[#285661]/15 text-[#285661] border border-[#285661]/30 hover:bg-[#285661]/25 transition-colors disabled:opacity-40"
           >
             Auto-Book Appointment
           </button>
@@ -114,7 +114,7 @@ export function DemoPanel({ handle, onClose }: { handle: string; onClose: () => 
             <button
               onClick={() => simulateVital('temperature')}
               disabled={sending}
-              className="py-3 rounded-xl text-xs font-medium bg-[#f97316]/15 text-[#f97316] border border-[#f97316]/30 hover:bg-[#f97316]/25 transition-colors disabled:opacity-40"
+              className="py-3 rounded-xl text-xs font-medium bg-[#F4A63C]/15 text-[#F4A63C] border border-[#F4A63C]/30 hover:bg-[#F4A63C]/25 transition-colors disabled:opacity-40"
             >
               {'\u{1F321}'} Temp
             </button>
