@@ -138,9 +138,7 @@ export default function Home() {
         <div className="w-full max-w-sm text-center space-y-8">
           {/* Logo */}
           <div className="space-y-2">
-            <div className="w-16 h-16 mx-auto rounded-2xl bg-[#02043D] border border-[#F4A63C]/30 flex items-center justify-center text-2xl font-bold text-[#F4A63C]">
-              B+
-            </div>
+            <img src="/logo-icon.png" alt="BoMed" className="w-16 h-16 mx-auto rounded-2xl" />
             <h1 className="text-2xl font-bold text-white">BoMed</h1>
             <p className="text-sm text-[#888]">Patient Portal</p>
           </div>
@@ -342,12 +340,7 @@ function Dashboard({ handle, nullifierHash }: { handle: string; nullifierHash: s
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#02043D]/80 border-b border-white/5 px-4 py-3">
         <div className="max-w-lg mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div
-              onClick={handleLogoTap}
-              className="w-8 h-8 rounded-lg bg-[#02043D] border border-[#F4A63C]/30 flex items-center justify-center text-xs font-bold text-[#F4A63C] cursor-pointer select-none"
-            >
-              B+
-            </div>
+            <img src="/logo-icon.png" alt="BoMed" className="w-8 h-8 rounded-lg cursor-pointer select-none" onClick={handleLogoTap} />
             <div>
               <p className="text-sm font-semibold text-white">{handle}</p>
               <p className="text-xs text-[#F4A63C]">Verified</p>
