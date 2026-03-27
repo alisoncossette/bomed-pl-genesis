@@ -11,10 +11,10 @@
  * Requires: BOLO_API_KEY (practice's API key), BOLO_API_URL
  */
 
-import { BoloClient } from '@bolospot/sdk'
-
 const POLL_INTERVAL = 15_000 // 15 seconds
 const WIDGET_SLUG = process.env.BOLO_WIDGET_SLUG || 'bomed'
+const API_KEY = process.env.BOLO_API_KEY || ''
+const BASE_URL = process.env.BOLO_API_URL || 'https://api.bolospot.com'
 
 interface Policy {
   autoApprove: boolean
@@ -26,10 +26,24 @@ interface Policy {
   allowedDays: number[]
 }
 
-const bolo = new BoloClient({
-  apiKey: process.env.BOLO_API_KEY || '',
-  baseUrl: process.env.BOLO_API_URL || 'https://api.bolospot.com',
-})
+// Direct fetch helper
+async function boloFetch<T>(endpoint: string, options?: { method?: string; body?: unknown }): Promise<T> {
+  const { method = 'GET', body } = options || {}
+  const url = `${BASE_URL}/api${endpoint}`
+  const res = await fetch(url, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_KEY}`,
+    },
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`Bolo API error ${res.status}: ${text}`)
+  }
+  return res.json() as Promise<T>
+}
 
 // Track what we've already processed to avoid duplicate bookings
 const processedGrants = new Set<string>()
@@ -81,31 +95,19 @@ function findNextSlot(policy: Policy): Date | null {
 async function checkAndBook() {
   try {
     // List all grants we've received (practice is the grantee)
-    const inbox = await bolo.relayInbox()
+    const inbox = await boloFetch<{ messages: any[] }>('/relay/inbox')
     const messages = inbox?.messages || []
 
     // Poll the grants API for new active grants with auto-book policies
     // In production this would use webhooks — here we poll for demo theater
-    const grantsRes = await fetch(`${process.env.BOLO_API_URL || 'https://api.bolospot.com'}/api/grants?direction=received`, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.BOLO_API_KEY || ''}`,
-      },
-    })
-
-    if (!grantsRes.ok) {
-      console.error('Failed to fetch grants:', grantsRes.status)
-      return
-    }
-
-    const grants = await grantsRes.json() as Array<{
+    const grants = await boloFetch<Array<{
       id: string
       grantorHandle: string
       widget: string
       scopes: string[]
       note: string | null
       isActive: boolean
-    }>
+    }>>('/grants?direction=received')
 
     for (const grant of grants) {
       if (!grant.isActive) continue
@@ -146,23 +148,26 @@ async function checkAndBook() {
       console.log(`[${grant.grantorHandle}] Auto-booking: ${slot.toISOString()}`)
 
       try {
-        await bolo.relaySend({
-          recipientHandle: grant.grantorHandle,
-          content: `Auto-booked: PT session on ${slot.toLocaleDateString(undefined, {
-            weekday: 'long',
-            month: 'short',
-            day: 'numeric',
-          })} at ${slot.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`,
-          widgetSlug: WIDGET_SLUG,
-          metadata: {
-            type: 'appointment',
-            autoBooked: true,
-            practiceName: 'Acme Physical Therapy',
-            dateTime: slot.toISOString(),
-            duration: 60,
-            appointmentType: 'PT_SESSION',
-            policyApplied: true,
-            bufferMinutes: policy.minBufferMinutes,
+        await boloFetch('/relay/send', {
+          method: 'POST',
+          body: {
+            recipientHandle: grant.grantorHandle,
+            content: `Auto-booked: PT session on ${slot.toLocaleDateString(undefined, {
+              weekday: 'long',
+              month: 'short',
+              day: 'numeric',
+            })} at ${slot.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`,
+            widgetSlug: WIDGET_SLUG,
+            metadata: {
+              type: 'appointment',
+              autoBooked: true,
+              practiceName: 'Acme Physical Therapy',
+              dateTime: slot.toISOString(),
+              duration: 60,
+              appointmentType: 'PT_SESSION',
+              policyApplied: true,
+              bufferMinutes: policy.minBufferMinutes,
+            },
           },
         })
 

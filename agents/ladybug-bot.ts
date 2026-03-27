@@ -13,15 +13,29 @@
  * Requires: BOLO_API_KEY (Ladybug.bot's API key), BOLO_API_URL
  */
 
-import { BoloClient } from '@bolospot/sdk'
-
 const WIDGET_SLUG = 'ladybug'
 const CONTINUOUS_INTERVAL = 30_000 // 30 seconds between readings
+const API_KEY = process.env.BOLO_API_KEY || ''
+const BASE_URL = process.env.BOLO_API_URL || 'https://api.bolospot.com'
 
-const bolo = new BoloClient({
-  apiKey: process.env.BOLO_API_KEY || '',
-  baseUrl: process.env.BOLO_API_URL || 'https://api.bolospot.com',
-})
+// Direct fetch helper
+async function boloFetch<T>(endpoint: string, options?: { method?: string; body?: unknown }): Promise<T> {
+  const { method = 'GET', body } = options || {}
+  const url = `${BASE_URL}/api${endpoint}`
+  const res = await fetch(url, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_KEY}`,
+    },
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  })
+  if (!res.ok) {
+    const text = await res.text()
+    throw new Error(`Bolo API error ${res.status}: ${text}`)
+  }
+  return res.json() as Promise<T>
+}
 
 interface VitalReading {
   type: string
@@ -77,7 +91,7 @@ async function sendVital(patientHandle: string, vitalType: string) {
 
   try {
     // Check if we have vitals:write access
-    const access = await bolo.checkAccess(patientHandle.replace(/^@/, ''))
+    const access = await boloFetch<{ widgets?: Array<{ status: string; scopes?: string[] }> }>(`/access/check?handle=${patientHandle.replace(/^@/, '')}`)
     const hasVitalsAccess = access.widgets?.some(
       (w: any) => w.status === 'granted' && w.scopes?.includes('vitals:write')
     )
@@ -87,18 +101,21 @@ async function sendVital(patientHandle: string, vitalType: string) {
       return false
     }
 
-    const result = await bolo.relaySend({
-      recipientHandle: patientHandle.replace(/^@/, ''),
-      content: `${reading.label}: ${reading.value}${reading.unit}`,
-      widgetSlug: WIDGET_SLUG,
-      metadata: {
-        type: 'vital',
-        vitalType: reading.type,
-        value: reading.value,
-        unit: reading.unit,
-        deviceName: 'Ladybug.bot',
-        deviceType: 'reading_robot',
-        measuredAt: new Date().toISOString(),
+    const result = await boloFetch<{ id: string }>('/relay/send', {
+      method: 'POST',
+      body: {
+        recipientHandle: patientHandle.replace(/^@/, ''),
+        content: `${reading.label}: ${reading.value}${reading.unit}`,
+        widgetSlug: WIDGET_SLUG,
+        metadata: {
+          type: 'vital',
+          vitalType: reading.type,
+          value: reading.value,
+          unit: reading.unit,
+          deviceName: 'Ladybug.bot',
+          deviceType: 'reading_robot',
+          measuredAt: new Date().toISOString(),
+        },
       },
     })
 
