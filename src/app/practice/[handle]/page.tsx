@@ -129,87 +129,85 @@ export default function PracticeDashboard() {
 
         {/* Grants */}
         <div className="flex-1">
-        {grants.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-20 h-20 rounded-2xl bg-white border border-[#e5e7eb] flex items-center justify-center mb-5 shadow-sm">
-              <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] flex items-center justify-center animate-pulse">
-                <svg className="w-8 h-8 text-[#9ca3af]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+          {grants.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="w-20 h-20 rounded-2xl bg-white border border-[#e5e7eb] flex items-center justify-center mb-5 shadow-sm">
+                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#f3f4f6] to-[#e5e7eb] flex items-center justify-center animate-pulse">
+                  <svg className="w-8 h-8 text-[#9ca3af]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
               </div>
+              <h2 className="text-xl font-bold text-[#02043d] mb-2">Waiting for patients...</h2>
+              <p className="text-sm text-[#6b7280] text-center max-w-md">
+                When patients scan your QR code and grant access, they'll appear here in real-time
+              </p>
             </div>
-            <h2 className="text-xl font-bold text-[#02043d] mb-2">Waiting for patients...</h2>
-            <p className="text-sm text-[#6b7280] text-center max-w-md">
-              When patients scan your QR code and grant access, they'll appear here in real-time
-            </p>
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {grants.map(grant => (
-              <div
-                key={grant.id}
-                className={`bg-white rounded-xl border border-[#e5e7eb] p-5 shadow-sm hover:shadow-md transition-all ${
-                  fadingOutIds.has(grant.id) ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
-                }`}
-                style={{ transition: 'all 0.6s ease-out' }}
-              >
-                {/* Patient handle */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0d9488] to-[#14b8a6] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
-                    {grant.granterHandle?.replace('@', '').slice(0, 2).toUpperCase() || '??'}
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {grants.map(grant => (
+                <div
+                  key={grant.id}
+                  className={`bg-white rounded-xl border border-[#e5e7eb] p-5 shadow-sm hover:shadow-md transition-all ${
+                    fadingOutIds.has(grant.id) ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
+                  }`}
+                  style={{ transition: 'all 0.6s ease-out' }}
+                >
+                  {/* Patient handle */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0d9488] to-[#14b8a6] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+                      {grant.granterHandle?.replace('@', '').slice(0, 2).toUpperCase() || '??'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-base font-bold text-[#02043d] truncate">
+                        {grant.granterHandle ? `@${grant.granterHandle}` : 'Unknown'}
+                      </p>
+                      <p className="text-xs text-[#9ca3af]">
+                        {new Date(grant.createdAt).toLocaleString(undefined, {
+                          month: 'short',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    </div>
+                    <div className="w-2 h-2 rounded-full bg-[#22c55e] flex-shrink-0" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-base font-bold text-[#02043d] truncate">
-                      {grant.granterHandle ? `@${grant.granterHandle}` : 'Unknown'}
-                    </p>
-                    <p className="text-xs text-[#9ca3af]">
-                      {new Date(grant.createdAt).toLocaleString(undefined, {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit',
-                      })}
-                    </p>
-                  </div>
-                  <div className="w-2 h-2 rounded-full bg-[#22c55e] flex-shrink-0" />
-                </div>
 
-                {/* Scopes */}
-                <div>
-                  <p className="text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wide mb-2">
-                    Granted Access
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {grant.scopes.map(scope => (
-                      <div
-                        key={scope}
-                        className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg"
-                      >
-                        <span className="text-sm">{scopeIcon(scope)}</span>
-                        <span className="text-xs font-medium text-[#166534]">
-                          {scope.split(':')[0]}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Expiration */}
-                {grant.expiresAt && (
-                  <div className="mt-3 pt-3 border-t border-[#f1f3f8]">
-                    <p className="text-xs text-[#9ca3af]">
-                      Expires {new Date(grant.expiresAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                  {/* Scopes */}
+                  <div>
+                    <p className="text-[10px] font-semibold text-[#9ca3af] uppercase tracking-wide mb-2">
+                      Granted Access
                     </p>
+                    <div className="flex flex-wrap gap-2">
+                      {grant.scopes.map(scope => (
+                        <div
+                          key={scope}
+                          className="flex items-center gap-1.5 px-2.5 py-1.5 bg-[#f0fdf4] border border-[#bbf7d0] rounded-lg"
+                        >
+                          <span className="text-sm">{scopeIcon(scope)}</span>
+                          <span className="text-xs font-medium text-[#166534]">
+                            {scope.split(':')[0]}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
+
+                  {/* Expiration */}
+                  {grant.expiresAt && (
+                    <div className="mt-3 pt-3 border-t border-[#f1f3f8]">
+                      <p className="text-xs text-[#9ca3af]">
+                        Expires {new Date(grant.expiresAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-
-        </div>{/* end flex-1 grants */}
-      </div>{/* end content flex */}
 
       {/* Footer stats */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e5e7eb] shadow-lg">

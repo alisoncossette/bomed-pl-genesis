@@ -478,6 +478,19 @@ function HomeContent() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// QR CODE SCANNER
+// ═══════════════════════════════════════════════════════════════════════════
+function decodeQR(imageData: ImageData): string | null {
+  try {
+    const jsQR = require('jsqr')
+    const code = jsQR(imageData.data, imageData.width, imageData.height)
+    return code ? code.data : null
+  } catch {
+    return null
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════════════════════════════════════
 function Dashboard({ handle, nullifierHash, boloToken }: { handle: string; nullifierHash: string | null; boloToken: string | null }) {
@@ -526,6 +539,7 @@ function Dashboard({ handle, nullifierHash, boloToken }: { handle: string; nulli
       {/* Content */}
       <div className="max-w-sm mx-auto px-4 py-5 flex flex-col gap-4">
         <AutoBookFeed handle={handle} />
+        <ConnectPractice handle={handle} boloToken={boloToken} />
         <PendingRequests handle={handle} boloToken={boloToken} />
         <ActiveGrants handle={handle} boloToken={boloToken} />
         <VitalsCard handle={handle} />
@@ -587,6 +601,261 @@ function EmptyState({ icon, title, desc }: { icon: React.ReactNode; title: strin
       <p className="text-sm font-semibold text-[#02043d] mb-1">{title}</p>
       <p className="text-xs text-[#9ca3af] leading-relaxed max-w-[220px]">{desc}</p>
     </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CONNECT PRACTICE
+// ═══════════════════════════════════════════════════════════════════════════
+function ConnectPractice({ handle, boloToken }: { handle: string; boloToken: string | null }) {
+  const [isExpanded, setIsExpanded]       = useState(false)
+  const [practiceHandleInput, setPracticeHandleInput] = useState('')
+  const [isConnecting, setIsConnecting]   = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+  const [errorMessage, setErrorMessage]   = useState('')
+  const [isScanning, setIsScanning]       = useState(false)
+
+  async function handleConnect() {
+    if (!practiceHandleInput.trim() || !boloToken) return
+
+    setIsConnecting(true)
+    setErrorMessage('')
+    setSuccessMessage('')
+
+    try {
+      const res = await fetch('/api/practice/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          practiceHandle: practiceHandleInput,
+          patientHandle: handle,
+          boloToken,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (data.success) {
+        setSuccessMessage(`✓ Connected to @${practiceHandleInput.replace(/^@/, '')}`)
+        setPracticeHandleInput('')
+        setTimeout(() => {
+          setSuccessMessage('')
+          setIsExpanded(false)
+        }, 3000)
+      } else {
+        setErrorMessage(data.error || 'Failed to connect')
+      }
+    } catch (error) {
+      setErrorMessage('Network error. Please try again.')
+    } finally {
+      setIsConnecting(false)
+    }
+  }
+
+  async function handleQRScan(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsScanning(true)
+    setErrorMessage('')
+
+    try {
+      const img = new Image()
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+
+      img.onload = async () => {
+        canvas.width = img.width
+        canvas.height = img.height
+        ctx?.drawImage(img, 0, 0)
+
+        const imageData = ctx?.getImageData(0, 0, canvas.width, canvas.height)
+        if (!imageData) {
+          setErrorMessage('Failed to read image')
+          setIsScanning(false)
+          return
+        }
+
+        const qrData = decodeQR(imageData)
+        if (!qrData) {
+          setErrorMessage('No QR code found in image')
+          setIsScanning(false)
+          return
+        }
+
+        // Extract practice handle from URL
+        // Expected format: https://bomed.world/?practice=greenfieldpt&scopes=...
+        try {
+          const url = new URL(qrData)
+          const practice = url.searchParams.get('practice')
+          const scopesParam = url.searchParams.get('scopes')
+
+          if (!practice) {
+            setErrorMessage('Invalid QR code: no practice handle found')
+            setIsScanning(false)
+            return
+          }
+
+          const scopes = scopesParam ? scopesParam.split(',') : undefined
+
+          // Auto-connect
+          const res = await fetch('/api/practice/connect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              practiceHandle: practice,
+              patientHandle: handle,
+              boloToken,
+              scopes,
+            }),
+          })
+
+          const data = await res.json()
+
+          if (data.success) {
+            setSuccessMessage(`✓ Connected to @${practice}`)
+            setTimeout(() => {
+              setSuccessMessage('')
+              setIsExpanded(false)
+            }, 3000)
+          } else {
+            setErrorMessage(data.error || 'Failed to connect')
+          }
+        } catch {
+          setErrorMessage('Invalid QR code format')
+        } finally {
+          setIsScanning(false)
+        }
+      }
+
+      img.onerror = () => {
+        setErrorMessage('Failed to load image')
+        setIsScanning(false)
+      }
+
+      img.src = URL.createObjectURL(file)
+    } catch {
+      setErrorMessage('Failed to process image')
+      setIsScanning(false)
+    }
+  }
+
+  return (
+    <section className="bm-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
+        <h3 className="text-sm font-bold text-[#02043d]">Connect a Practice</h3>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-7 h-7 rounded-lg bg-[#0d9488] hover:bg-[#0f766e] transition-colors flex items-center justify-center text-white"
+          aria-label={isExpanded ? 'Collapse' : 'Expand'}
+        >
+          <svg
+            className="w-4 h-4 transition-transform"
+            style={{ transform: isExpanded ? 'rotate(45deg)' : 'rotate(0deg)' }}
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M8 3v10M3 8h10" />
+          </svg>
+        </button>
+      </div>
+
+      {isExpanded && (
+        <div className="px-4 pb-4 flex flex-col gap-4 border-t border-[#f1f3f8] pt-4">
+          {/* Success message */}
+          {successMessage && (
+            <div className="px-3 py-2.5 rounded-lg bg-[#f0fdf4] border border-[#86efac] text-sm text-[#15803d] font-medium">
+              {successMessage}
+            </div>
+          )}
+
+          {/* Error message */}
+          {errorMessage && (
+            <div className="px-3 py-2.5 rounded-lg bg-[#fef2f2] border border-[#fca5a5] text-sm text-[#dc2626] font-medium">
+              {errorMessage}
+            </div>
+          )}
+
+          {/* Type handle */}
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] mb-2">
+              Type handle
+            </label>
+            <div className="flex gap-2">
+              <div className="flex-1 flex rounded-xl border border-[#e5e7eb] focus-within:border-[#0d9488] focus-within:ring-2 focus-within:ring-[#0d9488]/10 overflow-hidden">
+                <span className="flex items-center px-3 bg-[#f4f6fb] border-r border-[#e5e7eb] text-sm font-semibold text-[#9ca3af] select-none">
+                  @
+                </span>
+                <input
+                  type="text"
+                  value={practiceHandleInput}
+                  onChange={e => setPracticeHandleInput(e.target.value.replace(/^@/, ''))}
+                  onKeyDown={e => e.key === 'Enter' && handleConnect()}
+                  placeholder="greenfieldpt"
+                  className="flex-1 px-3 py-2.5 bg-white text-sm font-medium text-[#02043d] outline-none placeholder-[#9ca3af]/60"
+                  disabled={isConnecting}
+                />
+              </div>
+              <button
+                onClick={handleConnect}
+                disabled={!practiceHandleInput.trim() || isConnecting || !boloToken}
+                className="bm-btn-teal px-4 py-2.5 text-sm whitespace-nowrap"
+              >
+                {isConnecting ? (
+                  <>
+                    <Spinner />
+                    Connecting...
+                  </>
+                ) : (
+                  'Connect'
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* OR divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-[#e5e7eb]" />
+            <span className="text-xs text-[#9ca3af] font-medium">or</span>
+            <div className="flex-1 h-px bg-[#e5e7eb]" />
+          </div>
+
+          {/* Scan QR */}
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] mb-2">
+              Scan QR code
+            </label>
+            <label className="bm-btn-teal w-full flex items-center justify-center gap-2 cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleQRScan}
+                className="hidden"
+                disabled={isScanning || !boloToken}
+              />
+              {isScanning ? (
+                <>
+                  <Spinner />
+                  Scanning...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                  </svg>
+                  Scan with Camera
+                </>
+              )}
+            </label>
+          </div>
+        </div>
+      )}
+    </section>
   )
 }
 
