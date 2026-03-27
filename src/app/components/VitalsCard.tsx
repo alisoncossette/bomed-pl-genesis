@@ -26,7 +26,7 @@ const VITAL_LABELS: Record<string, string> = {
   oxygen: 'SpO2',
 }
 
-export function VitalsCard({ handle }: { handle: string }) {
+export function VitalsCard({ handle, boloToken }: { handle: string; boloToken?: string | null }) {
   const [vitals, setVitals] = useState<VitalReading[]>([])
   const [loading, setLoading] = useState(true)
 
