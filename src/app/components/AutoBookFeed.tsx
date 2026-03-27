@@ -13,107 +13,87 @@ interface AutoBookEvent {
   timestamp: string
 }
 
+const EVENT_CONFIG = {
+  auto_booked:     { emoji: '✅', label: 'Appointment booked',    bg: 'bg-[#f0fdf4]', dot: 'bg-[#16a34a]' },
+  auto_approved:   { emoji: '🔔', label: 'Request auto-approved', bg: 'bg-[#eff6ff]', dot: 'bg-[#3b82f6]' },
+  policy_blocked:  { emoji: '🚫', label: 'Blocked by policy',     bg: 'bg-[#fef2f2]', dot: 'bg-[#dc2626]' },
+}
+
 export function AutoBookFeed({ handle }: { handle: string }) {
-  const [events, setEvents] = useState<AutoBookEvent[]>([])
+  const [events, setEvents]   = useState<AutoBookEvent[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchEvents()
-    // Poll every 10s for demo effect
     const interval = setInterval(fetchEvents, 10000)
     return () => clearInterval(interval)
   }, [handle])
 
   async function fetchEvents() {
     try {
-      const res = await fetch(`/api/autobook/feed?handle=${encodeURIComponent(handle)}`)
+      const res  = await fetch(`/api/autobook/feed?handle=${encodeURIComponent(handle)}`)
       const data = await res.json()
       setEvents(data.events || [])
-    } catch {
-      // Silent fail
-    } finally {
-      setLoading(false)
-    }
+    } catch { /* silent */ } finally { setLoading(false) }
   }
 
   return (
-    <section className="glass-card p-6">
-      <div className="flex items-center gap-3 mb-5">
-        <div className="w-2.5 h-2.5 rounded-full bg-[#285661] animate-pulse shadow-lg shadow-[#285661]/50" />
-        <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider">
-          Agent Activity
-        </h3>
+    <section className="bm-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-[#f1f3f8]">
+        <div className="flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-[#0d9488] animate-pulse" />
+          <h3 className="text-sm font-bold text-[#02043d]">Agent Activity</h3>
+        </div>
+        <span className="text-[11px] font-medium text-[#0d9488]">Live</span>
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-8">
-          <div className="flex items-center gap-3">
-            <svg className="animate-spin h-5 w-5 text-[#9CA3AF]" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            <span className="text-sm font-medium text-[#9CA3AF]">Loading activity...</span>
-          </div>
+        <div className="flex items-center justify-center gap-2 py-10 text-[#9ca3af]">
+          <div className="bm-spinner bm-spinner-teal" />
+          <span className="text-sm">Loading activity…</span>
         </div>
       ) : events.length === 0 ? (
-        <div className="text-center py-10">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#285661]/10 flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-[#285661]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="flex flex-col items-center py-10 px-6 text-center">
+          <div className="w-11 h-11 rounded-xl bg-[#f4f6fb] flex items-center justify-center mb-3">
+            <svg className="w-5 h-5 text-[#9ca3af]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <p className="text-base font-semibold text-white mb-1">No agent activity</p>
-          <p className="text-xs text-[#9CA3AF] max-w-[280px] mx-auto">
+          <p className="text-sm font-semibold text-[#02043d] mb-1">No agent activity</p>
+          <p className="text-xs text-[#9ca3af] leading-relaxed max-w-[220px]">
             When your provider&apos;s agent books or requests appointments, they&apos;ll appear here
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {events.map((event) => (
-            <div
-              key={event.id}
-              className={`rounded-2xl p-5 border shadow-lg space-y-2 ${
-                event.type === 'auto_booked'
-                  ? 'bg-gradient-to-br from-[#285661]/15 to-[#285661]/5 border-[#285661]/30'
-                  : event.type === 'policy_blocked'
-                  ? 'bg-gradient-to-br from-[#ef4444]/15 to-[#ef4444]/5 border-[#ef4444]/30'
-                  : 'bg-gradient-to-br from-white/5 to-white/3 border-white/8'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-lg">
-                    {event.type === 'auto_booked' && '✅'}
-                    {event.type === 'auto_approved' && '🔔'}
-                    {event.type === 'policy_blocked' && '🚫'}
-                  </span>
-                  <p className="text-sm font-bold text-white">
-                    {event.type === 'auto_booked' && 'Auto-booked'}
-                    {event.type === 'auto_approved' && 'Auto-approved'}
-                    {event.type === 'policy_blocked' && 'Blocked by policy'}
-                  </p>
+        <div className="divide-y divide-[#f1f3f8]">
+          {events.map(event => {
+            const cfg = EVENT_CONFIG[event.type]
+            return (
+              <div key={event.id} className="flex items-start gap-3 p-4 animate-fade-in">
+                <div className={`w-8 h-8 rounded-full ${cfg.bg} flex items-center justify-center text-sm flex-shrink-0 mt-0.5`}>
+                  {cfg.emoji}
                 </div>
-                <span className="text-xs font-medium text-[#6B7280]">
-                  {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-semibold text-[#02043d]">{cfg.label}</p>
+                    <span className="text-[11px] text-[#9ca3af] whitespace-nowrap flex-shrink-0">
+                      {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#4b5563] mt-0.5">
+                    {event.practiceName} &mdash;{' '}
+                    {new Date(event.dateTime).toLocaleDateString(undefined, {
+                      weekday: 'short', month: 'short', day: 'numeric',
+                      hour: 'numeric', minute: '2-digit',
+                    })}
+                  </p>
+                  {event.reason && (
+                    <p className="text-[11px] text-[#9ca3af] italic mt-1">{event.reason}</p>
+                  )}
+                </div>
               </div>
-
-              <p className="text-sm font-medium text-[#D1D5DB]">
-                {event.practiceName} &mdash;{' '}
-                {new Date(event.dateTime).toLocaleDateString(undefined, {
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: '2-digit',
-                })}
-              </p>
-
-              {event.reason && (
-                <p className="text-xs text-[#9CA3AF] italic">{event.reason}</p>
-              )}
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </section>

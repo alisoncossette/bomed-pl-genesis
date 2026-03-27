@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BoMed — Design Mockup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #e8eaf0;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 20px;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    /* ── Phone shell ─────────────────────────────── */
+    .phone {
+      width: 390px;
+      min-height: 844px;
+      background: #f4f6fb;
+      border-radius: 44px;
+      box-shadow:
+        0 0 0 10px #1a1a2e,
+        0 0 0 12px #0d0d1a,
+        0 40px 80px rgba(0,0,0,0.45);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .phone-label {
+      text-align: center;
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 12px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── Scrollable content ──────────────────────── */
+    .scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .scroll-area::-webkit-scrollbar { display: none; }
+
+    /* ── Tokens ──────────────────────────────────── */
+    :root {
+      --navy:        #02043d;
+      --navy-soft:   #1a1c4a;
+      --teal:        #0d9488;
+      --teal-light:  #ccfbf1;
+      --teal-mid:    #99f6e4;
+      --orange:      #ffa350;
+      --orange-bg:   #fff7ed;
+      --white:       #ffffff;
+      --surface:     #f4f6fb;
+      --card:        #ffffff;
+      --border:      #e5e7eb;
+      --border-soft: #f1f3f8;
+      --text-1:      #02043d;
+      --text-2:      #4b5563;
+      --text-3:      #9ca3af;
+      --red:         #dc2626;
+      --red-bg:      #fef2f2;
+      --green:       #16a34a;
+      --green-bg:    #f0fdf4;
+      --yellow:      #b45309;
+      --yellow-bg:   #fff8cb;
+      --butter:      #fff8cb;
+      --butter-border: rgba(180,83,9,0.15);
+    }
+
+    /* ── Header ──────────────────────────────────── */
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-wrap {
+      width: 52px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 4px rgba(2,4,61,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      padding: 5px;
+    }
+
+    .logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .header-text { flex: 1; }
+
+    .header-handle {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-1);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .verified-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--orange);
+      background: var(--orange-bg);
+      border: 1px solid rgba(255,163,80,0.3);
+      border-radius: 20px;
+      padding: 1px 7px 1px 5px;
+    }
+
+    .verified-chip svg { width: 11px; height: 11px; }
+
+    .header-sub {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    .header-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--teal) 0%, #0f766e 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+
+    /* ── Main content ────────────────────────────── */
+    .content {
+      padding: 20px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ── Section card ────────────────────────────── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 1px 4px rgba(2,4,61,0.05);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 16px 18px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: 0.1px;
+    }
+
+    .card-body { padding: 14px 18px 18px; }
+    .card-body-flush { padding: 0; }
+
+    /* ── Count badge ─────────────────────────────── */
+    .count-badge {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--teal);
+      background: var(--teal-light);
+      border-radius: 20px;
+      padding: 2px 8px;
+    }
+
+    /* ── Alert banner ────────────────────────────── */
+    .alert-banner {
+      background: var(--butter);
+      border: 1px solid var(--butter-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .alert-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--yellow);
+      flex-shrink: 0;
+      margin-top: 4px;
+      box-shadow: 0 0 0 3px rgba(180,83,9,0.12);
+    }
+
+    .alert-text {
+      font-size: 13px;
+      color: #78350f;
+      line-height: 1.5;
+    }
+
+    .alert-text strong { font-weight: 600; }
+
+    /* ── Request card ────────────────────────────── */
+    .request-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .request-head {
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--border-soft);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .provider-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .provider-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+
+    .provider-sub {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+
+    .status-badge {
+      margin-left: auto;
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 20px;
+      padding: 3px 9px;
+      flex-shrink: 0;
+    }
+
+    /* .badge-pending defined below with butter color */
+
+    .badge-active {
+      color: var(--teal);
+      background: var(--teal-light);
+      border: 1px solid rgba(13,148,136,0.2);
+    }
+
+    .badge-blocked {
+      color: var(--red);
+      background: var(--red-bg);
+      border: 1px solid rgba(220,38,38,0.2);
+    }
+
+    .request-reason {
+      padding: 12px 16px;
+      background: #f9fafb;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 13px;
+      color: var(--text-2);
+      font-style: italic;
+      line-height: 1.5;
+    }
+
+    .badge-pending {
+      color: #92400e;
+      background: var(--butter);
+      border: 1px solid var(--butter-border);
+    }
+
+    .request-reason::before {
+      content: '"';
+      color: var(--teal);
+      font-weight: 700;
+      font-style: normal;
+    }
+    .request-reason::after {
+      content: '"';
+      color: var(--teal);
+      font-weight: 700;
+      font-style: normal;
+    }
+
+    .scopes-section {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-soft);
+    }
+
+    .scopes-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .scope-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+    }
+
+    .scope-row + .scope-row {
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .scope-info { display: flex; align-items: center; gap: 8px; }
+
+    .scope-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .scope-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-1);
+    }
+
+    .scope-desc {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    /* Toggle */
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 23px;
+      flex-shrink: 0;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      border-radius: 23px;
+      background: #e5e7eb;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 17px;
+      height: 17px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+
+    .toggle input:checked + .toggle-track {
+      background: var(--teal);
+    }
+
+    .toggle input:checked + .toggle-track::after {
+      transform: translateX(17px);
+    }
+
+    .request-actions {
+      padding: 14px 16px;
+      display: flex;
+      gap: 8px;
+    }
+
+    /* ── Buttons ─────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      padding: 9px 16px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: var(--teal);
+      color: white;
+      flex: 1;
+    }
+
+    .btn-primary:hover { background: #0f766e; }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid rgba(220,38,38,0.3);
+    }
+
+    .btn-danger:hover { background: var(--red-bg); }
+
+    .btn-ghost {
+      background: var(--surface);
+      color: var(--text-2);
+      border: 1px solid var(--border);
+    }
+
+    .btn-sm { font-size: 12px; padding: 6px 12px; }
+
+    /* ── Grant row ───────────────────────────────── */
+    .grant-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+    }
+
+    .grant-row + .grant-row {
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .grant-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .grant-details { flex: 1; min-width: 0; }
+
+    .grant-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-1);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .grant-scopes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 5px;
+    }
+
+    .scope-tag {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--teal);
+      background: var(--teal-light);
+      border-radius: 4px;
+      padding: 1px 6px;
+    }
+
+    .scope-tag.muted {
+      color: var(--text-3);
+      background: var(--surface);
+    }
+
+    /* ── Vital row ───────────────────────────────── */
+    .vital-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 18px;
+    }
+
+    .vital-row + .vital-row {
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .vital-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+
+    .vital-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+
+    .vital-source {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    .vital-value {
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .vital-num {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-1);
+      line-height: 1;
+    }
+
+    .vital-unit {
+      font-size: 11px;
+      color: var(--text-3);
+      font-weight: 500;
+      margin-left: 2px;
+    }
+
+    .vital-time {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 3px;
+    }
+
+    /* ── Activity feed ───────────────────────────── */
+    .activity-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 13px 18px;
+    }
+
+    .activity-row + .activity-row {
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .activity-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .dot-booked { background: #e0fdf4; }
+    .dot-blocked { background: var(--red-bg); }
+    .dot-approved { background: #eff6ff; }
+
+    .activity-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-1);
+    }
+
+    .activity-meta {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-top: 2px;
+    }
+
+    .activity-time {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 4px;
+    }
+
+    /* ── Empty state ─────────────────────────────── */
+    .empty {
+      padding: 32px 18px;
+      text-align: center;
+    }
+
+    .empty-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin: 0 auto 12px;
+    }
+
+    .empty-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-1);
+      margin-bottom: 4px;
+    }
+
+    .empty-sub {
+      font-size: 12px;
+      color: var(--text-3);
+      line-height: 1.5;
+      max-width: 220px;
+      margin: 0 auto;
+    }
+
+    /* ── Policy section ──────────────────────────── */
+    .policy-section {
+      padding: 12px 16px 4px;
+      border-top: 1px solid var(--border-soft);
+      background: var(--butter);
+    }
+
+    .policy-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--teal);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .policy-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px 0;
+    }
+
+    .policy-row + .policy-row {
+      border-top: 1px solid var(--border-soft);
+    }
+
+    .policy-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-1);
+    }
+
+    .policy-desc {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    /* ── Welcome screen ──────────────────────────── */
+    .welcome-screen {
+      min-height: 844px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px;
+      background: var(--white);
+      gap: 32px;
+    }
+
+    .welcome-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .welcome-logomark {
+      width: 110px;
+      height: 80px;
+      border-radius: 20px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 32px rgba(2,4,61,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+
+    .welcome-logomark img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .welcome-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-1);
+      letter-spacing: -0.5px;
+    }
+
+    .welcome-sub {
+      font-size: 15px;
+      color: var(--text-2);
+      margin-top: 4px;
+    }
+
+    .feature-list {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .feature-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .feature-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .feature-check svg {
+      width: 12px;
+      height: 12px;
+      color: white;
+    }
+
+    .feature-text {
+      font-size: 14px;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+
+    .feature-text strong {
+      color: var(--text-1);
+      font-weight: 600;
+    }
+
+    .welcome-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      background: var(--navy);
+      color: white;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .world-logo { font-size: 18px; }
+
+    .demo-notice {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--orange-bg);
+      border-radius: 8px;
+      border: 1px solid rgba(255,163,80,0.3);
+    }
+
+    .demo-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .demo-text {
+      font-size: 12px;
+      color: #92400e;
+      font-weight: 500;
+    }
+
+    /* ── Divider ─────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Label text ──────────────────────────────── */
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Annotation layer ────────────────────────── */
+    .annotation {
+      position: absolute;
+      right: -160px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .annotation-line {
+      width: 40px;
+      height: 1px;
+      background: #9ca3af;
+    }
+
+    .annotation-text {
+      font-size: 11px;
+      color: #6b7280;
+      white-space: nowrap;
+      font-weight: 500;
+    }
+
+    /* ── Color swatch panel ──────────────────────── */
+    .swatch-panel {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      width: 220px;
+      align-self: flex-start;
+      margin-top: 80px;
+    }
+
+    .swatch-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .swatch-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.06);
+      flex-shrink: 0;
+    }
+
+    .swatch-info { }
+    .swatch-name { font-size: 12px; font-weight: 600; color: #374151; }
+    .swatch-hex { font-size: 11px; color: #9ca3af; font-family: monospace; }
+
+    .swatch-group-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #d1d5db;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 12px 0 6px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 1 — WELCOME
+════════════════════════════════════════════ -->
+<div>
+  <p class="phone-label">Welcome screen</p>
+  <div class="phone">
+    <div class="welcome-screen">
+
+      <div class="welcome-logo">
+        <div class="welcome-logomark">
+          <img src="../public/logo-icon.png" alt="BoMed">
+        </div>
+        <div style="text-align:center">
+          <div class="welcome-title">BoMed</div>
+          <div class="welcome-sub">Patient Identity Portal</div>
+        </div>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature-row">
+          <div class="feature-check">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 6l3 3 5-5"/>
+            </svg>
+          </div>
+          <div class="feature-text"><strong>Proof of personhood</strong> — no passwords, no forms</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-check">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 6l3 3 5-5"/>
+            </svg>
+          </div>
+          <div class="feature-text"><strong>Scoped permissions</strong> — share only what you choose</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-check">
+            <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 6l3 3 5-5"/>
+            </svg>
+          </div>
+          <div class="feature-text"><strong>Instant revocation</strong> — always in control</div>
+        </div>
+      </div>
+
+      <div style="width:100%; display:flex; flex-direction:column; gap:12px;">
+        <button class="welcome-btn">
+          Get started
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </button>
+        <div class="demo-notice">
+          <div class="demo-dot"></div>
+          <span class="demo-text">Demo mode — running outside World App</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 2 — CREATE IDENTITY
+════════════════════════════════════════════ -->
+<div>
+  <p class="phone-label">Create identity</p>
+  <div class="phone">
+    <div class="welcome-screen" style="justify-content:flex-start; padding-top:56px; gap:28px;">
+
+      <!-- Logo + heading -->
+      <div class="welcome-logo" style="gap:12px;">
+        <div class="welcome-logomark" style="width:80px; height:58px;">
+          <img src="../public/logo-icon.png" alt="BoMed">
+        </div>
+        <div style="text-align:center">
+          <div class="welcome-title" style="font-size:24px;">Create your identity</div>
+          <div class="welcome-sub" style="font-size:14px; margin-top:4px;">Your BoMed handle is your address<br>for healthcare permissions</div>
+        </div>
+      </div>
+
+      <!-- Form -->
+      <div style="width:100%; display:flex; flex-direction:column; gap:16px;">
+
+        <!-- Name row -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div>
+            <label style="display:block; font-size:12px; font-weight:600; color:#6b7280; margin-bottom:6px;">First name</label>
+            <div style="padding:11px 14px; background:white; border:1.5px solid #e5e7eb; border-radius:10px; font-size:14px; color:#02043d; font-weight:500;">Alison</div>
+          </div>
+          <div>
+            <label style="display:block; font-size:12px; font-weight:600; color:#6b7280; margin-bottom:6px;">Last name</label>
+            <div style="padding:11px 14px; background:white; border:1.5px solid #e5e7eb; border-radius:10px; font-size:14px; color:#02043d; font-weight:500;">Park</div>
+          </div>
+        </div>
+
+        <!-- Handle -->
+        <div>
+          <label style="display:block; font-size:12px; font-weight:600; color:#6b7280; margin-bottom:6px;">Your @handle</label>
+          <div style="position:relative;">
+            <span style="position:absolute; left:14px; top:50%; transform:translateY(-50%); font-size:14px; font-weight:600; color:#9ca3af;">@</span>
+            <div style="padding:11px 14px 11px 28px; background:white; border:1.5px solid #0d9488; border-radius:10px; font-size:14px; color:#02043d; font-weight:500; box-shadow:0 0 0 3px rgba(13,148,136,0.1);">alisonpark</div>
+          </div>
+          <p style="font-size:12px; color:#9ca3af; margin-top:6px; padding-left:2px;">Auto-filled from your name — you can edit this</p>
+        </div>
+
+        <!-- Divider -->
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="flex:1; height:1px; background:#e5e7eb;"></div>
+          <span style="font-size:11px; color:#9ca3af; font-weight:500;">then verify you're human</span>
+          <div style="flex:1; height:1px; background:#e5e7eb;"></div>
+        </div>
+
+        <!-- Verify & Create button -->
+        <button class="welcome-btn" style="flex-direction:column; gap:4px; padding:16px;">
+          <div style="display:flex; align-items:center; gap:8px; font-size:15px;">
+            <span style="font-size:18px;">⌀</span>
+            Verify &amp; Create with World ID
+          </div>
+          <div style="font-size:11px; font-weight:400; opacity:0.7;">Proves you're a real person — takes ~10 seconds</div>
+        </button>
+
+        <p style="text-align:center; font-size:11px; color:#9ca3af; line-height:1.6;">
+          Your handle is stored on Bolospot.<br>Providers use it to send you permission requests.
+        </p>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SCREEN 3 — DASHBOARD
+════════════════════════════════════════════ -->
+<div>
+  <p class="phone-label">Dashboard (Screen 3)</p>
+  <div class="phone">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-inner">
+        <div class="logo-wrap">
+          <img src="../public/logo-icon.png" alt="BoMed">
+        </div>
+        <div class="header-text">
+          <div class="header-handle">
+            @alisonpark
+            <span class="verified-chip">
+              <svg viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              Verified
+            </span>
+          </div>
+          <div class="header-sub">World ID Patient</div>
+        </div>
+        <div class="header-avatar">AP</div>
+      </div>
+    </div>
+
+    <div class="scroll-area">
+      <div class="content">
+
+        <!-- Pending request alert -->
+        <div class="alert-banner">
+          <div class="alert-dot"></div>
+          <div class="alert-text">
+            <strong>1 permission request</strong> waiting for your review
+          </div>
+        </div>
+
+        <!-- ── Incoming Requests ── -->
+        <div class="card">
+          <div class="card-header" style="padding-bottom:14px;">
+            <span class="card-title">Incoming Requests</span>
+            <span class="count-badge">1 pending</span>
+          </div>
+
+          <div style="padding: 0 14px 14px;">
+            <div class="request-card">
+
+              <div class="request-head">
+                <div class="provider-icon">🏥</div>
+                <div style="flex:1; min-width:0;">
+                  <div class="provider-name">Sunrise Family Clinic</div>
+                  <div class="provider-sub">@sunrise.clinic</div>
+                </div>
+                <span class="status-badge badge-pending">Pending</span>
+              </div>
+
+              <div class="request-reason">
+                Scheduling follow-up care and coordinating your preventive health appointments
+              </div>
+
+              <div class="scopes-section">
+                <div class="scopes-label">Requested access</div>
+
+                <div class="scope-row">
+                  <div class="scope-info">
+                    <div class="scope-icon">📅</div>
+                    <div>
+                      <div class="scope-name">Appointments</div>
+                      <div class="scope-desc">Read & write scheduling</div>
+                    </div>
+                  </div>
+                  <label class="toggle">
+                    <input type="checkbox" checked>
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+
+                <div class="scope-row">
+                  <div class="scope-info">
+                    <div class="scope-icon">👤</div>
+                    <div>
+                      <div class="scope-name">Demographics</div>
+                      <div class="scope-desc">Name, DOB, contact info</div>
+                    </div>
+                  </div>
+                  <label class="toggle">
+                    <input type="checkbox" checked>
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+
+                <div class="scope-row">
+                  <div class="scope-info">
+                    <div class="scope-icon">💊</div>
+                    <div>
+                      <div class="scope-name">Medications</div>
+                      <div class="scope-desc">Current prescriptions</div>
+                    </div>
+                  </div>
+                  <label class="toggle">
+                    <input type="checkbox">
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+
+              </div>
+
+              <!-- Scheduling policy (collapsed preview) -->
+              <div class="policy-section">
+                <div class="policy-title">Scheduling policy</div>
+                <div class="policy-row">
+                  <div>
+                    <div class="policy-label">Auto-approve requests</div>
+                    <div class="policy-desc">Approve appointment requests automatically</div>
+                  </div>
+                  <label class="toggle">
+                    <input type="checkbox">
+                    <span class="toggle-track"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="request-actions">
+                <button class="btn btn-primary">Grant access</button>
+                <button class="btn btn-danger">Deny</button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Active Grants ── -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Active Grants</span>
+            <span class="count-badge">2 active</span>
+          </div>
+          <div class="card-body-flush">
+
+            <div class="grant-row">
+              <div class="grant-avatar" style="background:#f0fdf4;">🦷</div>
+              <div class="grant-details">
+                <div class="grant-name">Westside Dental</div>
+                <div class="grant-scopes">
+                  <span class="scope-tag">appointments</span>
+                  <span class="scope-tag">demographics</span>
+                </div>
+              </div>
+              <button class="btn btn-danger btn-sm">Revoke</button>
+            </div>
+
+            <div class="grant-row" style="border-top: 1px solid var(--border-soft);">
+              <div class="grant-avatar" style="background:#eff6ff;">🔬</div>
+              <div class="grant-details">
+                <div class="grant-name">CityLab Diagnostics</div>
+                <div class="grant-scopes">
+                  <span class="scope-tag">lab:read</span>
+                  <span class="scope-tag muted">demographics</span>
+                </div>
+              </div>
+              <button class="btn btn-danger btn-sm">Revoke</button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── Vitals ── -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Vitals</span>
+            <span style="font-size:11px; color:var(--text-3); font-weight:500;">via Ladybug.bot</span>
+          </div>
+          <div class="card-body-flush">
+
+            <div class="vital-row">
+              <div class="vital-icon">🌡️</div>
+              <div>
+                <div class="vital-label">Temperature</div>
+                <div class="vital-source">Ladybug.bot</div>
+              </div>
+              <div class="vital-value">
+                <div class="vital-num">98.6<span class="vital-unit">°F</span></div>
+                <div class="vital-time">2:14 PM</div>
+              </div>
+            </div>
+
+            <div class="vital-row" style="border-top:1px solid var(--border-soft);">
+              <div class="vital-icon">❤️</div>
+              <div>
+                <div class="vital-label">Heart Rate</div>
+                <div class="vital-source">Ladybug.bot</div>
+              </div>
+              <div class="vital-value">
+                <div class="vital-num">72<span class="vital-unit">bpm</span></div>
+                <div class="vital-time">2:14 PM</div>
+              </div>
+            </div>
+
+            <div class="vital-row" style="border-top:1px solid var(--border-soft);">
+              <div class="vital-icon">🩸</div>
+              <div>
+                <div class="vital-label">Blood Pressure</div>
+                <div class="vital-source">Ladybug.bot</div>
+              </div>
+              <div class="vital-value">
+                <div class="vital-num">118/76<span class="vital-unit">mmHg</span></div>
+                <div class="vital-time">2:10 PM</div>
+              </div>
+            </div>
+
+            <div class="vital-row" style="border-top:1px solid var(--border-soft);">
+              <div class="vital-icon">🫁</div>
+              <div>
+                <div class="vital-label">SpO₂</div>
+                <div class="vital-source">Ladybug.bot</div>
+              </div>
+              <div class="vital-value">
+                <div class="vital-num">98<span class="vital-unit">%</span></div>
+                <div class="vital-time">2:10 PM</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── Agent Activity ── -->
+        <div class="card">
+          <div class="card-header" style="padding-bottom:0;">
+            <span class="card-title">Agent Activity</span>
+            <div style="display:flex;align-items:center;gap:5px;">
+              <div style="width:6px;height:6px;border-radius:50%;background:#10b981;animation:pulse 2s infinite;"></div>
+              <span style="font-size:11px;color:#10b981;font-weight:600;">Live</span>
+            </div>
+          </div>
+          <div class="card-body-flush" style="margin-top:12px;">
+
+            <div class="activity-row">
+              <div class="activity-dot dot-booked">✅</div>
+              <div>
+                <div class="activity-title">Appointment booked</div>
+                <div class="activity-meta">Westside Dental · Fri Apr 4, 10:00 AM</div>
+                <div class="activity-time">Auto-booked · 3 hours ago</div>
+              </div>
+            </div>
+
+            <div class="activity-row" style="border-top:1px solid var(--border-soft);">
+              <div class="activity-dot dot-blocked">🚫</div>
+              <div>
+                <div class="activity-title">Request blocked</div>
+                <div class="activity-meta">Sunrise Family Clinic · outside allowed hours</div>
+                <div class="activity-time">Policy blocked · Yesterday</div>
+              </div>
+            </div>
+
+            <div class="activity-row" style="border-top:1px solid var(--border-soft);">
+              <div class="activity-dot dot-approved">🔔</div>
+              <div>
+                <div class="activity-title">Request auto-approved</div>
+                <div class="activity-meta">CityLab Diagnostics · lab results ready</div>
+                <div class="activity-time">Auto-approved · 2 days ago</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- /content -->
+    </div><!-- /scroll-area -->
+
+  </div><!-- /phone -->
+</div>
+
+<!-- ═══════════════════════════════════════════
+     COLOR SWATCH PANEL
+════════════════════════════════════════════ -->
+<div class="swatch-panel">
+  <div class="swatch-title">Color System</div>
+
+  <div class="swatch-group-label">Brand</div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#02043d;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">Navy</div>
+      <div class="swatch-hex">#02043d</div>
+    </div>
+  </div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:linear-gradient(135deg,#ffa350,#ffce56);"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">Gold gradient</div>
+      <div class="swatch-hex">#ffa350 → #ffce56</div>
+    </div>
+  </div>
+
+  <div class="swatch-group-label">Tertiary</div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#fff8cb; border:1px solid rgba(180,83,9,0.15);"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">Butter</div>
+      <div class="swatch-hex">#fff8cb</div>
+    </div>
+  </div>
+
+  <div class="swatch-group-label">Accent</div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#0d9488;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">Teal</div>
+      <div class="swatch-hex">#0d9488</div>
+    </div>
+  </div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#ccfbf1; border:1px solid #99f6e4;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">Teal light</div>
+      <div class="swatch-hex">#ccfbf1</div>
+    </div>
+  </div>
+
+  <div class="swatch-group-label">Surface</div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#ffffff; border:1px solid #e5e7eb;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">Card</div>
+      <div class="swatch-hex">#ffffff</div>
+    </div>
+  </div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#f4f6fb; border:1px solid #e5e7eb;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">Surface</div>
+      <div class="swatch-hex">#f4f6fb</div>
+    </div>
+  </div>
+
+  <div class="swatch-group-label">Status</div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#dc2626;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">Danger</div>
+      <div class="swatch-hex">#dc2626</div>
+    </div>
+  </div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#d97706;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">Warning</div>
+      <div class="swatch-hex">#d97706</div>
+    </div>
+  </div>
+  <div class="swatch-row">
+    <div class="swatch" style="background:#16a34a;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">Success</div>
+      <div class="swatch-hex">#16a34a</div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px; padding-top:16px; border-top:1px solid #e5e7eb;">
+    <div class="swatch-title">Typography</div>
+    <div style="font-size:12px; color:#6b7280; line-height:1.8;">
+      <div><strong style="color:#374151;">Font:</strong> Inter</div>
+      <div><strong style="color:#374151;">Weights:</strong> 400 · 500 · 600 · 700</div>
+      <div><strong style="color:#374151;">Radius:</strong> 8 · 12 · 16px</div>
+      <div><strong style="color:#374151;">Shadow:</strong> 0 1px 4px rgba(2,4,61,.05)</div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+</style>
+
+</body>
+</html>

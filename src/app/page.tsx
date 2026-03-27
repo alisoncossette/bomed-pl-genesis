@@ -7,44 +7,74 @@ import { AutoBookFeed } from './components/AutoBookFeed'
 import { VitalsCard } from './components/VitalsCard'
 import { DemoPanel } from './components/DemoPanel'
 
-type Step = 'welcome' | 'verifying' | 'handle' | 'dashboard'
+type Step = 'welcome' | 'setup' | 'dashboard'
 
+// ─── Spinner ────────────────────────────────────────────────────────────────
+function Spinner({ dark }: { dark?: boolean }) {
+  return (
+    <div className={`bm-spinner ${dark ? 'bm-spinner-teal' : ''}`} />
+  )
+}
+
+// ─── Logo mark ──────────────────────────────────────────────────────────────
+function LogoMark({ size = 'md' }: { size?: 'sm' | 'md' | 'lg' }) {
+  const dims = size === 'sm' ? 'w-10 h-8' : size === 'lg' ? 'w-28 h-20' : 'w-20 h-14'
+  const pad  = size === 'sm' ? 'p-1' : size === 'lg' ? 'p-3' : 'p-2'
+  return (
+    <div className={`${dims} ${pad} bg-white border border-[#e5e7eb] rounded-xl shadow-sm flex items-center justify-center flex-shrink-0`}>
+      <img src="/logo-icon.png" alt="BoMed" className="w-full h-full object-contain" />
+    </div>
+  )
+}
+
+// ─── Check icon ─────────────────────────────────────────────────────────────
+function CheckIcon() {
+  return (
+    <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"
+      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2 6l3 3 5-5" />
+    </svg>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HOME
+// ═══════════════════════════════════════════════════════════════════════════
 export default function Home() {
-  const [step, setStep] = useState<Step>('welcome')
-  const [verified, setVerified] = useState(false)
+  const [step, setStep]               = useState<Step>('welcome')
+  const [isVerifying, setIsVerifying] = useState(false)
   const [nullifierHash, setNullifierHash] = useState<string | null>(null)
-  const [handle, setHandle] = useState('')
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const [handle, setHandle]           = useState('')
+  const [firstName, setFirstName]     = useState('')
+  const [lastName, setLastName]       = useState('')
   const [handleInput, setHandleInput] = useState('')
   const [handleError, setHandleError] = useState('')
-  const [handleLoading, setHandleLoading] = useState(false)
-  const [isMiniApp, setIsMiniApp] = useState(false)
+  const [isMiniApp, setIsMiniApp]     = useState(false)
 
-  useEffect(() => {
-    setIsMiniApp(MiniKit.isInstalled())
-  }, [])
+  useEffect(() => { setIsMiniApp(MiniKit.isInstalled()) }, [])
 
-  // Auto-generate suggested handle from name (must be at top level, not inside conditional)
   const suggestedHandle = firstName && lastName
     ? `${firstName}${lastName}`.toLowerCase().replace(/\s+/g, '')
     : ''
 
   useEffect(() => {
-    if (suggestedHandle && !handleInput) {
-      setHandleInput(suggestedHandle)
-    }
+    if (suggestedHandle && !handleInput) setHandleInput(suggestedHandle)
   }, [suggestedHandle])
 
-  async function handleVerify() {
-    setStep('verifying')
+  async function handleSetupAndVerify() {
+    if (!handleInput.trim()) {
+      setHandleError('Please choose a handle')
+      return
+    }
+    setHandleError('')
+    setIsVerifying(true)
 
     if (!MiniKit.isInstalled()) {
-      // Dev/demo mode — simulate verification
+      // Dev/demo mode
       await new Promise(r => setTimeout(r, 1500))
-      setNullifierHash('dev_' + Math.random().toString(36).slice(2))
-      setVerified(true)
-      setStep('handle')
+      const devHash = 'dev_' + Math.random().toString(36).slice(2)
+      setNullifierHash(devHash)
+      await createHandle(devHash)
       return
     }
 
@@ -57,61 +87,52 @@ export default function Home() {
       const { finalPayload } = await MiniKit.commandsAsync.verify(verifyPayload)
 
       if (finalPayload.status === 'error') {
-        setStep('welcome')
+        setHandleError('Verification cancelled.')
+        setIsVerifying(false)
         return
       }
 
-      // Verify on backend
       const res = await fetch('/api/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          payload: finalPayload,
-          action: verifyPayload.action,
-        }),
+        body: JSON.stringify({ payload: finalPayload, action: verifyPayload.action }),
       })
 
       const data = await res.json()
 
       if (data.verified) {
         setNullifierHash(data.nullifier_hash)
-        setVerified(true)
-
-        // Check if they already have a handle linked
         if (data.handle) {
+          // Returning user — already has a handle
           setHandle(data.handle)
           setStep('dashboard')
+          setIsVerifying(false)
         } else {
-          setStep('handle')
+          await createHandle(data.nullifier_hash)
         }
       } else {
-        setStep('welcome')
+        setHandleError('Verification failed. Please try again.')
+        setIsVerifying(false)
       }
     } catch {
-      setStep('welcome')
+      setHandleError('Something went wrong. Please try again.')
+      setIsVerifying(false)
     }
   }
 
-  async function handleLinkHandle() {
-    setHandleError('')
-    setHandleLoading(true)
-
+  async function createHandle(hash: string) {
     let cleanHandle = handleInput.startsWith('@') ? handleInput : `@${handleInput}`
+    const baseHandle = cleanHandle.replace(/\d+$/, '')
     let attempt = 0
-    const maxAttempts = 10
-    const baseHandle = cleanHandle.replace(/\d+$/, '') // Remove trailing numbers if any
 
-    while (attempt < maxAttempts) {
+    while (attempt < 10) {
       const tryHandle = attempt === 0 ? cleanHandle : `${baseHandle}${attempt + 1}`
 
       try {
         const res = await fetch('/api/handle/link', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            handle: tryHandle,
-            nullifierHash,
-          }),
+          body: JSON.stringify({ handle: tryHandle, nullifierHash: hash }),
         })
 
         const data = await res.json()
@@ -119,228 +140,206 @@ export default function Home() {
         if (data.success) {
           setHandle(data.handle)
           setStep('dashboard')
+          setIsVerifying(false)
           return
         } else if (data.error?.includes('already exists') || data.error?.includes('taken') || data.error?.includes('conflict')) {
-          // Handle is taken, try next variation
           attempt++
           continue
         } else {
-          // Other error, show it
-          setHandleError(data.error || 'Could not link handle')
-          setHandleLoading(false)
+          setHandleError(data.error || 'Could not create your identity')
+          setIsVerifying(false)
           return
         }
       } catch {
         setHandleError('Network error. Please try again.')
-        setHandleLoading(false)
+        setIsVerifying(false)
         return
       }
     }
 
-    // Tried all variations, still failed
-    setHandleError('Handle is taken. Please try a different one.')
-    setHandleLoading(false)
+    setHandleError('That handle is taken. Please choose a different one.')
+    setIsVerifying(false)
   }
 
-  // Welcome / Verify screen
-  if (step === 'welcome' || step === 'verifying') {
+  // ── WELCOME ──────────────────────────────────────────────────────────────
+  if (step === 'welcome') {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-6 py-10">
-        <div className="w-full max-w-sm mx-auto text-center space-y-10">
-          {/* Logo badge - enhanced with more visual punch */}
-          <div className="space-y-5">
-            <div className="relative inline-block">
-              <div className="absolute inset-0 bg-[#F4A63C]/20 blur-2xl rounded-full scale-150" />
-              <div className="relative w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-white to-[#F0F2F5] p-2 shadow-2xl">
-                <img src="/logo-icon.png" alt="BoMed" className="w-full h-full object-contain" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <h1 className="text-5xl font-extrabold text-white leading-tight tracking-tight">
-                BoMed
-              </h1>
-              <p className="text-lg font-medium text-[#9CA3AF]">Patient Identity Portal</p>
+      <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-12">
+        <div className="w-full max-w-sm mx-auto flex flex-col items-center gap-10">
+
+          {/* Logo + wordmark */}
+          <div className="flex flex-col items-center gap-4">
+            <LogoMark size="lg" />
+            <div className="text-center">
+              <h1 className="text-4xl font-bold text-[#02043d] tracking-tight">BoMed</h1>
+              <p className="text-base text-[#6b7280] mt-1">Patient Identity Portal</p>
             </div>
           </div>
 
-          {/* Explainer Card - improved spacing and hierarchy */}
-          <div className="glass-card p-6 space-y-6">
-            <p className="text-[15px] text-[#D1D5DB] leading-relaxed text-left font-normal">
-              BoMed uses Bolospot to connect your verified identity to your healthcare providers — like Stripe connects your bank to merchants. Your @handle is your address. Providers request access, you approve it. Nothing moves without your say-so.
-            </p>
-            <div className="space-y-4 text-left">
-              <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#F4A63C] flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-white text-xs font-bold">✓</span>
+          {/* Feature list */}
+          <div className="w-full flex flex-col gap-4">
+            {[
+              { title: 'Proof of personhood', desc: 'No passwords, no forms — just you' },
+              { title: 'Scoped permissions', desc: 'Share only exactly what you choose' },
+              { title: 'Instant revocation', desc: 'Always in control of your data' },
+            ].map(f => (
+              <div key={f.title} className="flex items-start gap-3">
+                <div className="w-[22px] h-[22px] rounded-full bg-[#0d9488] flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <CheckIcon />
                 </div>
-                <span className="text-[15px] text-[#D1D5DB] leading-relaxed">Proof of personhood — no passwords</span>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#F4A63C] flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-white text-xs font-bold">✓</span>
+                <div>
+                  <span className="text-sm font-semibold text-[#02043d]">{f.title}</span>
+                  <span className="text-sm text-[#6b7280]"> — {f.desc}</span>
                 </div>
-                <span className="text-[15px] text-[#D1D5DB] leading-relaxed">Scoped permissions — share only what you choose</span>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#F4A63C] flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <span className="text-white text-xs font-bold">✓</span>
-                </div>
-                <span className="text-[15px] text-[#D1D5DB] leading-relaxed">Instant revocation — always in control</span>
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* Verify button - premium design with glow */}
-          <button
-            onClick={handleVerify}
-            disabled={step === 'verifying'}
-            className="w-full px-6 py-4 rounded-xl font-bold text-base text-white bg-gradient-to-r from-[#285661] to-[#3A7D8F] hover:from-[#3A7D8F] hover:to-[#285661] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed btn-glow-teal"
-          >
-            {step === 'verifying' ? (
-              <span className="flex items-center justify-center gap-3">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Verifying identity...
-              </span>
-            ) : (
-              'Verify with World ID'
+          {/* CTA */}
+          <div className="w-full flex flex-col gap-3">
+            <button
+              onClick={() => setStep('setup')}
+              className="bm-btn-primary"
+            >
+              Get started
+              <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none"
+                stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 8h10M9 4l4 4-4 4" />
+              </svg>
+            </button>
+
+            {!isMiniApp && (
+              <div className="demo-notice">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#ffa350]" />
+                <p className="text-xs font-medium text-[#92400e]">
+                  Demo mode — running outside World App
+                </p>
+              </div>
             )}
-          </button>
+          </div>
 
-          {!isMiniApp && (
-            <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#F4A63C]/10 border border-[#F4A63C]/30">
-              <div className="w-2 h-2 rounded-full bg-[#F4A63C] animate-pulse" />
-              <p className="text-xs font-medium text-[#FFB84D]">
-                Demo mode — running outside World App
-              </p>
-            </div>
-          )}
         </div>
       </main>
     )
   }
 
-  // Handle linking screen
-  if (step === 'handle') {
+  // ── SETUP ─────────────────────────────────────────────────────────────────
+  if (step === 'setup') {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-6 py-10">
-        <div className="w-full max-w-sm mx-auto space-y-8">
-          {/* Verified badge - more prominent */}
-          <div className="text-center space-y-5">
-            <div className="relative inline-block">
-              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#F4A63C] to-[#FFB84D] flex items-center justify-center pulse-orange shadow-2xl">
-                <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold text-white">Identity Verified</h2>
-              <p className="text-base font-medium text-[#9CA3AF]">Choose your Bolospot handle</p>
+      <main className="min-h-screen bg-[#f4f6fb] flex flex-col items-center justify-center px-6 py-12">
+        <div className="w-full max-w-sm mx-auto flex flex-col gap-7">
+
+          {/* Header */}
+          <div className="flex flex-col items-center gap-3 text-center">
+            <LogoMark size="md" />
+            <div>
+              <h2 className="text-2xl font-bold text-[#02043d]">Create your identity</h2>
+              <p className="text-sm text-[#6b7280] mt-1">
+                Your BoMed handle is your address<br />for healthcare permissions
+              </p>
             </div>
           </div>
 
-          {/* Name inputs and Handle input */}
-          <div className="glass-card p-6 space-y-6">
-            {/* Name inputs */}
+          {/* Form card */}
+          <div className="bm-card p-5 flex flex-col gap-5">
+
+            {/* Name row */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-semibold text-[#9CA3AF] mb-2">
+                <label className="block text-xs font-semibold text-[#6b7280] mb-1.5">
                   First name
                 </label>
                 <input
                   type="text"
                   value={firstName}
-                  onChange={(e) => {
-                    setFirstName(e.target.value)
-                    setHandleError('')
-                  }}
+                  onChange={e => { setFirstName(e.target.value); setHandleError('') }}
                   placeholder="Alison"
-                  className="w-full px-4 py-3 bg-[#141440] border border-white/10 rounded-lg text-white font-medium placeholder-[#9CA3AF]/40 focus:outline-none focus:border-[#F4A63C] focus:ring-2 focus:ring-[#F4A63C]/20 transition-all"
                   autoFocus
+                  className="bm-input"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-[#9CA3AF] mb-2">
+                <label className="block text-xs font-semibold text-[#6b7280] mb-1.5">
                   Last name
                 </label>
                 <input
                   type="text"
                   value={lastName}
-                  onChange={(e) => {
-                    setLastName(e.target.value)
-                    setHandleError('')
-                  }}
+                  onChange={e => { setLastName(e.target.value); setHandleError('') }}
                   placeholder="Park"
-                  className="w-full px-4 py-3 bg-[#141440] border border-white/10 rounded-lg text-white font-medium placeholder-[#9CA3AF]/40 focus:outline-none focus:border-[#F4A63C] focus:ring-2 focus:ring-[#F4A63C]/20 transition-all"
+                  className="bm-input"
                 />
               </div>
             </div>
 
-            {/* Handle input */}
+            {/* Handle */}
             <div>
-              <label className="block text-sm font-semibold text-[#9CA3AF] mb-2">
+              <label className="block text-xs font-semibold text-[#6b7280] mb-1.5">
                 Your @handle
               </label>
-              <div className="flex gap-2">
-                <div className="flex-1 relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9CA3AF] font-semibold">@</span>
-                  <input
-                    type="text"
-                    value={handleInput}
-                    onChange={(e) => {
-                      setHandleInput(e.target.value.replace(/^@/, ''))
-                      setHandleError('')
-                    }}
-                    placeholder="yourhandle"
-                    className="w-full pl-9 pr-4 py-3 bg-[#141440] border border-white/10 rounded-lg text-white font-medium placeholder-[#9CA3AF]/40 focus:outline-none focus:border-[#F4A63C] focus:ring-2 focus:ring-[#F4A63C]/20 transition-all"
-                  />
-                </div>
+              <div className="relative">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9ca3af]">@</span>
+                <input
+                  type="text"
+                  value={handleInput}
+                  onChange={e => { setHandleInput(e.target.value.replace(/^@/, '')); setHandleError('') }}
+                  placeholder="yourhandle"
+                  className={`bm-input pl-8 ${handleError ? 'error' : ''}`}
+                />
               </div>
-              {handleInput && (
-                <p className="text-sm text-[#9CA3AF] mt-2">
-                  Your handle will be <span className="font-semibold text-[#FFB84D]">@{handleInput}</span> — change it if you like
+              {handleInput && !handleError && (
+                <p className="text-xs text-[#9ca3af] mt-1.5 pl-0.5">
+                  Auto-filled from your name — you can edit this
                 </p>
+              )}
+              {handleError && (
+                <p className="text-xs text-[#dc2626] mt-1.5 pl-0.5 font-medium">{handleError}</p>
               )}
             </div>
 
-            {handleError && (
-              <div className="px-4 py-3 rounded-lg bg-[#ef4444]/10 border border-[#ef4444]/30">
-                <p className="text-sm font-medium text-[#ef4444]">{handleError}</p>
-              </div>
-            )}
+            {/* Divider */}
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-[#e5e7eb]" />
+              <span className="text-xs text-[#9ca3af] font-medium whitespace-nowrap">then verify you&apos;re human</span>
+              <div className="flex-1 h-px bg-[#e5e7eb]" />
+            </div>
 
-            <p className="text-sm text-[#D1D5DB] leading-relaxed">
-              This creates your Bolospot identity, verified by World ID.
-              Healthcare providers will send permission requests here.
-            </p>
+            {/* Verify & Create button */}
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={handleSetupAndVerify}
+                disabled={isVerifying || !handleInput.trim()}
+                className="bm-btn-primary"
+              >
+                {isVerifying ? (
+                  <>
+                    <Spinner />
+                    Verifying identity...
+                  </>
+                ) : (
+                  <>
+                    <span className="text-lg leading-none">⌀</span>
+                    Verify &amp; Create with World ID
+                  </>
+                )}
+              </button>
+              <p className="text-center text-[11px] text-[#9ca3af]">
+                Proves you&apos;re a real person — takes ~10 seconds
+              </p>
+            </div>
+
           </div>
 
-          <button
-            onClick={handleLinkHandle}
-            disabled={!handleInput.trim() || handleLoading}
-            className="w-full px-6 py-4 rounded-xl font-bold text-base text-white bg-gradient-to-r from-[#285661] to-[#3A7D8F] hover:from-[#3A7D8F] hover:to-[#285661] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed btn-glow-teal"
-          >
-            {handleLoading ? (
-              <span className="flex items-center justify-center gap-3">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Creating identity...
-              </span>
-            ) : (
-              'Create & Link Handle'
-            )}
-          </button>
+          <p className="text-center text-[11px] text-[#9ca3af] leading-relaxed px-4">
+            Your handle is stored on Bolospot. Healthcare providers use it to send you permission requests.
+          </p>
+
         </div>
       </main>
     )
   }
 
-  // Dashboard — redirect to dashboard page
+  // ── DASHBOARD ────────────────────────────────────────────────────────────
   if (step === 'dashboard') {
     return <Dashboard handle={handle} nullifierHash={nullifierHash} />
   }
@@ -348,7 +347,9 @@ export default function Home() {
   return null
 }
 
-// Inline dashboard component
+// ═══════════════════════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════════════════════
 function Dashboard({ handle, nullifierHash }: { handle: string; nullifierHash: string | null }) {
   const [showDemo, setShowDemo] = useState(false)
   const [tapCount, setTapCount] = useState(0)
@@ -356,84 +357,124 @@ function Dashboard({ handle, nullifierHash }: { handle: string; nullifierHash: s
   function handleLogoTap() {
     const next = tapCount + 1
     setTapCount(next)
-    if (next >= 5) {
-      setShowDemo(true)
-      setTapCount(0)
-    }
-    // Reset after 2s of no taps
+    if (next >= 5) { setShowDemo(true); setTapCount(0) }
     setTimeout(() => setTapCount(0), 2000)
   }
 
+  const initials = handle
+    .replace('@', '')
+    .slice(0, 2)
+    .toUpperCase()
+
   return (
-    <main className="min-h-screen pb-24">
-      {/* Header - Identity Card Design */}
-      <header className="sticky top-0 z-50 bg-gradient-to-b from-[#141440] to-[#141440]/95 backdrop-blur-xl border-b border-white/12 shadow-lg">
-        <div className="max-w-sm mx-auto px-6 py-5">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="absolute inset-0 bg-[#F4A63C]/30 blur-lg rounded-xl" />
-              <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-white to-[#F0F2F5] p-1.5 cursor-pointer select-none shadow-xl" onClick={handleLogoTap}>
-                <img src="/logo-icon.png" alt="BoMed" className="w-full h-full object-contain" />
-              </div>
+    <main className="min-h-screen bg-[#f4f6fb] pb-10">
+
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-white border-b border-[#e5e7eb] shadow-sm">
+        <div className="max-w-sm mx-auto px-4 py-3 flex items-center gap-3">
+          <div onClick={handleLogoTap} className="cursor-pointer select-none">
+            <LogoMark size="sm" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-bold text-[#02043d] truncate">{handle}</span>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#ffa350] bg-[#fff7ed] border border-[rgba(255,163,80,0.3)] rounded-full px-2 py-0.5 whitespace-nowrap">
+                <svg className="w-2.5 h-2.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                Verified
+              </span>
             </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2">
-                <p className="text-base font-bold text-white">{handle}</p>
-                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#F4A63C]/20 border border-[#F4A63C]/40">
-                  <svg className="w-3 h-3 text-[#FFB84D]" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-xs font-bold text-[#FFB84D]">Verified</span>
-                </div>
-              </div>
-              <p className="text-xs font-medium text-[#9CA3AF] mt-0.5">World ID Patient</p>
-            </div>
+            <p className="text-xs text-[#9ca3af] mt-0.5">World ID Patient</p>
+          </div>
+          <div className="w-9 h-9 rounded-full bg-[#0d9488] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+            {initials}
           </div>
         </div>
       </header>
 
-      <div className="max-w-sm mx-auto px-6 py-8 space-y-6">
-        {/* Agent Activity Feed */}
+      {/* Content */}
+      <div className="max-w-sm mx-auto px-4 py-5 flex flex-col gap-4">
         <AutoBookFeed handle={handle} />
-
-        {/* Pending Requests */}
         <PendingRequests handle={handle} />
-
-        {/* Active Grants */}
         <ActiveGrants handle={handle} />
-
-        {/* Vitals from Ladybug.bot */}
         <VitalsCard handle={handle} />
-
-        {/* Appointments */}
         <Appointments handle={handle} />
       </div>
 
-      {/* Demo panel — tap logo 5x to open */}
       {showDemo && <DemoPanel handle={handle} onClose={() => setShowDemo(false)} />}
     </main>
   )
 }
 
-// Pending bolo requests section
+// ─── Section wrapper ────────────────────────────────────────────────────────
+function Section({
+  title,
+  badge,
+  children,
+  live,
+}: {
+  title: string
+  badge?: string
+  children: React.ReactNode
+  live?: boolean
+}) {
+  return (
+    <section className="bm-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-[#f1f3f8]">
+        <div className="flex items-center gap-2">
+          {live && <div className="w-2 h-2 rounded-full bg-[#0d9488] animate-pulse" />}
+          <h3 className="text-sm font-bold text-[#02043d]">{title}</h3>
+        </div>
+        {badge && (
+          <span className="text-[11px] font-semibold text-[#0d9488] bg-[#ccfbf1] border border-[rgba(13,148,136,0.2)] rounded-full px-2 py-0.5">
+            {badge}
+          </span>
+        )}
+      </div>
+      {children}
+    </section>
+  )
+}
+
+// ─── Loading state ──────────────────────────────────────────────────────────
+function LoadingRows() {
+  return (
+    <div className="flex items-center justify-center gap-2 py-10 text-[#9ca3af]">
+      <div className="bm-spinner bm-spinner-teal" />
+      <span className="text-sm">Loading…</span>
+    </div>
+  )
+}
+
+// ─── Empty state ────────────────────────────────────────────────────────────
+function EmptyState({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
+  return (
+    <div className="flex flex-col items-center py-10 px-6 text-center">
+      <div className="w-11 h-11 rounded-xl bg-[#f4f6fb] flex items-center justify-center mb-3">
+        {icon}
+      </div>
+      <p className="text-sm font-semibold text-[#02043d] mb-1">{title}</p>
+      <p className="text-xs text-[#9ca3af] leading-relaxed max-w-[220px]">{desc}</p>
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PENDING REQUESTS
+// ═══════════════════════════════════════════════════════════════════════════
 function PendingRequests({ handle }: { handle: string }) {
   const [requests, setRequests] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading]   = useState(true)
 
-  useEffect(() => {
-    fetchRequests()
-  }, [handle])
+  useEffect(() => { fetchRequests() }, [handle])
 
   async function fetchRequests() {
     try {
-      const res = await fetch(`/api/requests?handle=${encodeURIComponent(handle)}`)
+      const res  = await fetch(`/api/requests?handle=${encodeURIComponent(handle)}`)
       const data = await res.json()
       setRequests(data.requests || [])
-    } catch {
-      // Silent fail
-    } finally {
-      setLoading(false)
-    }
+    } catch { /* silent */ } finally { setLoading(false) }
   }
 
   async function handleRespond(requestId: string, approved: boolean, scopes: string[], policy?: Policy) {
@@ -444,62 +485,32 @@ function PendingRequests({ handle }: { handle: string }) {
         body: JSON.stringify({ requestId, approved, scopes, handle, policy }),
       })
       fetchRequests()
-    } catch {
-      // Silent fail
-    }
-  }
-
-  if (loading) {
-    return (
-      <section className="glass-card p-6">
-        <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider mb-5">
-          Incoming Requests
-        </h3>
-        <div className="flex items-center justify-center py-8">
-          <div className="flex items-center gap-3">
-            <svg className="animate-spin h-5 w-5 text-[#9CA3AF]" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            <span className="text-sm font-medium text-[#9CA3AF]">Loading requests...</span>
-          </div>
-        </div>
-      </section>
-    )
+    } catch { /* silent */ }
   }
 
   return (
-    <section className="glass-card p-6">
-      <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider mb-5">
-        Incoming Requests
-      </h3>
-      {requests.length === 0 ? (
-        <div className="text-center py-10">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#FFB84D]/10 flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-[#F4A63C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-            </svg>
-          </div>
-          <p className="text-base font-semibold text-white mb-1">All clear</p>
-          <p className="text-sm text-[#9CA3AF]">
-            No pending permission requests
-          </p>
-        </div>
+    <Section
+      title="Incoming Requests"
+      badge={requests.length > 0 ? `${requests.length} pending` : undefined}
+    >
+      {loading ? <LoadingRows /> : requests.length === 0 ? (
+        <EmptyState
+          icon={<svg className="w-5 h-5 text-[#9ca3af]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>}
+          title="All clear"
+          desc="No pending permission requests"
+        />
       ) : (
-        <div className="space-y-4">
-          {requests.map((req) => (
-            <RequestCard
-              key={req.id}
-              request={req}
-              onRespond={handleRespond}
-            />
+        <div className="divide-y divide-[#f1f3f8]">
+          {requests.map(req => (
+            <RequestCard key={req.id} request={req} onRespond={handleRespond} />
           ))}
         </div>
       )}
-    </section>
+    </Section>
   )
 }
 
+// ─── Request card ───────────────────────────────────────────────────────────
 function RequestCard({
   request,
   onRespond,
@@ -507,108 +518,117 @@ function RequestCard({
   request: any
   onRespond: (id: string, approved: boolean, scopes: string[], policy?: Policy) => void
 }) {
-  const [selectedScopes, setSelectedScopes] = useState<Set<string>>(
-    new Set(request.scopes || [])
-  )
-  const [policy, setPolicy] = useState<Policy>(DEFAULT_POLICY)
+  const [selectedScopes, setSelectedScopes] = useState<Set<string>>(new Set(request.scopes || []))
+  const [policy, setPolicy]                 = useState<Policy>(DEFAULT_POLICY)
 
   function toggleScope(scope: string) {
     const next = new Set(selectedScopes)
-    if (next.has(scope)) next.delete(scope)
-    else next.add(scope)
+    next.has(scope) ? next.delete(scope) : next.add(scope)
     setSelectedScopes(next)
   }
 
-  const hasAppointmentScopes = Array.from(selectedScopes).some(
-    (s) => s.startsWith('appointments:')
-  )
+  const hasAppointmentScopes = Array.from(selectedScopes).some(s => s.startsWith('appointments:'))
+
+  function scopeIcon(scope: string) {
+    if (scope.startsWith('appointments')) return '📅'
+    if (scope.startsWith('demographics')) return '👤'
+    if (scope.startsWith('vitals'))       return '💓'
+    if (scope.startsWith('lab'))          return '🔬'
+    if (scope.startsWith('medications'))  return '💊'
+    return '📋'
+  }
 
   return (
-    <div className="relative bg-gradient-to-br from-[#252865] to-[#1E2154] rounded-2xl p-5 border border-white/12 shadow-lg space-y-4 trust-indicator">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <p className="text-base font-bold text-white">{request.fromName || request.fromHandle}</p>
-          </div>
-          <p className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wide">{request.widgetName || request.widget}</p>
+    <div className="p-4 flex flex-col gap-4">
+
+      {/* Provider row */}
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-xl bg-[#e0f2fe] flex items-center justify-center text-xl flex-shrink-0">🏥</div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold text-[#02043d]">{request.fromName || request.fromHandle}</p>
+          <p className="text-xs text-[#9ca3af] mt-0.5">{request.widgetName || request.widget}</p>
         </div>
-        <span className="badge-pending text-xs px-3 py-1.5 rounded-full whitespace-nowrap">
-          Pending
-        </span>
+        <span className="badge-pending text-[11px] px-2.5 py-1 rounded-full whitespace-nowrap">Pending</span>
       </div>
 
+      {/* Reason */}
       {request.reason && (
-        <div className="px-4 py-3 rounded-xl bg-[#141440] border border-white/8">
-          <p className="text-sm text-[#D1D5DB] italic leading-relaxed">&ldquo;{request.reason}&rdquo;</p>
+        <div className="px-3 py-2.5 rounded-lg bg-[#f9fafb] border border-[#f1f3f8]">
+          <p className="text-xs text-[#4b5563] italic leading-relaxed">&ldquo;{request.reason}&rdquo;</p>
         </div>
       )}
 
-      {/* Scope toggles */}
-      <div className="space-y-3">
-        <p className="text-sm text-[#9CA3AF] font-bold uppercase tracking-wide">Requested access:</p>
-        <div className="space-y-2.5">
+      {/* Scopes */}
+      <div>
+        <p className="text-[11px] font-semibold text-[#9ca3af] uppercase tracking-wide mb-2">Requested access</p>
+        <div className="flex flex-col gap-0 divide-y divide-[#f1f3f8]">
           {(request.scopes || []).map((scope: string) => (
-            <label key={scope} className="flex items-center gap-3 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={selectedScopes.has(scope)}
-                onChange={() => toggleScope(scope)}
-                className="accent-[#F4A63C] w-4 h-4 rounded"
-              />
-              <span className="text-sm font-medium text-[#F0F2F5] group-hover:text-white transition-colors">
-                {scope.replace(/[_:]/g, ' ')}
-              </span>
+            <label key={scope} className="flex items-center justify-between py-2.5 cursor-pointer">
+              <div className="flex items-center gap-2.5">
+                <span className="text-base">{scopeIcon(scope)}</span>
+                <div>
+                  <p className="text-sm font-medium text-[#02043d]">
+                    {scope.split(':')[0].charAt(0).toUpperCase() + scope.split(':')[0].slice(1)}
+                  </p>
+                  <p className="text-[11px] text-[#9ca3af]">{scope.replace(/[_:]/g, ' ')}</p>
+                </div>
+              </div>
+              <label className="bm-toggle">
+                <input
+                  type="checkbox"
+                  checked={selectedScopes.has(scope)}
+                  onChange={() => toggleScope(scope)}
+                />
+                <span className="bm-toggle-track" />
+              </label>
             </label>
           ))}
         </div>
       </div>
 
-      {/* Policy controls — shown when appointment scopes are selected */}
+      {/* Policy controls */}
       <PolicyControls
         policy={policy}
         onChange={setPolicy}
         scopeHasAppointments={hasAppointmentScopes}
       />
 
-      {/* Action buttons */}
-      <div className="flex gap-3 pt-2">
+      {/* Actions */}
+      <div className="flex gap-2 pt-1">
         <button
           onClick={() => onRespond(request.id, true, Array.from(selectedScopes), policy)}
           disabled={selectedScopes.size === 0}
-          className="flex-1 px-5 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#285661] to-[#3A7D8F] text-white hover:from-[#3A7D8F] hover:to-[#285661] transition-all shadow-lg disabled:opacity-40 disabled:cursor-not-allowed"
+          className="bm-btn-teal flex-1 text-sm py-2.5"
         >
-          Grant Access
+          Grant access
         </button>
         <button
           onClick={() => onRespond(request.id, false, [])}
-          className="flex-1 px-5 py-3 rounded-xl text-sm font-bold bg-transparent text-[#ef4444] border-2 border-[#ef4444] hover:bg-[#ef4444]/10 transition-all"
+          className="bm-btn-danger"
         >
           Deny
         </button>
       </div>
+
     </div>
   )
 }
 
-// Active grants section
+// ═══════════════════════════════════════════════════════════════════════════
+// ACTIVE GRANTS
+// ═══════════════════════════════════════════════════════════════════════════
 function ActiveGrants({ handle }: { handle: string }) {
-  const [grants, setGrants] = useState<any[]>([])
+  const [grants, setGrants]   = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    fetchGrants()
-  }, [handle])
+  useEffect(() => { fetchGrants() }, [handle])
 
   async function fetchGrants() {
     try {
-      const res = await fetch(`/api/grants?handle=${encodeURIComponent(handle)}`)
+      const res  = await fetch(`/api/grants?handle=${encodeURIComponent(handle)}`)
       const data = await res.json()
       setGrants(data.grants || [])
-    } catch {
-      // Silent fail
-    } finally {
-      setLoading(false)
-    }
+    } catch { /* silent */ } finally { setLoading(false) }
   }
 
   async function handleRevoke(grantId: string) {
@@ -619,160 +639,89 @@ function ActiveGrants({ handle }: { handle: string }) {
         body: JSON.stringify({ grantId, handle }),
       })
       fetchGrants()
-    } catch {
-      // Silent fail
-    }
-  }
-
-  if (loading) {
-    return (
-      <section className="glass-card p-6">
-        <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider mb-5">
-          Active Grants
-        </h3>
-        <div className="flex items-center justify-center py-8">
-          <div className="flex items-center gap-3">
-            <svg className="animate-spin h-5 w-5 text-[#9CA3AF]" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            <span className="text-sm font-medium text-[#9CA3AF]">Loading grants...</span>
-          </div>
-        </div>
-      </section>
-    )
+    } catch { /* silent */ }
   }
 
   return (
-    <section className="glass-card p-6">
-      <div className="flex items-center justify-between mb-5">
-        <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider">
-          Active Grants
-        </h3>
-        {grants.length > 0 && (
-          <span className="text-xs font-bold text-[#285661] bg-[#285661]/20 px-2.5 py-1 rounded-full border border-[#285661]/30">
-            {grants.length} active
-          </span>
-        )}
-      </div>
-      {grants.length === 0 ? (
-        <div className="text-center py-10">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#285661]/10 flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-[#285661]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-            </svg>
-          </div>
-          <p className="text-base font-semibold text-white mb-1">No active grants</p>
-          <p className="text-sm text-[#9CA3AF]">
-            You haven&apos;t shared access with anyone yet
-          </p>
-        </div>
+    <Section
+      title="Active Grants"
+      badge={grants.length > 0 ? `${grants.length} active` : undefined}
+    >
+      {loading ? <LoadingRows /> : grants.length === 0 ? (
+        <EmptyState
+          icon={<svg className="w-5 h-5 text-[#9ca3af]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>}
+          title="No active grants"
+          desc="You haven't shared access with anyone yet"
+        />
       ) : (
-        <div className="space-y-4">
-          {grants.map((grant) => (
-            <div key={grant.id} className="bg-gradient-to-br from-[#252865] to-[#1E2154] rounded-2xl p-5 border border-white/12 shadow-lg space-y-4">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1">
-                  <p className="text-base font-bold text-white mb-1">{grant.granteeHandle}</p>
-                  <p className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wide">{grant.widgetName || grant.widget}</p>
+        <div className="divide-y divide-[#f1f3f8]">
+          {grants.map(grant => (
+            <div key={grant.id} className="p-4 flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#f0fdf4] flex items-center justify-center text-xl flex-shrink-0">🏥</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <p className="text-sm font-bold text-[#02043d] truncate">{grant.granteeHandle}</p>
+                  <span className="badge-granted text-[11px] px-2.5 py-0.5 rounded-full whitespace-nowrap">Active</span>
                 </div>
-                <span className="badge-granted text-xs px-3 py-1.5 rounded-full whitespace-nowrap">
-                  Active
-                </span>
+                <p className="text-xs text-[#9ca3af] mb-2">{grant.widgetName || grant.widget}</p>
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {(grant.scopes || []).map((scope: string) => (
+                    <span key={scope} className="scope-tag">{scope.replace(/[_:]/g, ' ')}</span>
+                  ))}
+                </div>
+                <button
+                  onClick={() => handleRevoke(grant.id)}
+                  className="bm-btn-danger text-xs py-1.5 px-3"
+                >
+                  Revoke access
+                </button>
               </div>
-
-              <div className="flex flex-wrap gap-2">
-                {(grant.scopes || []).map((scope: string) => (
-                  <span key={scope} className="text-xs font-medium bg-[#141440] text-[#9CA3AF] px-3 py-1.5 rounded-lg border border-white/5">
-                    {scope.replace(/[_:]/g, ' ')}
-                  </span>
-                ))}
-              </div>
-
-              <button
-                onClick={() => handleRevoke(grant.id)}
-                className="w-full px-5 py-3 rounded-xl text-sm font-bold text-[#ef4444] bg-transparent border-2 border-[#ef4444] hover:bg-[#ef4444]/10 transition-all"
-              >
-                Revoke Access
-              </button>
             </div>
           ))}
         </div>
       )}
-    </section>
+    </Section>
   )
 }
 
-// Appointments section
+// ═══════════════════════════════════════════════════════════════════════════
+// APPOINTMENTS / MESSAGES
+// ═══════════════════════════════════════════════════════════════════════════
 function Appointments({ handle }: { handle: string }) {
   const [messages, setMessages] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading]   = useState(true)
 
-  useEffect(() => {
-    fetchMessages()
-  }, [handle])
+  useEffect(() => { fetchMessages() }, [handle])
 
   async function fetchMessages() {
     try {
-      const res = await fetch(`/api/relay/inbox?handle=${encodeURIComponent(handle)}`)
+      const res  = await fetch(`/api/relay/inbox?handle=${encodeURIComponent(handle)}`)
       const data = await res.json()
       setMessages(data.messages || [])
-    } catch {
-      // Silent fail
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  if (loading) {
-    return (
-      <section className="glass-card p-6">
-        <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider mb-5">
-          Messages
-        </h3>
-        <div className="flex items-center justify-center py-8">
-          <div className="flex items-center gap-3">
-            <svg className="animate-spin h-5 w-5 text-[#9CA3AF]" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            <span className="text-sm font-medium text-[#9CA3AF]">Loading messages...</span>
-          </div>
-        </div>
-      </section>
-    )
+    } catch { /* silent */ } finally { setLoading(false) }
   }
 
   return (
-    <section className="glass-card p-6">
-      <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider mb-5">
-        Messages &amp; Appointments
-      </h3>
-      {messages.length === 0 ? (
-        <div className="text-center py-10">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#638AC1]/10 flex items-center justify-center mb-4">
-            <svg className="w-8 h-8 text-[#638AC1]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-            </svg>
-          </div>
-          <p className="text-base font-semibold text-white mb-1">No messages</p>
-          <p className="text-sm text-[#9CA3AF]">
-            Appointment confirmations will appear here
-          </p>
-        </div>
+    <Section title="Messages & Appointments">
+      {loading ? <LoadingRows /> : messages.length === 0 ? (
+        <EmptyState
+          icon={<svg className="w-5 h-5 text-[#9ca3af]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>}
+          title="No messages"
+          desc="Appointment confirmations will appear here"
+        />
       ) : (
-        <div className="space-y-4">
-          {messages.map((msg) => (
-            <div key={msg.id} className="bg-gradient-to-br from-[#252865] to-[#1E2154] rounded-2xl p-5 border border-white/12 shadow-lg">
-              <div className="flex items-start justify-between mb-3 gap-3">
-                <p className="text-base font-bold text-white">{msg.senderHandle}</p>
-                <span className="text-xs font-medium text-[#9CA3AF]">
+        <div className="divide-y divide-[#f1f3f8]">
+          {messages.map(msg => (
+            <div key={msg.id} className="p-4">
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <p className="text-sm font-bold text-[#02043d]">{msg.senderHandle}</p>
+                <span className="text-xs text-[#9ca3af] whitespace-nowrap">
                   {new Date(msg.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 </span>
               </div>
-              <p className="text-sm text-[#D1D5DB] leading-relaxed mb-3">{msg.content}</p>
+              <p className="text-sm text-[#4b5563] leading-relaxed mb-2">{msg.content}</p>
               {msg.widgetSlug && (
-                <span className="inline-block text-xs font-medium bg-[#141440] text-[#9CA3AF] px-3 py-1.5 rounded-lg border border-white/5">
+                <span className="text-[11px] font-medium text-[#9ca3af] bg-[#f4f6fb] px-2 py-1 rounded-md">
                   via {msg.widgetSlug}
                 </span>
               )}
@@ -780,6 +729,6 @@ function Appointments({ handle }: { handle: string }) {
           ))}
         </div>
       )}
-    </section>
+    </Section>
   )
 }
