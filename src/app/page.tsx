@@ -45,6 +45,7 @@ export default function Home() {
   const [isVerifying, setIsVerifying] = useState(false)
   const [nullifierHash, setNullifierHash] = useState<string | null>(null)
   const [handle, setHandle]           = useState('')
+  const [boloToken, setBoloToken]     = useState<string | null>(null)
   const [firstName, setFirstName]     = useState('')
   const [lastName, setLastName]       = useState('')
   const [handleInput, setHandleInput] = useState('')
@@ -146,16 +147,19 @@ export default function Home() {
     for (const candidate of candidates) {
       const tryHandle = `@${candidate}`
       try {
+        const displayName = [firstName, lastName].filter(Boolean).join(' ') || candidate
+
         const res = await fetch('/api/handle/link', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ handle: tryHandle, nullifierHash: hash }),
+          body: JSON.stringify({ handle: tryHandle, nullifierHash: hash, displayName }),
         })
 
         const data = await res.json()
 
         if (data.success) {
           setHandle(data.handle)
+          if (data.accessToken) setBoloToken(data.accessToken)
           setStep('dashboard')
           setIsVerifying(false)
           return
