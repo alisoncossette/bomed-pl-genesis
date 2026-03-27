@@ -33,3 +33,8 @@ With BoMed, the request comes through the app. They see your available times, an
 [quiet, deliberate] The technology behind this — permissions, protocols, agents booking appointments — it sounds mundane. It's not. It's the difference between a parent who got through to the doctor in time, and one who didn't.
 
 [pause] BoMed. Built for the moments that matter.
+
+---
+
+[post-credits, casual — after logo fades]
+"Oh — and that appointment you've been putting off? It's already booked. You're welcome."
