@@ -9,37 +9,50 @@
 ## Project 1: BoMed — Patient-Controlled Healthcare Permissions
 
 ### 🎯 One-Liner
-**"World ID meets healthcare: Patients verify once, then control exactly who sees what in their medical records—forever."**
+**"The first healthcare network where identity is sovereign on both sides."**
 
 ### 💔 The Problem
-Your physical therapist needs to book appointments. Do you give them full EMR access? No way. But the only option is "yes to everything" or "share nothing." Meanwhile, healthcare agents are proliferating—scheduling bots, insurance verifiers, care coordinators—and every single one wants database-level access to your chart. Patients need granular control that actually works.
+Healthcare data systems trust no one—or trust everyone. There's no middle ground. Your physical therapist can't book appointments without full EMR access. Your insurance coordinator can't verify coverage without seeing your entire chart. Meanwhile, neither side knows if the other is who they claim to be. Patients fake credentials. Practices fake legitimacy. The trust layer is broken.
 
-### ✅ The Solution
-BoMed is a World App Mini App where patients verify their identity with World ID (orb verification), then manage healthcare permissions through Bolospot's sovereign permission layer.
+### ✅ The Solution: Triple Verification
+BoMed is the first healthcare network where **both sides are triple verified**:
+
+**For patients AND practices:**
+1. **World ID** — Proves you're a real human/org (biometric, one per entity)
+2. **Bolospot** — Proves your identity handle and permission graph (@handle as trust anchor)
+3. **BoMed** — Proves you're a legitimate healthcare participant (patient OR practice)
+
+**The pitch:** *Three layers of trust, zero clipboard. World ID proves you exist. Bolospot proves who you are. BoMed proves you belong in the network. No other healthcare data platform can say that.*
 
 **The flow:**
-1. **Verify** — Open Mini App, prove personhood with World ID
-2. **Link** — Connect your Bolospot @handle (now provably human)
-3. **Manage** — See incoming permission requests from your PT practice
-4. **Control** — Grant scope-level access: ✅ `appointments:read`, ✅ `insurance:write`, ❌ `records:full`
-5. **Revoke** — Instant revocation. No cached tokens. Trust graph updates live.
+1. **Verify** — Both patient AND practice verify via World ID (orb for individuals, custom verification for practices)
+2. **Link** — Connect Bolospot @handle (now provably human/org)
+3. **Activate** — Practice pays to activate BoMed widget (World Pay — WLD/USDC, instant settlement)
+4. **Manage** — Patient sees permission requests from verified practices
+5. **Control** — Grant scope-level access: ✅ `appointments:read`, ✅ `insurance:write`, ❌ `records:full`
+6. **Persist** — Trust follows the @handle, not the software. If practice changes EHR, grants persist.
 
-Permissions follow *people*, not software. Your PT's scheduling agent inherits their @handle. When you revoke access, it's immediate. When they message you (appointment reminders, insurance questions), it goes through the relay—agent-to-agent messaging through your trust boundary.
+**The moat:** Handle-to-handle trust. Not software-to-software. If a practice switches from Epic to Cerner, the trust relationship persists. Grants follow the person, not the app.
 
 ### 🌍 Why Protocol Labs / Why Now
 Protocol Labs is building infrastructure for a future where AI agents are first-class actors. BoMed proves that future needs *permission infrastructure*—not just storage (IPFS) or identity (World ID), but the layer that says "this agent can see this scope, for this person, right now."
 
 Healthcare is the perfect testbed: high stakes, strict compliance (HIPAA), and an explosion of agents. If sovereign permissions work here, they work everywhere.
 
-### 🪪 World ID Angle
-World ID solves the foundational problem: **Is this actually a patient, or a bot pretending to be one?**
+### 🪪 World ID Angle: Trust on Both Sides
+World ID solves the foundational problem for **both participants**: **Is this actually a patient/practice, or a bot/scammer pretending to be one?**
 
-Without orb verification, @handles are just strings. With World ID:
-- **One patient = one @handle** — no bots gaming the system
-- **Sybil resistance** — can't create fake patients to harvest data
-- **Trust anchor** — when a PT sees "verified patient," they know it's real
+**For patients:**
+- Orb verification proves one human = one @handle
+- No bots harvesting data through fake patient accounts
+- Practices see "verified patient" badge and trust it's real
 
-This is the first healthcare permission system built on proof-of-personhood. HIPAA requires identity verification; World ID makes it cryptographic.
+**For practices:**
+- Custom verification proves legitimate healthcare organization
+- No scam clinics harvesting patient data
+- Patients see "verified practice" badge and trust it's legitimate
+
+**The breakthrough:** This is the first healthcare permission system where **both sides are cryptographically verified**. HIPAA requires identity verification; World ID makes it bilateral and cryptographic.
 
 ### 🛠 Tech Stack
 - **Next.js 14** — React framework (matches World's starter kit)
@@ -71,77 +84,93 @@ This is the first healthcare permission system built on proof-of-personhood. HIP
 Total: ~1,200 lines of TypeScript. No existing codebase. Fresh Code track.
 
 ### 🎥 Demo Video Description
-**Title:** "BoMed: Patient-Controlled Healthcare Permissions with World ID"
+**Title:** "BoMed: The First Healthcare Network Where Identity is Sovereign on Both Sides"
 
 **Script (90 seconds):**
-1. **Problem** (0:00-0:15) — "Your PT wants to book appointments. Do you give them full access to your medical records? Probably not. But that's the only option today."
-2. **Solution** (0:15-0:30) — "BoMed lets patients control exactly who sees what. Verify with World ID, link your @handle, grant scoped permissions."
-3. **Demo** (0:30-1:00) — Show: World ID verification → @handle link → permission request from PT → grant `appointments:read` only → revoke instantly
-4. **Why it matters** (1:00-1:30) — "Permissions follow people, not software. Your PT's agent inherits their @handle. When you revoke, it's immediate. This is healthcare built for an AI-native world—starting with proof-of-personhood."
+1. **Problem** (0:00-0:15) — "Healthcare trusts no one—or trusts everyone. Your PT can't book appointments without full EMR access. Neither side knows if the other is legitimate."
+2. **Solution** (0:15-0:35) — "BoMed triple verifies BOTH sides. World ID proves you exist. Bolospot proves who you are. BoMed proves you belong in the network. Patient AND practice—both verified."
+3. **Demo** (0:35-1:05) — Show: Patient World ID verification → Practice org verification → Permission request from verified practice → Grant `appointments:read` only → Practice switches EHR, grants persist → Revoke instantly
+4. **Why it matters** (1:05-1:30) — "Handle-to-handle trust. Not software-to-software. If a practice changes EHR, the trust relationship persists. Grants follow the person, not the app. Three layers of trust, zero clipboard. No other healthcare platform can say that."
 
 ### 📝 Devfolio Short Description (150 chars max)
-**"Patients verify with World ID, then control healthcare permissions at scope-level. Your PT gets appointments, not your full chart. Built on Bolospot."**
+**"Triple verified healthcare: World ID + Bolospot + BoMed. Both patient AND practice verified. Handle-to-handle trust that survives software changes."**
 (149 chars)
 
 ### 📝 Devfolio Long Description (500-800 words)
 
-**The problem healthcare won't admit it has**
+**The trust problem healthcare won't name**
 
-Your physical therapist needs to book appointments. Your insurance coordinator needs to verify coverage. Your care manager needs to check vitals. Do you give them full access to your medical records? Of course not. But the only option today is "yes to everything" or "share nothing."
+Your physical therapist needs to book appointments. Do you give them full EMR access? No. But that's the only option today: "yes to everything" or "share nothing."
 
-Meanwhile, healthcare agents are proliferating. Scheduling bots, insurance verifiers, care coordinators, lab result parsers—every single one wants database-level access to your chart. Patients are stuck choosing between convenience (give everyone access) and privacy (lock everything down).
+Worse: neither side knows if the other is legitimate. Patients can fake credentials. Practices can fake legitimacy. The trust layer is broken. Healthcare data systems trust no one—or trust everyone. There's no middle ground.
 
-**BoMed: Sovereign permissions for healthcare**
+**BoMed: Triple verification, both sides**
 
-BoMed is a World App Mini App where patients verify their identity with World ID, then manage healthcare permissions through Bolospot's sovereign permission layer.
+BoMed is the first healthcare network where **both patient AND practice are triple verified**:
 
-The flow is simple:
-1. **Verify** — Open the Mini App, prove personhood with World ID (orb verification)
-2. **Link** — Connect your Bolospot @handle (now provably human)
-3. **Manage** — See incoming permission requests from your PT practice
-4. **Control** — Grant scope-level access: ✅ `appointments:read`, ✅ `insurance:write`, ❌ `records:full`
-5. **Revoke** — Instant revocation. No cached tokens. Trust graph updates live.
+1. **World ID** — Proves you're a real human/org (biometric, one per entity)
+2. **Bolospot** — Proves your identity handle and permission graph (@handle as trust anchor)
+3. **BoMed** — Proves you're a legitimate healthcare participant (patient OR practice)
 
-**How it works**
+**The pitch:** *Three layers of trust, zero clipboard. World ID proves you exist. Bolospot proves who you are. BoMed proves you belong in the network. No other healthcare data platform can say that.*
 
-Permissions follow *people*, not software. Your PT has a Bolospot @handle. Their scheduling agent inherits that @handle. When you grant `appointments:read` to your PT, their agent can:
-- Read your appointment schedule
+**The flow:**
+
+1. **Verify (both sides)** — Patient verifies via World ID orb. Practice verifies via custom org verification. Both get @handles.
+2. **Activate** — Practice pays to activate BoMed widget (World Pay — WLD/USDC, instant settlement). This isn't freemium; trust costs money.
+3. **Request** — Practice sends permission request to patient's @handle: "I need `appointments:read` and `insurance:write`"
+4. **Control** — Patient sees request from **verified practice**. Grants scope-level access. No full EMR access.
+5. **Persist** — Trust follows the @handle, not the software. Practice switches from Epic to Cerner? Grants persist.
+
+**The moat: Handle-to-handle trust**
+
+This isn't software-to-software integration. It's **person-to-person trust that survives software changes**.
+
+Your PT has a @handle. Their scheduling agent inherits that @handle. When you grant `appointments:read`:
+- The agent can read your appointment schedule
 - Send appointment reminders via relay
 - Request new appointment slots
 
 But the agent **cannot** access your insurance data, lab results, or clinical notes. You control the scope.
 
-When you revoke access, it's immediate. No cached tokens. No "24-48 hours to propagate." The trust graph updates live, and the next API call fails.
+**Crucially:** If your PT switches from Epic to Cerner, the trust relationship persists. The new EHR inherits the same @handle. Grants don't break. This is **the actual IP**.
 
-**Why World ID?**
+**Why World ID on both sides?**
 
-World ID solves the foundational problem: **Is this actually a patient, or a bot pretending to be one?**
+World ID solves the **bilateral trust problem**:
 
-Without orb verification, @handles are just strings. With World ID:
-- **One patient = one @handle** — no bots gaming the system
-- **Sybil resistance** — can't create fake patients to harvest data
-- **Trust anchor** — when a PT sees "verified patient," they know it's real
+**For patients:**
+- Orb verification: one human = one @handle
+- No bots harvesting data through fake patient accounts
+- Practices see "verified patient" badge and trust it's real
 
-This is the first healthcare permission system built on proof-of-personhood. HIPAA requires identity verification; World ID makes it cryptographic.
+**For practices:**
+- Custom org verification: proves legitimate healthcare organization
+- No scam clinics harvesting patient data
+- Patients see "verified practice" badge and trust it's legitimate
 
-**Why Bolospot?**
+**The breakthrough:** This is the first healthcare permission system where **both sides are cryptographically verified**. HIPAA requires identity verification; World ID makes it bilateral and cryptographic.
 
-Bolospot is the missing layer: **a consumer permissioning protocol for AI agents.**
+**Business model: World Pay**
 
-Think email for agents. Your @handle is permanent. You control who can reach you and what they can do. No more "sign in with Google" on 47 different health apps. Your permissions are sovereign—they follow you, not the software vendor.
+Practices pay to activate the BoMed widget. Payment via World Pay (WLD/USDC, instant settlement). Both patient AND practice are World ID verified on Bolospot AND on BoMed.
 
-The key insight: **permissions are conversations.** Your PT requests `appointments:read`. You approve. They message you via relay ("Reminder: PT tomorrow at 2pm"). You revoke when you switch providers. All through one @handle, one trust graph.
+This is a **blueprint for any high-trust vertical**: legal, finance, education. Triple verification + World Pay = sovereign identity meets sovereign transactions.
+
+Think Stripe Connect for identity networks.
 
 **What was built**
 
-Everything. This was built from scratch for PL Genesis (Fresh Code track).
+Everything. Built from scratch for PL Genesis (Fresh Code track).
 
-- World ID Mini App with orb verification flow
+- World ID Mini App with orb verification flow (patients)
+- World ID org verification flow (practices)
 - Permission dashboard (view grants, requests, relay inbox)
 - Granular scope control (8 scopes: appointments, insurance, records, labs, imaging, billing, notes, vitals)
-- Instant revocation (no cached tokens)
+- Instant revocation (no cached tokens, live trust graph)
 - Agent relay (appointment reminders routed through trust boundary)
 - @handle linking (connect verified World ID to Bolospot address)
+- World Pay integration (practice activation via WLD/USDC)
 
 ~1,200 lines of TypeScript. Next.js 14, World ID SDK, @bolospot/sdk, Tailwind CSS 4.
 
@@ -149,11 +178,13 @@ Everything. This was built from scratch for PL Genesis (Fresh Code track).
 
 Healthcare is the perfect testbed for AI-native infrastructure. High stakes, strict compliance (HIPAA), and an explosion of agents. If sovereign permissions work here, they work everywhere.
 
-Protocol Labs is building infrastructure for a future where AI agents are first-class actors. BoMed proves that future needs *permission infrastructure*—not just storage (IPFS) or identity (World ID), but the layer that says "this agent can see this scope, for this person, right now."
+Protocol Labs is building infrastructure for a future where AI agents are first-class actors. BoMed proves that future needs **bilateral trust + permission infrastructure**—not just storage (IPFS) or identity (World ID), but the layer that says:
 
-This is healthcare built for an AI-native world. Starting with proof-of-personhood.
+*"This agent (verified) can see this scope (controlled), for this person (verified), right now (live revocation)."*
 
-**(752 words)**
+This is healthcare built for an AI-native world. Starting with proof-of-personhood. On both sides.
+
+**(797 words)**
 
 ### 🏷 Devfolio Tags
 - World ID
@@ -390,9 +421,11 @@ This is your address for an AI-native world. Permanent. Sovereign. Built on proo
 
 ### BoMed
 - **Fresh Code** — Built from scratch for PL Genesis. ~1,200 lines of TypeScript.
-- **World ID native** — First healthcare permission system built on proof-of-personhood.
-- **Real problem** — Healthcare agents are proliferating. Patients have no granular control.
-- **Protocol Labs angle** — Proves AI-native infrastructure needs permission layers, not just storage/identity.
+- **Triple verification** — First healthcare network where BOTH patient AND practice are verified (World ID + Bolospot + BoMed).
+- **The actual IP** — Handle-to-handle trust that survives software changes. Practice switches EHR? Grants persist.
+- **Business model** — World Pay integration (WLD/USDC). Practices pay to activate. Both sides verified.
+- **Protocol Labs angle** — Proves AI-native infrastructure needs bilateral trust + permission layers, not just storage/identity.
+- **Blueprint for verticals** — Triple verification + World Pay = model for legal, finance, education.
 
 ### Bolospot
 - **Infrastructure play** — Not SaaS. A protocol. Your @handle is portable.
