@@ -53,7 +53,7 @@ async function checkHandleAvailable(handle: string): Promise<boolean> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { handle, nullifierHash, displayName } = await req.json()
+    const { handle, nullifierHash, displayName, email: userEmail } = await req.json()
 
     if (!handle || !nullifierHash) {
       return NextResponse.json(
@@ -73,7 +73,9 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { email, password } = deriveBoloCredentials(nullifierHash)
+    // Use real email if provided, otherwise derive from nullifier
+    const { email: derivedEmail, password } = deriveBoloCredentials(nullifierHash)
+    const email = (userEmail && userEmail.includes('@')) ? userEmail.trim() : derivedEmail
 
     let accessToken: string
     let boloHandle: string

@@ -48,6 +48,7 @@ export default function Home() {
   const [boloToken, setBoloToken]     = useState<string | null>(null)
   const [firstName, setFirstName]     = useState('')
   const [lastName, setLastName]       = useState('')
+  const [email, setEmail]             = useState('')
   const [handleInput, setHandleInput] = useState('')
   const [handleError, setHandleError] = useState('')
   const [isMiniApp, setIsMiniApp]     = useState(false)
@@ -152,7 +153,7 @@ export default function Home() {
         const res = await fetch('/api/handle/link', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ handle: tryHandle, nullifierHash: hash, displayName }),
+          body: JSON.stringify({ handle: tryHandle, nullifierHash: hash, displayName, email: email.trim() || undefined }),
         })
 
         const data = await res.json()
@@ -290,6 +291,23 @@ export default function Home() {
                   className="bm-input"
                 />
               </div>
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-xs font-semibold text-[#6b7280] mb-1.5">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="bm-input w-full"
+              />
+              <p className="text-xs text-[#9ca3af] mt-1.5 pl-0.5">
+                For appointment confirmations and your Bolo account
+              </p>
             </div>
 
             {/* Handle */}
