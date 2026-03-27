@@ -1,62 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getBoloClient } from '@/lib/bolo'
-import { boloFetch } from '@/lib/bolo'
+
+const BASE_URL = process.env.BOLO_API_URL || 'https://api.bolospot.com'
 
 export async function POST(req: NextRequest) {
   try {
     const { requestId, approved, scopes, handle, policy } = await req.json()
+    const boloToken = req.headers.get('x-bolo-token')
 
-    if (!requestId || !handle) {
+    if (!requestId) {
       return NextResponse.json(
-        { success: false, error: 'Request ID and handle required' },
+        { success: false, error: 'Request ID required' },
         { status: 400 }
       )
     }
 
-    if (approved && scopes && scopes.length > 0) {
-      const bolo = getBoloClient()
-
-      // Fetch the original request to get the requester's handle
-      let granteeHandle = ''
-      let widget = 'bomed'
-      try {
-        const request = await boloFetch<{
-          id: string
-          requesterHandle: string
-          widget: string
-        }>(`/access-requests/${requestId}`)
-        granteeHandle = request.requesterHandle
-        widget = request.widget || 'bomed'
-      } catch {
-        // If we can't fetch the request, fall back to the fromHandle passed from client
-        console.warn('Could not fetch request details, using fallback')
-      }
-
-      if (!granteeHandle) {
-        return NextResponse.json(
-          { success: false, error: 'Could not determine requester handle' },
-          { status: 400 }
-        )
-      }
-
-      // Create the grant with the selected scopes and policy metadata
-      const grantNote = policy
-        ? `Approved via BoMed Patient Portal | Policy: ${JSON.stringify(policy)}`
-        : 'Approved via BoMed Patient Portal'
-
-      await bolo.createGrant({
-        granteeHandle,
-        widget,
-        scopes,
-        note: grantNote,
-      })
-
-      return NextResponse.json({ success: true, action: 'granted' })
-    } else {
-      // Deny — acknowledge the request without creating a grant
-      // TODO: Bolospot API should support declining requests directly
-      return NextResponse.json({ success: true, action: 'denied' })
+    if (!boloToken) {
+      return NextResponse.json(
+        { success: false, error: 'Not authenticated' },
+        { status: 401 }
+      )
     }
+
+    // Use PATCH /api/grants/requests/{id} — the real Bolo endpoint
+    const res = await fetch(`${BASE_URL}/api/grants/requests/${requestId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${boloToken}`,
+      },
+      body: JSON.stringify({ approve: approved }),
+    })
+
+    if (!res.ok) {
+      const text = await res.text()
+      console.error('Bolo respond error:', res.status, text)
+      return NextResponse.json(
+        { success: false, error: `Bolo error: ${res.status}` },
+        { status: res.status }
+      )
+    }
+
+    return NextResponse.json({ success: true, action: approved ? 'granted' : 'denied' })
   } catch (error) {
     console.error('Respond error:', error)
     return NextResponse.json(
