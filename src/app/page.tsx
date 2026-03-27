@@ -145,53 +145,64 @@ export default function Home() {
   // Welcome / Verify screen
   if (step === 'welcome' || step === 'verifying') {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-5 py-8">
-        <div className="w-full max-w-sm mx-auto text-center space-y-8">
-          {/* Logo badge */}
-          <div className="space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-xl bg-white p-1.5">
-              <img src="/logo-icon.png" alt="BoMed" className="w-full h-full object-contain" />
+      <main className="min-h-screen flex flex-col items-center justify-center px-6 py-10">
+        <div className="w-full max-w-sm mx-auto text-center space-y-10">
+          {/* Logo badge - enhanced with more visual punch */}
+          <div className="space-y-5">
+            <div className="relative inline-block">
+              <div className="absolute inset-0 bg-[#F4A63C]/20 blur-2xl rounded-full scale-150" />
+              <div className="relative w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-white to-[#F0F2F5] p-2 shadow-2xl">
+                <img src="/logo-icon.png" alt="BoMed" className="w-full h-full object-contain" />
+              </div>
             </div>
-            <div className="space-y-1">
-              <h1 className="text-4xl font-bold text-[#F0F2F5] leading-tight">BoMed</h1>
-              <p className="text-base text-[#9CA3AF]">Patient Portal</p>
+            <div className="space-y-2">
+              <h1 className="text-5xl font-extrabold text-white leading-tight tracking-tight">
+                BoMed
+              </h1>
+              <p className="text-lg font-medium text-[#9CA3AF]">Patient Identity Portal</p>
             </div>
           </div>
 
-          {/* Explainer Card */}
-          <div className="glass-card p-5 space-y-5">
-            <p className="text-base text-[#9CA3AF] leading-relaxed text-left">
+          {/* Explainer Card - improved spacing and hierarchy */}
+          <div className="glass-card p-6 space-y-6">
+            <p className="text-[15px] text-[#D1D5DB] leading-relaxed text-left font-normal">
               BoMed uses Bolospot to connect your verified identity to your healthcare providers — like Stripe connects your bank to merchants. Your @handle is your address. Providers request access, you approve it. Nothing moves without your say-so.
             </p>
-            <div className="space-y-3 text-left text-base">
-              <div className="flex items-start gap-3 text-[#9CA3AF]">
-                <span className="text-[#F4A63C] text-lg">✓</span>
-                <span>Proof of personhood — no passwords</span>
+            <div className="space-y-4 text-left">
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-[#F4A63C] flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-xs font-bold">✓</span>
+                </div>
+                <span className="text-[15px] text-[#D1D5DB] leading-relaxed">Proof of personhood — no passwords</span>
               </div>
-              <div className="flex items-start gap-3 text-[#9CA3AF]">
-                <span className="text-[#F4A63C] text-lg">✓</span>
-                <span>Scoped permissions — share only what you choose</span>
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-[#F4A63C] flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-xs font-bold">✓</span>
+                </div>
+                <span className="text-[15px] text-[#D1D5DB] leading-relaxed">Scoped permissions — share only what you choose</span>
               </div>
-              <div className="flex items-start gap-3 text-[#9CA3AF]">
-                <span className="text-[#F4A63C] text-lg">✓</span>
-                <span>Instant revocation — always in control</span>
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-[#F4A63C] flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <span className="text-white text-xs font-bold">✓</span>
+                </div>
+                <span className="text-[15px] text-[#D1D5DB] leading-relaxed">Instant revocation — always in control</span>
               </div>
             </div>
           </div>
 
-          {/* Verify button */}
+          {/* Verify button - premium design with glow */}
           <button
             onClick={handleVerify}
             disabled={step === 'verifying'}
-            className="w-full px-6 py-3 rounded-lg font-semibold text-sm text-white bg-[#285661] hover:bg-[#1f4550] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-4 rounded-xl font-bold text-base text-white bg-gradient-to-r from-[#285661] to-[#3A7D8F] hover:from-[#3A7D8F] hover:to-[#285661] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed btn-glow-teal"
           >
             {step === 'verifying' ? (
-              <span className="flex items-center justify-center gap-2">
+              <span className="flex items-center justify-center gap-3">
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Verifying...
+                Verifying identity...
               </span>
             ) : (
               'Verify with World ID'
@@ -199,9 +210,12 @@ export default function Home() {
           </button>
 
           {!isMiniApp && (
-            <p className="text-xs text-[#9CA3AF]">
-              Demo mode — running outside World App
-            </p>
+            <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-[#F4A63C]/10 border border-[#F4A63C]/30">
+              <div className="w-2 h-2 rounded-full bg-[#F4A63C] animate-pulse" />
+              <p className="text-xs font-medium text-[#FFB84D]">
+                Demo mode — running outside World App
+              </p>
+            </div>
           )}
         </div>
       </main>
@@ -211,27 +225,29 @@ export default function Home() {
   // Handle linking screen
   if (step === 'handle') {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-5 py-8">
+      <main className="min-h-screen flex flex-col items-center justify-center px-6 py-10">
         <div className="w-full max-w-sm mx-auto space-y-8">
-          {/* Verified badge */}
-          <div className="text-center space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-full bg-[#F4A63C] flex items-center justify-center pulse-orange">
-              <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
+          {/* Verified badge - more prominent */}
+          <div className="text-center space-y-5">
+            <div className="relative inline-block">
+              <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-[#F4A63C] to-[#FFB84D] flex items-center justify-center pulse-orange shadow-2xl">
+                <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
             </div>
-            <div className="space-y-1">
-              <h2 className="text-2xl font-bold text-[#F0F2F5]">Identity Verified</h2>
-              <p className="text-base text-[#9CA3AF]">Choose your Bolospot handle</p>
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold text-white">Identity Verified</h2>
+              <p className="text-base font-medium text-[#9CA3AF]">Choose your Bolospot handle</p>
             </div>
           </div>
 
           {/* Name inputs and Handle input */}
-          <div className="glass-card p-5 space-y-5">
+          <div className="glass-card p-6 space-y-6">
             {/* Name inputs */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+                <label className="block text-sm font-semibold text-[#9CA3AF] mb-2">
                   First name
                 </label>
                 <input
@@ -242,12 +258,12 @@ export default function Home() {
                     setHandleError('')
                   }}
                   placeholder="Alison"
-                  className="w-full px-4 py-3 bg-[#141440] border border-white/10 rounded-lg text-[#F0F2F5] placeholder-[#9CA3AF]/40 focus:outline-none focus:border-[#F4A63C] transition-colors"
+                  className="w-full px-4 py-3 bg-[#141440] border border-white/10 rounded-lg text-white font-medium placeholder-[#9CA3AF]/40 focus:outline-none focus:border-[#F4A63C] focus:ring-2 focus:ring-[#F4A63C]/20 transition-all"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+                <label className="block text-sm font-semibold text-[#9CA3AF] mb-2">
                   Last name
                 </label>
                 <input
@@ -258,19 +274,19 @@ export default function Home() {
                     setHandleError('')
                   }}
                   placeholder="Park"
-                  className="w-full px-4 py-3 bg-[#141440] border border-white/10 rounded-lg text-[#F0F2F5] placeholder-[#9CA3AF]/40 focus:outline-none focus:border-[#F4A63C] transition-colors"
+                  className="w-full px-4 py-3 bg-[#141440] border border-white/10 rounded-lg text-white font-medium placeholder-[#9CA3AF]/40 focus:outline-none focus:border-[#F4A63C] focus:ring-2 focus:ring-[#F4A63C]/20 transition-all"
                 />
               </div>
             </div>
 
             {/* Handle input */}
             <div>
-              <label className="block text-sm font-medium text-[#9CA3AF] mb-2">
+              <label className="block text-sm font-semibold text-[#9CA3AF] mb-2">
                 Your @handle
               </label>
               <div className="flex gap-2">
                 <div className="flex-1 relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9CA3AF]">@</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#9CA3AF] font-semibold">@</span>
                   <input
                     type="text"
                     value={handleInput}
@@ -279,22 +295,24 @@ export default function Home() {
                       setHandleError('')
                     }}
                     placeholder="yourhandle"
-                    className="w-full pl-9 pr-4 py-3 bg-[#141440] border border-white/10 rounded-lg text-[#F0F2F5] placeholder-[#9CA3AF]/40 focus:outline-none focus:border-[#F4A63C] transition-colors"
+                    className="w-full pl-9 pr-4 py-3 bg-[#141440] border border-white/10 rounded-lg text-white font-medium placeholder-[#9CA3AF]/40 focus:outline-none focus:border-[#F4A63C] focus:ring-2 focus:ring-[#F4A63C]/20 transition-all"
                   />
                 </div>
               </div>
               {handleInput && (
                 <p className="text-sm text-[#9CA3AF] mt-2">
-                  Your handle will be @{handleInput} — change it if you like
+                  Your handle will be <span className="font-semibold text-[#FFB84D]">@{handleInput}</span> — change it if you like
                 </p>
               )}
             </div>
 
             {handleError && (
-              <p className="text-sm text-[#ef4444]">{handleError}</p>
+              <div className="px-4 py-3 rounded-lg bg-[#ef4444]/10 border border-[#ef4444]/30">
+                <p className="text-sm font-medium text-[#ef4444]">{handleError}</p>
+              </div>
             )}
 
-            <p className="text-sm text-[#9CA3AF] leading-relaxed">
+            <p className="text-sm text-[#D1D5DB] leading-relaxed">
               This creates your Bolospot identity, verified by World ID.
               Healthcare providers will send permission requests here.
             </p>
@@ -303,9 +321,19 @@ export default function Home() {
           <button
             onClick={handleLinkHandle}
             disabled={!handleInput.trim() || handleLoading}
-            className="w-full px-6 py-3 rounded-lg font-semibold text-sm text-white bg-[#285661] hover:bg-[#1f4550] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-4 rounded-xl font-bold text-base text-white bg-gradient-to-r from-[#285661] to-[#3A7D8F] hover:from-[#3A7D8F] hover:to-[#285661] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed btn-glow-teal"
           >
-            {handleLoading ? 'Creating...' : 'Create & Link Handle'}
+            {handleLoading ? (
+              <span className="flex items-center justify-center gap-3">
+                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Creating identity...
+              </span>
+            ) : (
+              'Create & Link Handle'
+            )}
           </button>
         </div>
       </main>
@@ -338,25 +366,33 @@ function Dashboard({ handle, nullifierHash }: { handle: string; nullifierHash: s
 
   return (
     <main className="min-h-screen pb-24">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-[#141440] border-b border-white/8 px-5 py-4">
-        <div className="max-w-sm mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-white p-1 cursor-pointer select-none" onClick={handleLogoTap}>
-              <img src="/logo-icon.png" alt="BoMed" className="w-full h-full object-contain" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-[#F0F2F5]">{handle}</p>
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#F4A63C]" />
-                <p className="text-xs text-[#F4A63C]">Verified</p>
+      {/* Header - Identity Card Design */}
+      <header className="sticky top-0 z-50 bg-gradient-to-b from-[#141440] to-[#141440]/95 backdrop-blur-xl border-b border-white/12 shadow-lg">
+        <div className="max-w-sm mx-auto px-6 py-5">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="absolute inset-0 bg-[#F4A63C]/30 blur-lg rounded-xl" />
+              <div className="relative w-12 h-12 rounded-xl bg-gradient-to-br from-white to-[#F0F2F5] p-1.5 cursor-pointer select-none shadow-xl" onClick={handleLogoTap}>
+                <img src="/logo-icon.png" alt="BoMed" className="w-full h-full object-contain" />
               </div>
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="text-base font-bold text-white">{handle}</p>
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#F4A63C]/20 border border-[#F4A63C]/40">
+                  <svg className="w-3 h-3 text-[#FFB84D]" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-xs font-bold text-[#FFB84D]">Verified</span>
+                </div>
+              </div>
+              <p className="text-xs font-medium text-[#9CA3AF] mt-0.5">World ID Patient</p>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-sm mx-auto px-5 py-8 space-y-5">
+      <div className="max-w-sm mx-auto px-6 py-8 space-y-6">
         {/* Agent Activity Feed */}
         <AutoBookFeed handle={handle} />
 
@@ -415,28 +451,42 @@ function PendingRequests({ handle }: { handle: string }) {
 
   if (loading) {
     return (
-      <section className="glass-card p-5">
-        <h3 className="text-sm font-semibold text-[#9CA3AF] uppercase tracking-wider mb-4">
+      <section className="glass-card p-6">
+        <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider mb-5">
           Incoming Requests
         </h3>
-        <div className="flex items-center justify-center py-6">
-          <div className="animate-pulse text-sm text-[#9CA3AF]">Loading...</div>
+        <div className="flex items-center justify-center py-8">
+          <div className="flex items-center gap-3">
+            <svg className="animate-spin h-5 w-5 text-[#9CA3AF]" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <span className="text-sm font-medium text-[#9CA3AF]">Loading requests...</span>
+          </div>
         </div>
       </section>
     )
   }
 
   return (
-    <section className="glass-card p-5">
-      <h3 className="text-sm font-semibold text-[#9CA3AF] uppercase tracking-wider mb-4">
+    <section className="glass-card p-6">
+      <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider mb-5">
         Incoming Requests
       </h3>
       {requests.length === 0 ? (
-        <p className="text-sm text-[#9CA3AF] py-4 text-center">
-          No pending requests
-        </p>
+        <div className="text-center py-10">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#FFB84D]/10 flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-[#F4A63C]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            </svg>
+          </div>
+          <p className="text-base font-semibold text-white mb-1">All clear</p>
+          <p className="text-sm text-[#9CA3AF]">
+            No pending permission requests
+          </p>
+        </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {requests.map((req) => (
             <RequestCard
               key={req.id}
@@ -474,37 +524,43 @@ function RequestCard({
   )
 
   return (
-    <div className="bg-[#252865] rounded-xl p-4 border border-white/8 space-y-3">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-[#F0F2F5]">{request.fromName || request.fromHandle}</p>
-          <p className="text-xs text-[#9CA3AF]">{request.widgetName || request.widget}</p>
+    <div className="relative bg-gradient-to-br from-[#252865] to-[#1E2154] rounded-2xl p-5 border border-white/12 shadow-lg space-y-4 trust-indicator">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <p className="text-base font-bold text-white">{request.fromName || request.fromHandle}</p>
+          </div>
+          <p className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wide">{request.widgetName || request.widget}</p>
         </div>
-        <span className="badge-pending text-xs px-2 py-1 rounded-full">
+        <span className="badge-pending text-xs px-3 py-1.5 rounded-full whitespace-nowrap">
           Pending
         </span>
       </div>
 
       {request.reason && (
-        <p className="text-sm text-[#9CA3AF] italic">&ldquo;{request.reason}&rdquo;</p>
+        <div className="px-4 py-3 rounded-xl bg-[#141440] border border-white/8">
+          <p className="text-sm text-[#D1D5DB] italic leading-relaxed">&ldquo;{request.reason}&rdquo;</p>
+        </div>
       )}
 
       {/* Scope toggles */}
-      <div className="space-y-2">
-        <p className="text-sm text-[#9CA3AF] font-medium">Requested access:</p>
-        {(request.scopes || []).map((scope: string) => (
-          <label key={scope} className="flex items-center gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={selectedScopes.has(scope)}
-              onChange={() => toggleScope(scope)}
-              className="accent-[#F4A63C] w-4 h-4"
-            />
-            <span className="text-sm text-[#F0F2F5]">
-              {scope.replace(/[_:]/g, ' ')}
-            </span>
-          </label>
-        ))}
+      <div className="space-y-3">
+        <p className="text-sm text-[#9CA3AF] font-bold uppercase tracking-wide">Requested access:</p>
+        <div className="space-y-2.5">
+          {(request.scopes || []).map((scope: string) => (
+            <label key={scope} className="flex items-center gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                checked={selectedScopes.has(scope)}
+                onChange={() => toggleScope(scope)}
+                className="accent-[#F4A63C] w-4 h-4 rounded"
+              />
+              <span className="text-sm font-medium text-[#F0F2F5] group-hover:text-white transition-colors">
+                {scope.replace(/[_:]/g, ' ')}
+              </span>
+            </label>
+          ))}
+        </div>
       </div>
 
       {/* Policy controls — shown when appointment scopes are selected */}
@@ -515,17 +571,17 @@ function RequestCard({
       />
 
       {/* Action buttons */}
-      <div className="flex gap-2 pt-1">
+      <div className="flex gap-3 pt-2">
         <button
           onClick={() => onRespond(request.id, true, Array.from(selectedScopes), policy)}
           disabled={selectedScopes.size === 0}
-          className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#285661] text-white hover:bg-[#1f4550] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex-1 px-5 py-3 rounded-xl text-sm font-bold bg-gradient-to-r from-[#285661] to-[#3A7D8F] text-white hover:from-[#3A7D8F] hover:to-[#285661] transition-all shadow-lg disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          Grant
+          Grant Access
         </button>
         <button
           onClick={() => onRespond(request.id, false, [])}
-          className="flex-1 px-4 py-2.5 rounded-lg text-sm font-semibold bg-transparent text-[#ef4444] border border-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
+          className="flex-1 px-5 py-3 rounded-xl text-sm font-bold bg-transparent text-[#ef4444] border-2 border-[#ef4444] hover:bg-[#ef4444]/10 transition-all"
         >
           Deny
         </button>
@@ -570,44 +626,64 @@ function ActiveGrants({ handle }: { handle: string }) {
 
   if (loading) {
     return (
-      <section className="glass-card p-5">
-        <h3 className="text-sm font-semibold text-[#9CA3AF] uppercase tracking-wider mb-4">
+      <section className="glass-card p-6">
+        <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider mb-5">
           Active Grants
         </h3>
-        <div className="animate-pulse text-sm text-[#9CA3AF] text-center py-6">Loading...</div>
+        <div className="flex items-center justify-center py-8">
+          <div className="flex items-center gap-3">
+            <svg className="animate-spin h-5 w-5 text-[#9CA3AF]" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <span className="text-sm font-medium text-[#9CA3AF]">Loading grants...</span>
+          </div>
+        </div>
       </section>
     )
   }
 
   return (
-    <section className="glass-card p-5">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-semibold text-[#9CA3AF] uppercase tracking-wider">
+    <section className="glass-card p-6">
+      <div className="flex items-center justify-between mb-5">
+        <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider">
           Active Grants
         </h3>
-        <span className="text-xs text-[#9CA3AF]">{grants.length} active</span>
+        {grants.length > 0 && (
+          <span className="text-xs font-bold text-[#285661] bg-[#285661]/20 px-2.5 py-1 rounded-full border border-[#285661]/30">
+            {grants.length} active
+          </span>
+        )}
       </div>
       {grants.length === 0 ? (
-        <p className="text-sm text-[#9CA3AF] py-4 text-center">
-          No active grants — you haven&#39;t shared access with anyone yet
-        </p>
+        <div className="text-center py-10">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#285661]/10 flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-[#285661]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+          </div>
+          <p className="text-base font-semibold text-white mb-1">No active grants</p>
+          <p className="text-sm text-[#9CA3AF]">
+            You haven&apos;t shared access with anyone yet
+          </p>
+        </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {grants.map((grant) => (
-            <div key={grant.id} className="bg-[#252865] rounded-xl p-4 border border-white/8">
-              <div className="flex items-center justify-between mb-2">
-                <div>
-                  <p className="text-sm font-medium text-[#F0F2F5]">{grant.granteeHandle}</p>
-                  <p className="text-xs text-[#9CA3AF]">{grant.widgetName || grant.widget}</p>
+            <div key={grant.id} className="bg-gradient-to-br from-[#252865] to-[#1E2154] rounded-2xl p-5 border border-white/12 shadow-lg space-y-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <p className="text-base font-bold text-white mb-1">{grant.granteeHandle}</p>
+                  <p className="text-xs font-semibold text-[#9CA3AF] uppercase tracking-wide">{grant.widgetName || grant.widget}</p>
                 </div>
-                <span className="badge-granted text-xs px-2 py-1 rounded-full">
+                <span className="badge-granted text-xs px-3 py-1.5 rounded-full whitespace-nowrap">
                   Active
                 </span>
               </div>
 
-              <div className="flex flex-wrap gap-1.5 mb-3">
+              <div className="flex flex-wrap gap-2">
                 {(grant.scopes || []).map((scope: string) => (
-                  <span key={scope} className="text-xs bg-[#141440] text-[#9CA3AF] px-2 py-1 rounded-lg">
+                  <span key={scope} className="text-xs font-medium bg-[#141440] text-[#9CA3AF] px-3 py-1.5 rounded-lg border border-white/5">
                     {scope.replace(/[_:]/g, ' ')}
                   </span>
                 ))}
@@ -615,7 +691,7 @@ function ActiveGrants({ handle }: { handle: string }) {
 
               <button
                 onClick={() => handleRevoke(grant.id)}
-                className="w-full px-4 py-2 rounded-lg text-sm font-semibold text-[#ef4444] bg-transparent border border-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
+                className="w-full px-5 py-3 rounded-xl text-sm font-bold text-[#ef4444] bg-transparent border-2 border-[#ef4444] hover:bg-[#ef4444]/10 transition-all"
               >
                 Revoke Access
               </button>
@@ -650,37 +726,53 @@ function Appointments({ handle }: { handle: string }) {
 
   if (loading) {
     return (
-      <section className="glass-card p-5">
-        <h3 className="text-sm font-semibold text-[#9CA3AF] uppercase tracking-wider mb-4">
+      <section className="glass-card p-6">
+        <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider mb-5">
           Messages
         </h3>
-        <div className="animate-pulse text-sm text-[#9CA3AF] text-center py-6">Loading...</div>
+        <div className="flex items-center justify-center py-8">
+          <div className="flex items-center gap-3">
+            <svg className="animate-spin h-5 w-5 text-[#9CA3AF]" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+            <span className="text-sm font-medium text-[#9CA3AF]">Loading messages...</span>
+          </div>
+        </div>
       </section>
     )
   }
 
   return (
-    <section className="glass-card p-5">
-      <h3 className="text-sm font-semibold text-[#9CA3AF] uppercase tracking-wider mb-4">
+    <section className="glass-card p-6">
+      <h3 className="text-sm font-bold text-[#9CA3AF] uppercase tracking-wider mb-5">
         Messages &amp; Appointments
       </h3>
       {messages.length === 0 ? (
-        <p className="text-sm text-[#9CA3AF] py-4 text-center">
-          No messages yet
-        </p>
+        <div className="text-center py-10">
+          <div className="w-16 h-16 mx-auto rounded-2xl bg-[#638AC1]/10 flex items-center justify-center mb-4">
+            <svg className="w-8 h-8 text-[#638AC1]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+          </div>
+          <p className="text-base font-semibold text-white mb-1">No messages</p>
+          <p className="text-sm text-[#9CA3AF]">
+            Appointment confirmations will appear here
+          </p>
+        </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {messages.map((msg) => (
-            <div key={msg.id} className="bg-[#252865] rounded-xl p-4 border border-white/8">
-              <div className="flex items-center justify-between mb-1">
-                <p className="text-sm font-medium text-[#F0F2F5]">{msg.senderHandle}</p>
-                <span className="text-xs text-[#9CA3AF]">
-                  {new Date(msg.createdAt).toLocaleDateString()}
+            <div key={msg.id} className="bg-gradient-to-br from-[#252865] to-[#1E2154] rounded-2xl p-5 border border-white/12 shadow-lg">
+              <div className="flex items-start justify-between mb-3 gap-3">
+                <p className="text-base font-bold text-white">{msg.senderHandle}</p>
+                <span className="text-xs font-medium text-[#9CA3AF]">
+                  {new Date(msg.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 </span>
               </div>
-              <p className="text-sm text-[#9CA3AF]">{msg.content}</p>
+              <p className="text-sm text-[#D1D5DB] leading-relaxed mb-3">{msg.content}</p>
               {msg.widgetSlug && (
-                <span className="inline-block mt-2 text-xs bg-[#141440] text-[#9CA3AF] px-2 py-1 rounded">
+                <span className="inline-block text-xs font-medium bg-[#141440] text-[#9CA3AF] px-3 py-1.5 rounded-lg border border-white/5">
                   via {msg.widgetSlug}
                 </span>
               )}

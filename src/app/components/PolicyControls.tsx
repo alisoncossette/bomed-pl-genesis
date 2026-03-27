@@ -36,8 +36,8 @@ export function PolicyControls({
   if (!scopeHasAppointments) return null
 
   return (
-    <div className="space-y-3 pt-2 border-t border-white/5">
-      <p className="text-xs font-medium text-[#285661]">Scheduling Policy</p>
+    <div className="space-y-4 pt-4 border-t border-white/10">
+      <p className="text-xs font-bold text-[#3A7D8F] uppercase tracking-wide">Scheduling Policy</p>
 
       {/* Auto-approve toggle */}
       <ToggleRow
@@ -59,11 +59,11 @@ export function PolicyControls({
 
       {/* Policy details — show when either auto mode is on */}
       {policy.autoApprove && (
-        <div className="space-y-3 pl-2">
+        <div className="space-y-4 pl-2">
           {/* Buffer time */}
           <div>
-            <label className="text-xs text-[#888]">Travel buffer</label>
-            <div className="flex items-center gap-2 mt-1">
+            <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wide mb-2 block">Travel buffer</label>
+            <div className="flex items-center gap-3 mt-2">
               <input
                 type="range"
                 min={0}
@@ -71,9 +71,9 @@ export function PolicyControls({
                 step={15}
                 value={policy.minBufferMinutes}
                 onChange={(e) => onChange({ ...policy, minBufferMinutes: Number(e.target.value) })}
-                className="flex-1 accent-[#285661] h-1"
+                className="flex-1 accent-[#285661] h-2 rounded-full"
               />
-              <span className="text-xs text-white w-14 text-right">
+              <span className="text-xs font-bold text-white w-16 text-right bg-[#141440] px-2.5 py-1.5 rounded-lg">
                 {policy.minBufferMinutes} min
               </span>
             </div>
@@ -81,13 +81,13 @@ export function PolicyControls({
 
           {/* Allowed hours */}
           <div>
-            <label className="text-xs text-[#888]">Allowed hours</label>
-            <div className="flex items-center gap-2 mt-1">
+            <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wide mb-2 block">Allowed hours</label>
+            <div className="flex items-center gap-2 mt-2">
               <TimeSelect
                 value={policy.allowedHoursStart}
                 onChange={(v) => onChange({ ...policy, allowedHoursStart: v })}
               />
-              <span className="text-xs text-[#555]">to</span>
+              <span className="text-xs font-medium text-[#6B7280]">to</span>
               <TimeSelect
                 value={policy.allowedHoursEnd}
                 onChange={(v) => onChange({ ...policy, allowedHoursEnd: v })}
@@ -97,24 +97,24 @@ export function PolicyControls({
 
           {/* Max per week */}
           <div>
-            <label className="text-xs text-[#888]">Max appointments per week</label>
-            <div className="flex items-center gap-2 mt-1">
+            <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wide mb-2 block">Max appointments per week</label>
+            <div className="flex items-center gap-3 mt-2">
               <input
                 type="range"
                 min={1}
                 max={10}
                 value={policy.maxPerWeek}
                 onChange={(e) => onChange({ ...policy, maxPerWeek: Number(e.target.value) })}
-                className="flex-1 accent-[#285661] h-1"
+                className="flex-1 accent-[#285661] h-2 rounded-full"
               />
-              <span className="text-xs text-white w-8 text-right">{policy.maxPerWeek}</span>
+              <span className="text-xs font-bold text-white w-10 text-right bg-[#141440] px-2.5 py-1.5 rounded-lg">{policy.maxPerWeek}</span>
             </div>
           </div>
 
           {/* Allowed days */}
           <div>
-            <label className="text-xs text-[#888]">Allowed days</label>
-            <div className="flex gap-1 mt-1">
+            <label className="text-xs font-bold text-[#9CA3AF] uppercase tracking-wide mb-2 block">Allowed days</label>
+            <div className="flex gap-1.5 mt-2">
               {DAY_LABELS.map((day, i) => (
                 <button
                   key={day}
@@ -124,10 +124,10 @@ export function PolicyControls({
                       : [...policy.allowedDays, i].sort()
                     onChange({ ...policy, allowedDays: next })
                   }}
-                  className={`px-2 py-1 rounded-lg text-xs transition-colors ${
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     policy.allowedDays.includes(i)
-                      ? 'bg-[#285661]/20 text-[#285661] border border-[#285661]/30'
-                      : 'bg-white/5 text-[#555] border border-white/5'
+                      ? 'bg-[#285661]/30 text-[#94C7E0] border border-[#285661]/50 shadow-md'
+                      : 'bg-white/5 text-[#6B7280] border border-white/8'
                   }`}
                 >
                   {day}
@@ -153,19 +153,19 @@ function ToggleRow({
   onChange: (v: boolean) => void
 }) {
   return (
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm text-white">{label}</p>
-        <p className="text-xs text-[#555]">{description}</p>
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex-1">
+        <p className="text-sm font-bold text-white mb-0.5">{label}</p>
+        <p className="text-xs text-[#9CA3AF]">{description}</p>
       </div>
       <button
         onClick={() => onChange(!checked)}
-        className={`relative w-11 h-6 rounded-full transition-colors ${
-          checked ? 'bg-[#285661]' : 'bg-white/10'
+        className={`relative w-12 h-7 rounded-full transition-all shadow-md ${
+          checked ? 'bg-gradient-to-r from-[#285661] to-[#3A7D8F]' : 'bg-white/10'
         }`}
       >
         <span
-          className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform ${
+          className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-lg transition-transform ${
             checked ? 'translate-x-5' : 'translate-x-0'
           }`}
         />
@@ -179,10 +179,10 @@ function TimeSelect({ value, onChange }: { value: number; onChange: (v: number) 
     <select
       value={value}
       onChange={(e) => onChange(Number(e.target.value))}
-      className="bg-white/5 border border-white/10 rounded-lg text-xs text-white px-2 py-1.5 focus:outline-none focus:border-[#285661]/50"
+      className="bg-[#141440] border border-white/10 rounded-lg text-xs font-semibold text-white px-3 py-2 focus:outline-none focus:border-[#285661] focus:ring-2 focus:ring-[#285661]/20 transition-all"
     >
       {Array.from({ length: 24 }, (_, i) => (
-        <option key={i} value={i} className="bg-[#08090d]">
+        <option key={i} value={i} className="bg-[#141440]">
           {i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i - 12} PM`}
         </option>
       ))}
