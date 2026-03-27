@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { MiniKit, VerifyCommandInput, VerificationLevel } from '@worldcoin/minikit-js'
 import { PolicyControls, DEFAULT_POLICY, type Policy } from './components/PolicyControls'
 import { AutoBookFeed } from './components/AutoBookFeed'
 import { VitalsCard } from './components/VitalsCard'
 import { DemoPanel } from './components/DemoPanel'
 
-type Step = 'welcome' | 'setup' | 'dashboard'
+type Step = 'welcome' | 'setup' | 'dashboard' | 'sending-request'
 
 // ─── Spinner ────────────────────────────────────────────────────────────────
 function Spinner({ dark }: { dark?: boolean }) {
@@ -40,7 +41,8 @@ function CheckIcon() {
 // ═══════════════════════════════════════════════════════════════════════════
 // HOME
 // ═══════════════════════════════════════════════════════════════════════════
-export default function Home() {
+function HomeContent() {
+  const searchParams = useSearchParams()
   const [step, setStep]               = useState<Step>('welcome')
   const [isVerifying, setIsVerifying] = useState(false)
   const [nullifierHash, setNullifierHash] = useState<string | null>(null)
@@ -52,8 +54,19 @@ export default function Home() {
   const [handleInput, setHandleInput] = useState('')
   const [handleError, setHandleError] = useState('')
   const [isMiniApp, setIsMiniApp]     = useState(false)
+  const [practiceHandle, setPracticeHandle] = useState<string | null>(null)
+  const [practiceScopes, setPracticeScopes] = useState<string[]>([])
 
   useEffect(() => { setIsMiniApp(MiniKit.isInstalled()) }, [])
+
+  useEffect(() => {
+    const practice = searchParams.get('practice')
+    const scopes = searchParams.get('scopes')
+    if (practice) {
+      setPracticeHandle(practice)
+      setPracticeScopes(scopes ? scopes.split(',') : [])
+    }
+  }, [searchParams])
 
   const suggestedHandle = firstName && lastName
     ? `${firstName}${lastName}`.toLowerCase().replace(/\s+/g, '')
@@ -80,6 +93,30 @@ export default function Home() {
     if (suggestedHandle && !handleInput) setHandleInput(suggestedHandle)
   }, [suggestedHandle])
 
+  async function sendPracticeRequest(userHandle: string, token: string, practice: string, scopes: string[]) {
+    setStep('sending-request')
+
+    const BASE_URL = process.env.NEXT_PUBLIC_BOLO_API_URL || 'https://api.bolospot.com'
+
+    try {
+      await fetch(`${BASE_URL}/api/@${practice}/request`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ scopes }),
+      })
+
+      // Brief delay to show the "sending" state
+      await new Promise(r => setTimeout(r, 1500))
+    } catch (error) {
+      console.error('Failed to send practice request:', error)
+    }
+
+    setStep('dashboard')
+  }
+
   async function handleSetupAndVerify() {
     if (!handleInput.trim()) {
       setHandleError('Please choose a handle')
@@ -98,7 +135,14 @@ export default function Home() {
           setNullifierHash('demo')
           setBoloToken(data.accessToken)
           setHandle(data.handle)
-          setStep('dashboard')
+
+          // If we came from a practice QR code, auto-send the request
+          if (practiceHandle && practiceScopes.length > 0) {
+            await sendPracticeRequest(data.handle, data.accessToken, practiceHandle, practiceScopes)
+          } else {
+            setStep('dashboard')
+          }
+
           setIsVerifying(false)
           return
         }
@@ -136,7 +180,14 @@ export default function Home() {
         if (data.handle) {
           // Returning user — already has a handle
           setHandle(data.handle)
-          setStep('dashboard')
+
+          // If we came from a practice QR code, auto-send the request
+          if (practiceHandle && practiceScopes.length > 0 && boloToken) {
+            await sendPracticeRequest(data.handle, boloToken, practiceHandle, practiceScopes)
+          } else {
+            setStep('dashboard')
+          }
+
           setIsVerifying(false)
         } else {
           await createHandle(data.nullifier_hash)
@@ -173,7 +224,14 @@ export default function Home() {
         if (data.success) {
           setHandle(data.handle)
           if (data.accessToken) setBoloToken(data.accessToken)
-          setStep('dashboard')
+
+          // If we came from a practice QR code, auto-send the request
+          if (practiceHandle && practiceScopes.length > 0) {
+            await sendPracticeRequest(data.handle, data.accessToken, practiceHandle, practiceScopes)
+          } else {
+            setStep('dashboard')
+          }
+
           setIsVerifying(false)
           return
         } else if (data.error?.includes('already exists') || data.error?.includes('taken') || data.error?.includes('conflict')) {
@@ -389,6 +447,28 @@ export default function Home() {
     )
   }
 
+  // ── SENDING REQUEST ──────────────────────────────────────────────────────
+  if (step === 'sending-request') {
+    return (
+      <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-12">
+        <div className="w-full max-w-sm mx-auto flex flex-col items-center gap-6">
+          <LogoMark size="md" />
+          <div className="flex flex-col items-center gap-3 text-center">
+            <Spinner dark />
+            <div>
+              <h2 className="text-xl font-bold text-[#02043d]">
+                Sending request to {practiceHandle ? `@${practiceHandle}` : 'practice'}...
+              </h2>
+              <p className="text-sm text-[#6b7280] mt-1">
+                Your permissions will be ready to grant
+              </p>
+            </div>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
   // ── DASHBOARD ────────────────────────────────────────────────────────────
   if (step === 'dashboard') {
     return <Dashboard handle={handle} nullifierHash={nullifierHash} boloToken={boloToken} />
@@ -445,10 +525,10 @@ function Dashboard({ handle, nullifierHash, boloToken }: { handle: string; nulli
 
       {/* Content */}
       <div className="max-w-sm mx-auto px-4 py-5 flex flex-col gap-4">
-        <AutoBookFeed handle={handle} boloToken={boloToken} />
+        <AutoBookFeed handle={handle} />
         <PendingRequests handle={handle} boloToken={boloToken} />
         <ActiveGrants handle={handle} boloToken={boloToken} />
-        <VitalsCard handle={handle} boloToken={boloToken} />
+        <VitalsCard handle={handle} />
         <Appointments handle={handle} boloToken={boloToken} />
       </div>
 
@@ -790,5 +870,13 @@ function Appointments({ handle, boloToken }: { handle: string; boloToken: string
         </div>
       )}
     </Section>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+      <HomeContent />
+    </Suspense>
   )
 }
