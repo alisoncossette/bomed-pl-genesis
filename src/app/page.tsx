@@ -57,6 +57,23 @@ export default function Home() {
     ? `${firstName}${lastName}`.toLowerCase().replace(/\s+/g, '')
     : ''
 
+  // Priority-ordered handle suggestions when the preferred one is taken
+  function getHandleFallbacks(first: string, last: string): string[] {
+    const f = first.toLowerCase().replace(/\s+/g, '')
+    const l = last.toLowerCase().replace(/\s+/g, '')
+    if (!f || !l) return []
+    return [
+      `${f}${l}`,            // allisonpark
+      `${f[0]}${l}`,         // apark
+      `${f.slice(0,2)}${l}`, // alpark
+      `${f}.${l}`,           // allison.park
+      `${f[0]}.${l}`,        // a.park
+      `${f}${l[0]}`,         // allisonp
+      `${f}${l}1`,
+      `${f}${l}2`,
+    ]
+  }
+
   useEffect(() => {
     if (suggestedHandle && !handleInput) setHandleInput(suggestedHandle)
   }, [suggestedHandle])
@@ -121,13 +138,13 @@ export default function Home() {
   }
 
   async function createHandle(hash: string) {
-    let cleanHandle = handleInput.startsWith('@') ? handleInput : `@${handleInput}`
-    const baseHandle = cleanHandle.replace(/\d+$/, '')
-    let attempt = 0
+    // Build ordered list: user's input first, then smart fallbacks
+    const userInput = handleInput.replace(/^@/, '').toLowerCase().trim()
+    const fallbacks = getHandleFallbacks(firstName, lastName)
+    const candidates = [userInput, ...fallbacks.filter(h => h !== userInput)]
 
-    while (attempt < 10) {
-      const tryHandle = attempt === 0 ? cleanHandle : `${baseHandle}${attempt + 1}`
-
+    for (const candidate of candidates) {
+      const tryHandle = `@${candidate}`
       try {
         const res = await fetch('/api/handle/link', {
           method: 'POST',
@@ -143,8 +160,7 @@ export default function Home() {
           setIsVerifying(false)
           return
         } else if (data.error?.includes('already exists') || data.error?.includes('taken') || data.error?.includes('conflict')) {
-          attempt++
-          continue
+          continue // try next fallback
         } else {
           setHandleError(data.error || 'Could not create your identity')
           setIsVerifying(false)
@@ -277,14 +293,14 @@ export default function Home() {
               <label className="block text-xs font-semibold text-[#6b7280] mb-1.5">
                 Your @handle
               </label>
-              <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#9ca3af]">@</span>
+              <div className={`flex rounded-xl border overflow-hidden transition-all ${handleError ? 'border-[#dc2626] ring-2 ring-[#dc2626]/10' : 'border-[#e5e7eb] focus-within:border-[#0d9488] focus-within:ring-2 focus-within:ring-[#0d9488]/10'}`}>
+                <span className="flex items-center px-3 bg-[#f4f6fb] border-r border-[#e5e7eb] text-sm font-semibold text-[#9ca3af] select-none">@</span>
                 <input
                   type="text"
                   value={handleInput}
                   onChange={e => { setHandleInput(e.target.value.replace(/^@/, '')); setHandleError('') }}
                   placeholder="yourhandle"
-                  className={`bm-input pl-8 ${handleError ? 'error' : ''}`}
+                  className="flex-1 px-3 py-3 bg-white text-sm font-medium text-[#02043d] outline-none placeholder-[#9ca3af]/60"
                 />
               </div>
               {handleInput && !handleError && (

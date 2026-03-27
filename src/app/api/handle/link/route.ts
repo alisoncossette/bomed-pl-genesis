@@ -15,31 +15,21 @@ export async function POST(req: NextRequest) {
     const cleanHandle = handle.replace(/^@/, '').toLowerCase()
     const bolo = getBoloClient()
 
-    // Check if handle exists on Bolospot
+    // Check handle availability on Bolospot (best-effort — don't fail if API is down)
     try {
-      const lookup = await bolo.lookupHandle(cleanHandle)
-      if (!lookup.exists) {
-        // Auto-create the handle with World ID verification
-        try {
-          await boloFetch('/users/create', {
-            method: 'POST',
-            body: {
-              handle: cleanHandle,
-              worldIdNullifier: nullifierHash,
-              isHumanVerified: true,
-              verificationLevel: 'VERIFIED',
-            },
-          })
-        } catch (createError) {
-          console.error('Handle creation error:', createError)
+      const res = await fetch(`${process.env.BOLO_API_URL || 'https://api.bolospot.com'}/api/users/check-handle/${cleanHandle}`)
+      if (res.ok) {
+        const data = await res.json()
+        // If handle is explicitly taken, reject early
+        if (data.available === false) {
           return NextResponse.json(
-            { success: false, error: 'Could not create handle. Please try a different handle or contact support.' },
-            { status: 500 }
+            { success: false, error: 'Handle already exists' },
+            { status: 409 }
           )
         }
       }
     } catch {
-      // If lookup fails, we'll still try to proceed — handle may exist but lookup API may be down
+      // API down — proceed anyway, handle linking still works locally
     }
 
     // TODO: Persist the nullifierHash <-> handle mapping in a database
