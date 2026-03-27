@@ -1,25 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getBoloClient } from '@/lib/bolo'
+
+const BASE_URL = process.env.BOLO_API_URL || 'https://api.bolospot.com'
+const API_KEY = process.env.BOLO_API_KEY || ''
 
 export async function GET(req: NextRequest) {
-  const handle = req.nextUrl.searchParams.get('handle')
+  const boloToken = req.headers.get('x-bolo-token')
 
-  if (!handle) {
-    return NextResponse.json({ messages: [] }, { status: 400 })
-  }
+  // Use patient's JWT if available, fall back to widget API key
+  const headers: Record<string, string> = boloToken
+    ? { Authorization: `Bearer ${boloToken}` }
+    : { 'X-API-Key': API_KEY }
 
   try {
-    const bolo = getBoloClient()
-    const inbox = await bolo.relayInbox()
+    const res = await fetch(`${BASE_URL}/api/relay/inbox`, { headers })
 
-    // Return messages — the relay inbox returns all messages for the authenticated user
-    const messages = (inbox?.messages || []).map((msg: any) => ({
-      id: msg.id,
-      senderHandle: msg.senderHandle ? `@${msg.senderHandle}` : 'Unknown',
-      content: msg.content,
-      widgetSlug: msg.widgetSlug,
-      metadata: msg.metadata,
-      createdAt: msg.createdAt,
+    if (!res.ok) {
+      console.error('Bolo relay/inbox error:', res.status, await res.text())
+      return NextResponse.json({ messages: [] })
+    }
+
+    const data = await res.json()
+    const items = Array.isArray(data) ? data : (data.messages || data.items || [])
+
+    const messages = items.map((m: any) => ({
+      id: m.id,
+      senderHandle: m.senderHandle ? `@${m.senderHandle}` : 'Unknown',
+      content: m.content || m.message || '',
+      widgetSlug: m.widgetSlug || m.widget || '',
+      createdAt: m.createdAt,
     }))
 
     return NextResponse.json({ messages })

@@ -1,31 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { boloFetch } from '@/lib/bolo'
 
-interface Grant {
-  id: string
-  grantorHandle: string
-  granteeHandle: string
-  widget: string
-  scopes: string[]
-  note: string | null
-  isActive: boolean
-  createdAt: string
-  expiresAt: string | null
-}
+const BASE_URL = process.env.BOLO_API_URL || 'https://api.bolospot.com'
 
 export async function GET(req: NextRequest) {
-  const handle = req.nextUrl.searchParams.get('handle')
+  const boloToken = req.headers.get('x-bolo-token')
 
-  if (!handle) {
-    return NextResponse.json({ grants: [] }, { status: 400 })
+  if (!boloToken) {
+    return NextResponse.json({ grants: [] })
   }
 
   try {
-    // Use direct API — list grants sent by this patient
-    const grants = await boloFetch<Grant[]>('/grants?direction=sent')
-    const active = (grants || []).filter((g) => g.isActive)
+    const res = await fetch(`${BASE_URL}/api/grants/given`, {
+      headers: { Authorization: `Bearer ${boloToken}` },
+    })
 
-    return NextResponse.json({ grants: active })
+    if (!res.ok) {
+      console.error('Bolo grants/given error:', res.status, await res.text())
+      return NextResponse.json({ grants: [] })
+    }
+
+    const data = await res.json()
+    const items = Array.isArray(data) ? data : (data.grants || data.items || [])
+
+    const grants = items.map((g: any) => ({
+      id: g.id,
+      granteeHandle: g.granteeHandle ? `@${g.granteeHandle}` : 'Unknown',
+      widget: g.widget,
+      widgetName: g.widgetName || g.widget,
+      scopes: g.scopes || [],
+      expiresAt: g.expiresAt || null,
+      createdAt: g.createdAt,
+    }))
+
+    return NextResponse.json({ grants })
   } catch (error) {
     console.error('Grants fetch error:', error)
     return NextResponse.json({ grants: [] })

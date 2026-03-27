@@ -379,7 +379,7 @@ export default function Home() {
 
   // ── DASHBOARD ────────────────────────────────────────────────────────────
   if (step === 'dashboard') {
-    return <Dashboard handle={handle} nullifierHash={nullifierHash} />
+    return <Dashboard handle={handle} nullifierHash={nullifierHash} boloToken={boloToken} />
   }
 
   return null
@@ -388,7 +388,7 @@ export default function Home() {
 // ═══════════════════════════════════════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════════════════════════════════════
-function Dashboard({ handle, nullifierHash }: { handle: string; nullifierHash: string | null }) {
+function Dashboard({ handle, nullifierHash, boloToken }: { handle: string; nullifierHash: string | null; boloToken: string | null }) {
   const [showDemo, setShowDemo] = useState(false)
   const [tapCount, setTapCount] = useState(0)
 
@@ -433,11 +433,11 @@ function Dashboard({ handle, nullifierHash }: { handle: string; nullifierHash: s
 
       {/* Content */}
       <div className="max-w-sm mx-auto px-4 py-5 flex flex-col gap-4">
-        <AutoBookFeed handle={handle} />
-        <PendingRequests handle={handle} />
-        <ActiveGrants handle={handle} />
-        <VitalsCard handle={handle} />
-        <Appointments handle={handle} />
+        <AutoBookFeed handle={handle} boloToken={boloToken} />
+        <PendingRequests handle={handle} boloToken={boloToken} />
+        <ActiveGrants handle={handle} boloToken={boloToken} />
+        <VitalsCard handle={handle} boloToken={boloToken} />
+        <Appointments handle={handle} boloToken={boloToken} />
       </div>
 
       {showDemo && <DemoPanel handle={handle} onClose={() => setShowDemo(false)} />}
@@ -501,15 +501,17 @@ function EmptyState({ icon, title, desc }: { icon: React.ReactNode; title: strin
 // ═══════════════════════════════════════════════════════════════════════════
 // PENDING REQUESTS
 // ═══════════════════════════════════════════════════════════════════════════
-function PendingRequests({ handle }: { handle: string }) {
+function PendingRequests({ handle, boloToken }: { handle: string; boloToken: string | null }) {
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading]   = useState(true)
 
-  useEffect(() => { fetchRequests() }, [handle])
+  useEffect(() => { fetchRequests() }, [handle, boloToken])
 
   async function fetchRequests() {
     try {
-      const res  = await fetch(`/api/requests?handle=${encodeURIComponent(handle)}`)
+      const headers: Record<string, string> = {}
+      if (boloToken) headers['x-bolo-token'] = boloToken
+      const res  = await fetch(`/api/requests?handle=${encodeURIComponent(handle)}`, { headers })
       const data = await res.json()
       setRequests(data.requests || [])
     } catch { /* silent */ } finally { setLoading(false) }
@@ -517,9 +519,11 @@ function PendingRequests({ handle }: { handle: string }) {
 
   async function handleRespond(requestId: string, approved: boolean, scopes: string[], policy?: Policy) {
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (boloToken) headers['x-bolo-token'] = boloToken
       await fetch('/api/requests/respond', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ requestId, approved, scopes, handle, policy }),
       })
       fetchRequests()
@@ -655,15 +659,17 @@ function RequestCard({
 // ═══════════════════════════════════════════════════════════════════════════
 // ACTIVE GRANTS
 // ═══════════════════════════════════════════════════════════════════════════
-function ActiveGrants({ handle }: { handle: string }) {
+function ActiveGrants({ handle, boloToken }: { handle: string; boloToken: string | null }) {
   const [grants, setGrants]   = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => { fetchGrants() }, [handle])
+  useEffect(() => { fetchGrants() }, [handle, boloToken])
 
   async function fetchGrants() {
     try {
-      const res  = await fetch(`/api/grants?handle=${encodeURIComponent(handle)}`)
+      const headers: Record<string, string> = {}
+      if (boloToken) headers['x-bolo-token'] = boloToken
+      const res  = await fetch(`/api/grants?handle=${encodeURIComponent(handle)}`, { headers })
       const data = await res.json()
       setGrants(data.grants || [])
     } catch { /* silent */ } finally { setLoading(false) }
@@ -671,9 +677,11 @@ function ActiveGrants({ handle }: { handle: string }) {
 
   async function handleRevoke(grantId: string) {
     try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (boloToken) headers['x-bolo-token'] = boloToken
       await fetch('/api/grants/revoke', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ grantId, handle }),
       })
       fetchGrants()
@@ -725,15 +733,17 @@ function ActiveGrants({ handle }: { handle: string }) {
 // ═══════════════════════════════════════════════════════════════════════════
 // APPOINTMENTS / MESSAGES
 // ═══════════════════════════════════════════════════════════════════════════
-function Appointments({ handle }: { handle: string }) {
+function Appointments({ handle, boloToken }: { handle: string; boloToken: string | null }) {
   const [messages, setMessages] = useState<any[]>([])
   const [loading, setLoading]   = useState(true)
 
-  useEffect(() => { fetchMessages() }, [handle])
+  useEffect(() => { fetchMessages() }, [handle, boloToken])
 
   async function fetchMessages() {
     try {
-      const res  = await fetch(`/api/relay/inbox?handle=${encodeURIComponent(handle)}`)
+      const headers: Record<string, string> = {}
+      if (boloToken) headers['x-bolo-token'] = boloToken
+      const res  = await fetch(`/api/relay/inbox?handle=${encodeURIComponent(handle)}`, { headers })
       const data = await res.json()
       setMessages(data.messages || [])
     } catch { /* silent */ } finally { setLoading(false) }
