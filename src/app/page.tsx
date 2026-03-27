@@ -89,8 +89,20 @@ export default function Home() {
     setIsVerifying(true)
 
     if (!MiniKit.isInstalled()) {
-      // Dev/demo mode
+      // Demo mode — log in as the real demo patient account
       await new Promise(r => setTimeout(r, 1500))
+      try {
+        const res = await fetch('/api/demo/login', { method: 'POST' })
+        const data = await res.json()
+        if (data.success) {
+          setNullifierHash('demo')
+          setBoloToken(data.accessToken)
+          setHandle(data.handle)
+          setStep('dashboard')
+          setIsVerifying(false)
+          return
+        }
+      } catch { /* fall through to manual handle creation */ }
       const devHash = 'dev_' + Math.random().toString(36).slice(2)
       setNullifierHash(devHash)
       await createHandle(devHash)
