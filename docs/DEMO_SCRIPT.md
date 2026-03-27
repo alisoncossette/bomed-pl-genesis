@@ -1,4 +1,4 @@
-# BoMed Demo Video — Voiceover Script
+# BoMed Demo Video ï¿½ Voiceover Script
 
 ## Tone guide
 [warm] = personal, relatable
@@ -20,16 +20,16 @@ With BoMed, the request comes through the app. They see your available times, an
 
 [frustrated] And what about the ever changing insurance card. Getting a new job, new insurance, and having to update every single provider separately and remembering to bring the card each time.
 
-[relieved] With BoMed—you update it once in the app. It propagates to every practice you've granted access. Address change? Same. Done once. Everywhere.
+[relieved] With BoMedï¿½you update it once in the app. It propagates to every practice you've granted access. Address change? Same. Done once. Everywhere.
 
-[beat] But is it too complicated for patients? Here's the reality. A new patient walks in and scans the QR code. World ID verifies them instantly—no passwords. They tap grant.
+[beat] But is it too complicated for patients? Here's the reality. A new patient walks in and scans the QR code. World ID verifies them instantlyï¿½no passwords. They tap grant.
 
 [excited] The practice dashboard lights up. Verified insurance, contacts, and calendar arrive before the appointment even begins.
 
-[warm] And this is where the entire room shifts. It's a win for the practice, too—solving problems on both sides of the door. Timely, accurate insurance data means fewer claim rejections and faster reimbursement. No more chasing patients to update expired cards; it propagates automatically. And scheduling around patient availability? That means fewer no-shows and missed appointments. Patients get seen sooner, leading to better care outcomes.
+[warm] And this is where the entire room shifts. It's a win for the practice, tooï¿½solving problems on both sides of the door. Timely, accurate insurance data means fewer claim rejections and faster reimbursement. No more chasing patients to update expired cards; it propagates automatically. And scheduling around patient availability? That means fewer no-shows and missed appointments. Patients get seen sooner, leading to better care outcomes.
 
 [serious] But as the patient, you hold the keys. One tap, and it's gone. No cached copies. No lingering permissions. Always your data, always your call.
 
-Built on Bolospot—an open trust protocol. Any practice. Any vertical.
+[quiet, deliberate] The technology behind this â€” permissions, protocols, agents booking appointments â€” it sounds mundane. It's not. It's the difference between a parent who got through to the doctor in time, and one who didn't.
 
-Grant access once. [pause] Show up.
+[pause] BoMed. Built for the moments that matter.
