@@ -435,6 +435,41 @@ This is your address for an AI-native world. Permanent. Sovereign. Built on proo
 
 ---
 
+## Roadmap
+
+### World ID Native Login on Bolospot
+**Priority: High**
+Currently, World ID patients get a Bolo account via deterministic credentials derived from their nullifier hash (real email collected at signup). The bridge works today, but the long-term vision is native World ID authentication on bolospot.com:
+
+- Patient visits bolospot.com → clicks "Login with World ID"
+- World App verifies → nullifier hash → matched to existing account
+- No email/password required — World ID *is* the key
+- Fully non-custodial identity: the patient controls access via biometric, not a password
+
+This turns World ID into a universal healthcare identity layer — patients log in to any BoMed-compatible practice portal the same way, with the same handle, with no new credentials to manage.
+
+**Dependencies:** Bolospot adds World ID as a first-class auth method (via IDKit or MiniKit callback).
+
+### Appointment Confirmation Add-on
+- Scoped `appointments:confirm` permission
+- Practice agent sends reminders/confirmations via relay
+- AI voice calls (ElevenLabs) for confirmation — no staff needed
+- Tiers: SMS-only → voice → full rescheduling agent
+
+### app.bomed.ai — Web Patient Portal
+- Browser-based version of the World App mini-app
+- IDKit QR code flow for World ID verification on desktop
+- Same Bolospot backend, same @handle system
+- For patients who prefer web over mobile
+
+### Medical Record Storage
+- Extend permissions to `records:read`, `records:share`
+- Patient-controlled medical history, lab results, medications
+- Scoped sharing per provider, per visit
+- Zero-copy: data stays with patient, providers get temporary access
+
+---
+
 ## Post-Submission
 
 After submitting on Devfolio:
