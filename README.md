@@ -10,6 +10,18 @@ Built on Bolospot — an open trust protocol for the AI age.
 
 ---
 
+## Screenshots
+
+| Login | Verify | App |
+|-------|--------|-----|
+| ![Login](docs/bomed%20login.png) | ![Verify](docs/bomed%20verify.png) | ![App](docs/bomed%20app.png) |
+
+| Dashboard (before) | Dashboard (after) | Agent Activity |
+|--------------------|-------------------|----------------|
+| ![Dashboard Before](docs/Dashboard%20Before.png) | ![Dashboard After](docs/Dashboard%20After.png) | ![Agent Activity](docs/agent%20activity.png) |
+
+---
+
 ## The Problem
 
 Healthcare data infrastructure is broken — not because the medicine is bad, but because the data layer is a disaster. Patients repeat themselves at every office visit. Insurance cards get lost. Records don't follow people. Providers waste hours on administrative overhead before a single diagnosis is made.
