@@ -8,8 +8,6 @@ BoMed puts patients in control of their healthcare identity. Scan a QR code, ver
 
 Built on Bolospot — an open trust protocol for the AI age.
 
-<img src="docs/bomed%20world.png" width="480" alt="BoMed — Patient Identity for the AI Age" />
-
 ---
 
 ## The Problem
