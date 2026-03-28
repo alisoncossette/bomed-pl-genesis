@@ -8,7 +8,7 @@ BoMed puts patients in control of their healthcare identity. Scan a QR code, ver
 
 Built on Bolospot — an open trust protocol for the AI age.
 
-<img src="docs/bomed%20world.png" width="600" alt="BoMed — Patient Identity for the AI Age" />
+<img src="docs/bomed%20world.png" width="480" alt="BoMed — Patient Identity for the AI Age" />
 
 ---
 
@@ -28,18 +28,18 @@ BoMed gives every patient a permanent health identity. Not tied to a hospital. N
 
 1. **Verify** — Prove personhood with World ID (orb verification). You're a real, unique human — not a bot, not a duplicate.
 
-   <img src="docs/bomed%20login.png" width="300" alt="Login screen" /> <img src="docs/bomed%20verify.png" width="300" alt="World ID verification" />
+   <img src="docs/bomed%20login.png" width="220" alt="Login screen" /> <img src="docs/bomed%20verify.png" width="220" alt="World ID verification" />
 
 2. **Link** — Connect your Bolospot @handle. Your permanent health address.
 3. **Manage** — See incoming permission requests from providers.
 4. **Control** — Granular scope-level consent: ✅ appointments, ✅ insurance, ❌ full records.
 5. **Revoke** — Instant, complete revocation. Not eventually. Now.
 
-   <img src="docs/bomed%20app.png" width="300" alt="Patient app — grants and permissions" />
+   <img src="docs/bomed%20app.png" width="220" alt="Patient app — grants and permissions" />
 
 On the provider side, a live dashboard populates in real time with verified patient data before the appointment begins. When insurance changes, patients update it once — it propagates everywhere. When the visit ends, one tap removes access entirely.
 
-<img src="docs/Dashboard%20Before.png" width="420" alt="Provider dashboard — awaiting patient" /> <img src="docs/Dashboard%20After.png" width="420" alt="Provider dashboard — patient verified" />
+<img src="docs/Dashboard%20Before.png" width="340" alt="Provider dashboard — awaiting patient" /> <img src="docs/Dashboard%20After.png" width="340" alt="Provider dashboard — patient verified" />
 
 ---
 
@@ -99,7 +99,7 @@ The same primitives that let a patient control who sees their insurance card wil
 
 **The protocol is the product. BoMed is the proof.**
 
-<img src="docs/agent%20activity.png" width="600" alt="AI agent activity — automated appointment booking" />
+<img src="docs/agent%20activity.png" width="480" alt="AI agent activity — automated appointment booking" />
 
 ### Why World ID
 
