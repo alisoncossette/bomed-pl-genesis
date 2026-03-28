@@ -8,24 +8,7 @@ BoMed puts patients in control of their healthcare identity. Scan a QR code, ver
 
 Built on Bolospot — an open trust protocol for the AI age.
 
----
-
-## Screenshots
-
-**Patient flow**
-
-![Login](docs/bomed%20login.png)
-![Verify](docs/bomed%20verify.png)
-![App](docs/bomed%20app.png)
-
-**Provider dashboard**
-
-![Dashboard Before](docs/Dashboard%20Before.png)
-![Dashboard After](docs/Dashboard%20After.png)
-
-**Agent activity**
-
-![Agent Activity](docs/agent%20activity.png)
+<img src="docs/bomed%20world.png" width="600" alt="BoMed — Patient Identity for the AI Age" />
 
 ---
 
@@ -44,12 +27,19 @@ Hospitals own your records. Insurers own your claims. Apps own your data. The pa
 BoMed gives every patient a permanent health identity. Not tied to a hospital. Not owned by an insurer. **Theirs.**
 
 1. **Verify** — Prove personhood with World ID (orb verification). You're a real, unique human — not a bot, not a duplicate.
+
+   <img src="docs/bomed%20login.png" width="300" alt="Login screen" /> <img src="docs/bomed%20verify.png" width="300" alt="World ID verification" />
+
 2. **Link** — Connect your Bolospot @handle. Your permanent health address.
 3. **Manage** — See incoming permission requests from providers.
 4. **Control** — Granular scope-level consent: ✅ appointments, ✅ insurance, ❌ full records.
 5. **Revoke** — Instant, complete revocation. Not eventually. Now.
 
+   <img src="docs/bomed%20app.png" width="300" alt="Patient app — grants and permissions" />
+
 On the provider side, a live dashboard populates in real time with verified patient data before the appointment begins. When insurance changes, patients update it once — it propagates everywhere. When the visit ends, one tap removes access entirely.
+
+<img src="docs/Dashboard%20Before.png" width="420" alt="Provider dashboard — awaiting patient" /> <img src="docs/Dashboard%20After.png" width="420" alt="Provider dashboard — patient verified" />
 
 ---
 
@@ -108,6 +98,8 @@ The same primitives that let a patient control who sees their insurance card wil
 - Let anyone set the terms for how they're reached, accessed, and represented in an AI-powered world
 
 **The protocol is the product. BoMed is the proof.**
+
+<img src="docs/agent%20activity.png" width="600" alt="AI agent activity — automated appointment booking" />
 
 ### Why World ID
 
