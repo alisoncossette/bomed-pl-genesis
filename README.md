@@ -12,13 +12,20 @@ Built on Bolospot — an open trust protocol for the AI age.
 
 ## Screenshots
 
-| Login | Verify | App |
-|-------|--------|-----|
-| ![Login](docs/bomed%20login.png) | ![Verify](docs/bomed%20verify.png) | ![App](docs/bomed%20app.png) |
+**Patient flow**
 
-| Dashboard (before) | Dashboard (after) | Agent Activity |
-|--------------------|-------------------|----------------|
-| ![Dashboard Before](docs/Dashboard%20Before.png) | ![Dashboard After](docs/Dashboard%20After.png) | ![Agent Activity](docs/agent%20activity.png) |
+![Login](docs/bomed%20login.png)
+![Verify](docs/bomed%20verify.png)
+![App](docs/bomed%20app.png)
+
+**Provider dashboard**
+
+![Dashboard Before](docs/Dashboard%20Before.png)
+![Dashboard After](docs/Dashboard%20After.png)
+
+**Agent activity**
+
+![Agent Activity](docs/agent%20activity.png)
 
 ---
 
