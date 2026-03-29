@@ -471,7 +471,8 @@ function HomeContent() {
 
   // ── DASHBOARD ────────────────────────────────────────────────────────────
   if (step === 'dashboard') {
-    return <Dashboard handle={handle} nullifierHash={nullifierHash} boloToken={boloToken} />
+    const isDemoMode = !MiniKit.isInstalled()
+    return <Dashboard handle={handle} nullifierHash={nullifierHash} boloToken={boloToken} isDemoMode={isDemoMode} onSignOut={() => setStep('welcome')} />
   }
 
   return null
@@ -493,7 +494,7 @@ function decodeQR(imageData: ImageData): string | null {
 // ═══════════════════════════════════════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════════════════════════════════════
-function Dashboard({ handle, nullifierHash, boloToken }: { handle: string; nullifierHash: string | null; boloToken: string | null }) {
+function Dashboard({ handle, nullifierHash, boloToken, isDemoMode, onSignOut }: { handle: string; nullifierHash: string | null; boloToken: string | null; isDemoMode: boolean; onSignOut: () => void }) {
   const [showDemo, setShowDemo] = useState(false)
   const [tapCount, setTapCount] = useState(0)
 
@@ -530,18 +531,34 @@ function Dashboard({ handle, nullifierHash, boloToken }: { handle: string; nulli
             </div>
             <p className="text-xs text-[#9ca3af] mt-0.5">World ID Patient</p>
           </div>
-          <div className="w-9 h-9 rounded-full bg-[#0d9488] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+          <button
+            onClick={onSignOut}
+            className="w-9 h-9 rounded-full bg-[#0d9488] hover:bg-[#0f766e] transition-colors flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+            title="Sign out"
+          >
             {initials}
-          </div>
+          </button>
         </div>
       </header>
 
+      {/* Demo mode banner */}
+      {isDemoMode && (
+        <div className="max-w-sm mx-auto px-4 pt-4">
+          <div className="demo-notice">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#ffa350]" />
+            <p className="text-xs font-medium text-[#92400e]">
+              🎭 DEMO MODE — tap sign out to reset
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       <div className="max-w-sm mx-auto px-4 py-5 flex flex-col gap-4">
-        <AutoBookFeed handle={handle} />
-        <ConnectPractice handle={handle} boloToken={boloToken} />
-        <PendingRequests handle={handle} boloToken={boloToken} />
-        <ActiveGrants handle={handle} boloToken={boloToken} />
+        <AutoBookFeed handle={handle} isDemoMode={isDemoMode} />
+        <ConnectPractice handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
+        <PendingRequests handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
+        <ActiveGrants handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
         <VitalsCard handle={handle} />
         <Appointments handle={handle} boloToken={boloToken} />
       </div>
@@ -607,7 +624,7 @@ function EmptyState({ icon, title, desc }: { icon: React.ReactNode; title: strin
 // ═══════════════════════════════════════════════════════════════════════════
 // CONNECT PRACTICE
 // ═══════════════════════════════════════════════════════════════════════════
-function ConnectPractice({ handle, boloToken }: { handle: string; boloToken: string | null }) {
+function ConnectPractice({ handle, boloToken, isDemoMode }: { handle: string; boloToken: string | null; isDemoMode: boolean }) {
   const [isExpanded, setIsExpanded]       = useState(false)
   const [practiceHandleInput, setPracticeHandleInput] = useState('')
   const [isConnecting, setIsConnecting]   = useState(false)
@@ -780,10 +797,36 @@ function ConnectPractice({ handle, boloToken }: { handle: string; boloToken: str
             </div>
           )}
 
+          {/* Example practices */}
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] mb-2">
+              Quick connect
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { name: 'Greenfield PT', handle: 'greenfieldpt' },
+                { name: 'Lang Family Practice', handle: 'langfamilypractice' },
+                { name: 'GM Orthopedic', handle: 'gmorthopedic' },
+              ].map(p => (
+                <button
+                  key={p.handle}
+                  onClick={() => setPracticeHandleInput(p.handle)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                    practiceHandleInput === p.handle
+                      ? 'bg-[#0d9488] text-white border-[#0d9488]'
+                      : 'bg-white text-[#4b5563] border-[#e5e7eb] hover:border-[#0d9488] hover:text-[#0d9488]'
+                  }`}
+                >
+                  {p.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Type handle */}
           <div>
             <label className="block text-xs font-semibold text-[#6b7280] mb-2">
-              Type handle
+              Or type handle
             </label>
             <div className="flex gap-2">
               <div className="flex-1 flex rounded-xl border border-[#e5e7eb] focus-within:border-[#0d9488] focus-within:ring-2 focus-within:ring-[#0d9488]/10 overflow-hidden">
