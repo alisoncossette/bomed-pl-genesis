@@ -556,6 +556,7 @@ function Dashboard({ handle, nullifierHash, boloToken, isDemoMode, onSignOut }: 
       {/* Content */}
       <div className="max-w-sm mx-auto px-4 py-5 flex flex-col gap-4">
         <AutoBookFeed handle={handle} isDemoMode={isDemoMode} />
+        <PatientProfile />
         <ConnectPractice handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
         <PendingRequests handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
         <ActiveGrants handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
@@ -624,6 +625,143 @@ function EmptyState({ icon, title, desc }: { icon: React.ReactNode; title: strin
 // ═══════════════════════════════════════════════════════════════════════════
 // CONNECT PRACTICE
 // ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// PATIENT PROFILE (insurance, DOB, address)
+// ═══════════════════════════════════════════════════════════════════════════
+function PatientProfile() {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [profile, setProfile] = useState({
+    dob: '',
+    address: '',
+    city: '',
+    state: '',
+    zip: '',
+    insuranceProvider: '',
+    memberId: '',
+    groupNumber: '',
+    insurancePhone: '',
+  })
+
+  function handleChange(field: string, value: string) {
+    setProfile(prev => ({ ...prev, [field]: value }))
+    setSaved(false)
+  }
+
+  function handleSave() {
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2500)
+  }
+
+  const hasInsurance = profile.insuranceProvider || profile.memberId
+
+  return (
+    <section className="bm-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-bold text-[#02043d]">My Profile</h3>
+          {hasInsurance && (
+            <span className="text-[11px] font-semibold text-[#0d9488] bg-[#ccfbf1] border border-[rgba(13,148,136,0.2)] rounded-full px-2 py-0.5">
+              Insurance on file
+            </span>
+          )}
+        </div>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-7 h-7 rounded-lg bg-[#f4f6fb] hover:bg-[#e5e7eb] transition-colors flex items-center justify-center text-[#6b7280]"
+        >
+          <svg className="w-4 h-4 transition-transform" style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+            viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 6l4 4 4-4" />
+          </svg>
+        </button>
+      </div>
+
+      {!isExpanded && (
+        <div className="px-4 pb-4 flex gap-4">
+          {[
+            { icon: '📋', label: 'Insurance', filled: !!profile.insuranceProvider },
+            { icon: '🎂', label: 'Date of birth', filled: !!profile.dob },
+            { icon: '🏠', label: 'Address', filled: !!profile.address },
+          ].map(item => (
+            <button key={item.label} onClick={() => setIsExpanded(true)}
+              className="flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded-xl border border-dashed border-[#e5e7eb] hover:border-[#0d9488] hover:bg-[#f0fdfa] transition-all">
+              <span className="text-lg">{item.icon}</span>
+              <span className={`text-[10px] font-semibold ${item.filled ? 'text-[#0d9488]' : 'text-[#9ca3af]'}`}>
+                {item.filled ? '✓ ' : '+ '}{item.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {isExpanded && (
+        <div className="px-4 pb-4 flex flex-col gap-5 border-t border-[#f1f3f8] pt-4">
+
+          {/* Date of birth */}
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] mb-1.5">🎂 Date of birth</label>
+            <input type="date" value={profile.dob}
+              onChange={e => handleChange('dob', e.target.value)}
+              className="bm-input w-full" />
+          </div>
+
+          {/* Address */}
+          <div className="flex flex-col gap-2">
+            <label className="block text-xs font-semibold text-[#6b7280]">🏠 Home address</label>
+            <input type="text" value={profile.address} placeholder="Street address"
+              onChange={e => handleChange('address', e.target.value)}
+              className="bm-input w-full" />
+            <div className="grid grid-cols-3 gap-2">
+              <input type="text" value={profile.city} placeholder="City"
+                onChange={e => handleChange('city', e.target.value)}
+                className="bm-input col-span-1" />
+              <input type="text" value={profile.state} placeholder="State" maxLength={2}
+                onChange={e => handleChange('state', e.target.value.toUpperCase())}
+                className="bm-input col-span-1" />
+              <input type="text" value={profile.zip} placeholder="ZIP"
+                onChange={e => handleChange('zip', e.target.value)}
+                className="bm-input col-span-1" />
+            </div>
+          </div>
+
+          {/* Insurance */}
+          <div className="flex flex-col gap-2">
+            <label className="block text-xs font-semibold text-[#6b7280]">🏥 Insurance</label>
+            <input type="text" value={profile.insuranceProvider} placeholder="Provider (e.g. Blue Cross)"
+              onChange={e => handleChange('insuranceProvider', e.target.value)}
+              className="bm-input w-full" />
+            <div className="grid grid-cols-2 gap-2">
+              <input type="text" value={profile.memberId} placeholder="Member ID"
+                onChange={e => handleChange('memberId', e.target.value)}
+                className="bm-input" />
+              <input type="text" value={profile.groupNumber} placeholder="Group #"
+                onChange={e => handleChange('groupNumber', e.target.value)}
+                className="bm-input" />
+            </div>
+            <input type="tel" value={profile.insurancePhone} placeholder="Insurance phone (optional)"
+              onChange={e => handleChange('insurancePhone', e.target.value)}
+              className="bm-input w-full" />
+          </div>
+
+          <button onClick={handleSave}
+            className={`bm-btn-primary transition-all ${saved ? 'bg-[#16a34a] border-[#16a34a]' : ''}`}>
+            {saved ? '✓ Saved' : 'Save profile'}
+          </button>
+
+        </div>
+      )}
+    </section>
+  )
+}
+
+const CONNECT_SCOPES = [
+  { id: 'appointments:read',    label: 'Appointments', icon: '📅', desc: 'View & book appointments' },
+  { id: 'insurance:read',       label: 'Insurance',    icon: '🏥', desc: 'Verify coverage' },
+  { id: 'demographics:read',    label: 'Address & DOB', icon: '👤', desc: 'Name, address, date of birth' },
+  { id: 'vitals:write',         label: 'Vitals',       icon: '💓', desc: 'Send readings to provider' },
+]
+
 function ConnectPractice({ handle, boloToken, isDemoMode }: { handle: string; boloToken: string | null; isDemoMode: boolean }) {
   const [isExpanded, setIsExpanded]       = useState(false)
   const [practiceHandleInput, setPracticeHandleInput] = useState('')
@@ -631,13 +769,32 @@ function ConnectPractice({ handle, boloToken, isDemoMode }: { handle: string; bo
   const [successMessage, setSuccessMessage] = useState('')
   const [errorMessage, setErrorMessage]   = useState('')
   const [isScanning, setIsScanning]       = useState(false)
+  const [selectedScopes, setSelectedScopes] = useState<Set<string>>(new Set(['appointments:read']))
+
+  function toggleConnectScope(id: string) {
+    setSelectedScopes(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
 
   async function handleConnect() {
-    if (!practiceHandleInput.trim() || !boloToken) return
+    if (!practiceHandleInput.trim()) return
 
     setIsConnecting(true)
     setErrorMessage('')
     setSuccessMessage('')
+
+    // Demo mode — no API needed
+    if (isDemoMode || !boloToken) {
+      await new Promise(r => setTimeout(r, 800))
+      setSuccessMessage(`✓ Connected to @${practiceHandleInput.replace(/^@/, '')} (demo)`)
+      setPracticeHandleInput('')
+      setTimeout(() => { setSuccessMessage(''); setIsExpanded(false) }, 2500)
+      setIsConnecting(false)
+      return
+    }
 
     try {
       const res = await fetch('/api/practice/connect', {
@@ -647,6 +804,7 @@ function ConnectPractice({ handle, boloToken, isDemoMode }: { handle: string; bo
           practiceHandle: practiceHandleInput,
           patientHandle: handle,
           boloToken,
+          scopes: Array.from(selectedScopes),
         }),
       })
 
@@ -823,6 +981,34 @@ function ConnectPractice({ handle, boloToken, isDemoMode }: { handle: string; bo
             </div>
           </div>
 
+          {/* Scope selection */}
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] mb-2">
+              What to share
+            </label>
+            <div className="flex flex-col divide-y divide-[#f1f3f8] rounded-xl border border-[#e5e7eb] overflow-hidden">
+              {CONNECT_SCOPES.map(scope => (
+                <label key={scope.id} className="flex items-center justify-between px-3 py-2.5 bg-white cursor-pointer hover:bg-[#f9fafb] transition-colors">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-base">{scope.icon}</span>
+                    <div>
+                      <p className="text-sm font-medium text-[#02043d]">{scope.label}</p>
+                      <p className="text-[11px] text-[#9ca3af]">{scope.desc}</p>
+                    </div>
+                  </div>
+                  <label className="bm-toggle">
+                    <input
+                      type="checkbox"
+                      checked={selectedScopes.has(scope.id)}
+                      onChange={() => toggleConnectScope(scope.id)}
+                    />
+                    <span className="bm-toggle-track" />
+                  </label>
+                </label>
+              ))}
+            </div>
+          </div>
+
           {/* Type handle */}
           <div>
             <label className="block text-xs font-semibold text-[#6b7280] mb-2">
@@ -845,7 +1031,7 @@ function ConnectPractice({ handle, boloToken, isDemoMode }: { handle: string; bo
               </div>
               <button
                 onClick={handleConnect}
-                disabled={!practiceHandleInput.trim() || isConnecting || !boloToken}
+                disabled={!practiceHandleInput.trim() || isConnecting}
                 className="bm-btn-teal px-4 py-2.5 text-sm whitespace-nowrap"
               >
                 {isConnecting ? (
@@ -905,11 +1091,34 @@ function ConnectPractice({ handle, boloToken, isDemoMode }: { handle: string; bo
 // ═══════════════════════════════════════════════════════════════════════════
 // PENDING REQUESTS
 // ═══════════════════════════════════════════════════════════════════════════
-function PendingRequests({ handle, boloToken }: { handle: string; boloToken: string | null }) {
-  const [requests, setRequests] = useState<any[]>([])
-  const [loading, setLoading]   = useState(true)
+const DEMO_REQUESTS = [
+  {
+    id: 'demo-req-1',
+    fromName: 'Greenfield Physical Therapy',
+    fromHandle: '@greenfieldpt',
+    widgetName: 'BoMed Scheduling',
+    reason: 'Book PT sessions and receive appointment reminders',
+    scopes: ['appointments:read', 'appointments:request', 'vitals:write'],
+  },
+  {
+    id: 'demo-req-2',
+    fromName: 'City Dental Associates',
+    fromHandle: '@citydental',
+    widgetName: 'BoMed Check-In',
+    reason: 'Verify insurance and manage appointment scheduling',
+    scopes: ['appointments:read', 'insurance:read'],
+  },
+]
 
-  useEffect(() => { fetchRequests() }, [handle, boloToken])
+function PendingRequests({ handle, boloToken, isDemoMode }: { handle: string; boloToken: string | null; isDemoMode: boolean }) {
+  const [requests, setRequests] = useState<any[]>(isDemoMode ? DEMO_REQUESTS : [])
+  const [loading, setLoading]   = useState(!isDemoMode)
+
+  useEffect(() => {
+    if (!isDemoMode) {
+      fetchRequests()
+    }
+  }, [handle, boloToken, isDemoMode])
 
   async function fetchRequests() {
     try {
@@ -922,6 +1131,12 @@ function PendingRequests({ handle, boloToken }: { handle: string; boloToken: str
   }
 
   async function handleRespond(requestId: string, approved: boolean, scopes: string[], policy?: Policy) {
+    if (isDemoMode) {
+      // In demo mode, just remove from local state
+      setRequests(prev => prev.filter(r => r.id !== requestId))
+      return
+    }
+
     try {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' }
       if (boloToken) headers['x-bolo-token'] = boloToken
@@ -934,17 +1149,31 @@ function PendingRequests({ handle, boloToken }: { handle: string; boloToken: str
     } catch { /* silent */ }
   }
 
+  function handleReset() {
+    setRequests(DEMO_REQUESTS)
+  }
+
   return (
     <Section
       title="Incoming Requests"
       badge={requests.length > 0 ? `${requests.length} pending` : undefined}
     >
       {loading ? <LoadingRows /> : requests.length === 0 ? (
-        <EmptyState
-          icon={<svg className="w-5 h-5 text-[#9ca3af]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>}
-          title="All clear"
-          desc="No pending permission requests"
-        />
+        <div className="flex flex-col items-center py-10 px-6 text-center">
+          <div className="w-11 h-11 rounded-xl bg-[#f4f6fb] flex items-center justify-center mb-3">
+            <svg className="w-5 h-5 text-[#9ca3af]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>}
+          </div>
+          <p className="text-sm font-semibold text-[#02043d] mb-1">All clear</p>
+          <p className="text-xs text-[#9ca3af] leading-relaxed max-w-[220px] mb-3">No pending permission requests</p>
+          {isDemoMode && (
+            <button
+              onClick={handleReset}
+              className="text-xs font-medium text-[#0d9488] hover:text-[#0f766e] underline"
+            >
+              Reset demo requests
+            </button>
+          )}
+        </div>
       ) : (
         <div className="divide-y divide-[#f1f3f8]">
           {requests.map(req => (
@@ -1063,7 +1292,7 @@ function RequestCard({
 // ═══════════════════════════════════════════════════════════════════════════
 // ACTIVE GRANTS
 // ═══════════════════════════════════════════════════════════════════════════
-function ActiveGrants({ handle, boloToken }: { handle: string; boloToken: string | null }) {
+function ActiveGrants({ handle, boloToken, isDemoMode }: { handle: string; boloToken: string | null; isDemoMode: boolean }) {
   const [grants, setGrants]   = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
