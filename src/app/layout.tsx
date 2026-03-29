@@ -23,7 +23,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-[#141440]">
-        <MiniKitProvider>{children}</MiniKitProvider>
+        <div className="min-h-screen flex justify-center bg-[#e5e7eb]">
+          <div className="w-full max-w-[430px] min-h-screen bg-white shadow-2xl relative overflow-hidden">
+            <MiniKitProvider>{children}</MiniKitProvider>
+          </div>
+        </div>
       </body>
     </html>
   )
