@@ -1339,14 +1339,26 @@ function ActiveGrants({ handle, boloToken, isDemoMode }: { handle: string; boloT
               <div className="w-10 h-10 rounded-xl bg-[#f0fdf4] flex items-center justify-center text-xl flex-shrink-0">🏥</div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2 mb-1.5">
-                  <p className="text-sm font-bold text-[#02043d] truncate">{grant.granteeHandle}</p>
+                  <p className="text-sm font-bold text-[#02043d] truncate">@{(grant.granteeHandle || '').replace(/^@+/, '')}</p>
                   <span className="badge-granted text-[11px] px-2.5 py-0.5 rounded-full whitespace-nowrap">Active</span>
                 </div>
-                <p className="text-xs text-[#9ca3af] mb-2">{grant.widgetName || grant.widget}</p>
+                <p className="text-xs text-[#9ca3af] mb-2">{grant.widgetName || grant.widget || 'BoMed'}</p>
                 <div className="flex flex-wrap gap-1 mb-3">
-                  {(grant.scopes || []).map((scope: string) => (
-                    <span key={scope} className="scope-tag">{scope.replace(/[_:]/g, ' ')}</span>
-                  ))}
+                  {(grant.scopes || []).map((scope: string) => {
+                    const labels: Record<string, string> = {
+                      'appointments:read': '📅 Appointments',
+                      'appointments:request': '📅 Appt requests',
+                      'appointments:book': '📅 Booking',
+                      'insurance:read': '🏥 Insurance',
+                      'demographics:read': '👤 Demographics',
+                      'vitals:write': '💓 Vitals',
+                      'vitals:read': '💓 Vitals (read)',
+                      'patients:read': '👤 Patient info',
+                      'labs:read': '🔬 Labs',
+                      'medications:read': '💊 Medications',
+                    }
+                    return <span key={scope} className="scope-tag">{labels[scope] || scope.replace(/[_:]/g, ' ')}</span>
+                  })}
                 </div>
                 <button
                   onClick={() => handleRevoke(grant.id)}

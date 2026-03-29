@@ -19,7 +19,7 @@ const EVENT_CONFIG = {
   policy_blocked:  { emoji: '🚫', label: 'Blocked by policy',     bg: 'bg-[#fef2f2]', dot: 'bg-[#dc2626]' },
 }
 
-export function AutoBookFeed({ handle, boloToken }: { handle: string; boloToken?: string | null }) {
+export function AutoBookFeed({ handle, boloToken, isDemoMode }: { handle: string; boloToken?: string | null; isDemoMode: boolean }) {
   const [events, setEvents]   = useState<AutoBookEvent[]>([])
   const [loading, setLoading] = useState(true)
 

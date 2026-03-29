@@ -77,7 +77,7 @@ export function VitalsCard({ handle, boloToken }: { handle: string; boloToken?: 
           </div>
           <p className="text-base font-semibold text-white mb-1">No vitals received</p>
           <p className="text-xs text-[#9CA3AF] max-w-[280px] mx-auto">
-            When Ladybug.bot takes a reading, it will appear here &mdash; if you&apos;ve granted vitals:write
+            When Ladybug.bot takes a reading, it will appear here — once you've given a provider permission to log vitals
           </p>
         </div>
       ) : (
