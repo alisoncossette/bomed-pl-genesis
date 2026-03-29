@@ -39,7 +39,7 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy bomed-web \
+          gcloud run deploy bomed-world \
             --image us-central1-docker.pkg.dev/bolo-485301/bolo-repo/bomed-world:${{ github.sha }} \
             --region us-central1 \
             --platform managed \
