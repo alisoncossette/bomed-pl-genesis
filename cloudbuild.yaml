@@ -5,8 +5,6 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/bomed-world:$COMMIT_SHA'
-      - '-t'
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/bomed-world:latest'
       - '.'
 
@@ -15,8 +13,7 @@ steps:
     id: push
     args:
       - 'push'
-      - '--all-tags'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/bomed-world'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/bomed-world:latest'
 
   # Deploy to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -27,7 +24,7 @@ steps:
       - 'deploy'
       - 'bomed-world'
       - '--image'
-      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/bomed-world:$COMMIT_SHA'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/bomed-world:latest'
       - '--region'
       - 'us-central1'
       - '--platform'
