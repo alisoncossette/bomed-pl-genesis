@@ -2,7 +2,11 @@
 
 > *"AI is making decisions about you, for you, every day. And right now? You have no say. Bolospot changes that."*
 
-**Live:** [world.bomed.ai](https://world.bomed.ai) · **Demo Video:** [youtube.com/watch?v=OA-1iItaHSg](https://www.youtube.com/watch?v=OA-1iItaHSg) · **Submission:** [devspot.app/projects/1290](https://devspot.app/projects/1290)
+**Live:** [world.bomed.ai](https://world.bomed.ai) · **Submission:** [devspot.app/projects/1290](https://devspot.app/projects/1290)
+
+## Demo
+
+[![BoMed Demo Video](https://img.youtube.com/vi/OA-1iItaHSg/maxresdefault.jpg)](https://www.youtube.com/watch?v=OA-1iItaHSg)
 
 BoMed puts patients in control of their healthcare identity. Scan a QR code, verify your humanity with World ID, grant your provider exactly the access they need — in one tap. No clipboards, no phone tag, no faxes. When the visit ends, revoke access instantly. Nothing cached. Nothing lingering.
 
