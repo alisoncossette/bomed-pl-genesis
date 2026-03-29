@@ -8,7 +8,7 @@ import { AutoBookFeed } from './components/AutoBookFeed'
 import { VitalsCard } from './components/VitalsCard'
 import { DemoPanel } from './components/DemoPanel'
 
-type Step = 'welcome' | 'setup' | 'dashboard' | 'sending-request'
+type Step = 'welcome' | 'setup' | 'bolo-login' | 'dashboard' | 'sending-request'
 
 // ─── Spinner ────────────────────────────────────────────────────────────────
 function Spinner({ dark }: { dark?: boolean }) {
@@ -56,6 +56,10 @@ function HomeContent() {
   const [isMiniApp, setIsMiniApp]     = useState(false)
   const [practiceHandle, setPracticeHandle] = useState<string | null>(null)
   const [practiceScopes, setPracticeScopes] = useState<string[]>([])
+  const [loginHandle, setLoginHandle]   = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
+  const [loginError, setLoginError]     = useState('')
+  const [isLoggingIn, setIsLoggingIn]   = useState(false)
 
   useEffect(() => { setIsMiniApp(MiniKit.isInstalled()) }, [])
 
@@ -92,6 +96,45 @@ function HomeContent() {
   useEffect(() => {
     if (suggestedHandle && !handleInput) setHandleInput(suggestedHandle)
   }, [suggestedHandle])
+
+  async function handleBoloLogin() {
+    if (!loginHandle.trim() || !loginPassword) {
+      setLoginError('Handle and password are required')
+      return
+    }
+    setLoginError('')
+    setIsLoggingIn(true)
+
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ handle: loginHandle, password: loginPassword }),
+      })
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        setLoginError(data.error || 'Login failed')
+        setIsLoggingIn(false)
+        return
+      }
+
+      setHandle(data.handle)
+      setBoloToken(data.accessToken)
+      setNullifierHash(null)
+
+      // If we came from a practice QR code, auto-send the request
+      if (practiceHandle && practiceScopes.length > 0) {
+        await sendPracticeRequest(data.handle, data.accessToken, practiceHandle, practiceScopes)
+      } else {
+        setStep('dashboard')
+      }
+    } catch {
+      setLoginError('Network error. Please try again.')
+    }
+
+    setIsLoggingIn(false)
+  }
 
   async function sendPracticeRequest(userHandle: string, token: string, practice: string, scopes: string[]) {
     setStep('sending-request')
@@ -322,6 +365,13 @@ function HomeContent() {
               </svg>
             </button>
 
+            <button
+              onClick={() => setStep('bolo-login')}
+              className="text-sm font-medium text-[#0d9488] hover:text-[#0f766e] transition-colors"
+            >
+              Already have a Bolo account? Sign in
+            </button>
+
             {!isMiniApp && (
               <div className="demo-notice">
                 <div className="w-1.5 h-1.5 rounded-full bg-[#ffa350]" />
@@ -330,6 +380,96 @@ function HomeContent() {
                 </p>
               </div>
             )}
+          </div>
+
+        </div>
+      </main>
+    )
+  }
+
+  // ── BOLO LOGIN ───────────────────────────────────────────────────────────
+  if (step === 'bolo-login') {
+    return (
+      <main className="min-h-screen bg-[#f4f6fb] flex flex-col items-center justify-center px-6 py-12">
+        <div className="w-full max-w-sm mx-auto flex flex-col gap-7">
+
+          {/* Header */}
+          <div className="flex flex-col items-center gap-3 text-center">
+            <LogoMark size="md" />
+            <div>
+              <h2 className="text-2xl font-bold text-[#02043d]">Sign in to BoMed</h2>
+              <p className="text-sm text-[#6b7280] mt-1">
+                Use your existing Bolo handle
+              </p>
+            </div>
+          </div>
+
+          {/* Login card */}
+          <div className="bm-card p-5 flex flex-col gap-5">
+
+            {/* Handle */}
+            <div>
+              <label className="block text-xs font-semibold text-[#6b7280] mb-1.5">
+                Your @handle
+              </label>
+              <div className={`flex rounded-xl border overflow-hidden transition-all ${loginError ? 'border-[#dc2626] ring-2 ring-[#dc2626]/10' : 'border-[#e5e7eb] focus-within:border-[#0d9488] focus-within:ring-2 focus-within:ring-[#0d9488]/10'}`}>
+                <span className="flex items-center px-3 bg-[#f4f6fb] border-r border-[#e5e7eb] text-sm font-semibold text-[#9ca3af] select-none">@</span>
+                <input
+                  type="text"
+                  value={loginHandle}
+                  onChange={e => { setLoginHandle(e.target.value.replace(/^@/, '')); setLoginError('') }}
+                  placeholder="yourhandle"
+                  autoFocus
+                  className="flex-1 px-3 py-3 bg-white text-sm font-medium text-[#02043d] outline-none placeholder-[#9ca3af]/60"
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-xs font-semibold text-[#6b7280] mb-1.5">
+                Password
+              </label>
+              <input
+                type="password"
+                value={loginPassword}
+                onChange={e => { setLoginPassword(e.target.value); setLoginError('') }}
+                placeholder="Your Bolo password"
+                onKeyDown={e => { if (e.key === 'Enter') handleBoloLogin() }}
+                className="bm-input w-full"
+              />
+            </div>
+
+            {loginError && (
+              <p className="text-xs text-[#dc2626] font-medium">{loginError}</p>
+            )}
+
+            {/* Sign in button */}
+            <button
+              onClick={handleBoloLogin}
+              disabled={isLoggingIn || !loginHandle.trim() || !loginPassword}
+              className="bm-btn-primary"
+            >
+              {isLoggingIn ? (
+                <>
+                  <Spinner />
+                  Signing in...
+                </>
+              ) : (
+                'Sign in'
+              )}
+            </button>
+
+          </div>
+
+          {/* Back link */}
+          <div className="text-center">
+            <button
+              onClick={() => { setStep('welcome'); setLoginError('') }}
+              className="text-sm font-medium text-[#6b7280] hover:text-[#02043d] transition-colors"
+            >
+              Back
+            </button>
           </div>
 
         </div>
