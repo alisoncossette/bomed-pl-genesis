@@ -95,23 +95,33 @@ function HomeContent() {
 
   async function sendPracticeRequest(userHandle: string, token: string, practice: string, scopes: string[]) {
     setStep('sending-request')
-
-    const BASE_URL = process.env.NEXT_PUBLIC_BOLO_API_URL || 'https://api.bolospot.com'
+    setHandleError('')
 
     try {
-      await fetch(`${BASE_URL}/api/@${practice}/request`, {
+      const res = await fetch('/api/practice/request', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify({ scopes }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          practiceHandle: practice,
+          scopes,
+          boloToken: token,
+        }),
       })
+
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        console.error('Practice request failed:', data.error)
+        setHandleError(data.error || 'Failed to connect to practice. Please try again.')
+        setStep('dashboard')
+        return
+      }
 
       // Brief delay to show the "sending" state
       await new Promise(r => setTimeout(r, 1500))
     } catch (error) {
       console.error('Failed to send practice request:', error)
+      setHandleError('Network error connecting to practice. Please try again.')
     }
 
     setStep('dashboard')
@@ -178,17 +188,30 @@ function HomeContent() {
       if (data.verified) {
         setNullifierHash(data.nullifier_hash)
         if (data.handle) {
-          // Returning user — already has a handle
-          setHandle(data.handle)
+          // Returning user — already has a handle, but we need a token.
+          // Re-authenticate via handle/link which will login the existing account.
+          try {
+            const linkRes = await fetch('/api/handle/link', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ handle: data.handle, nullifierHash: data.nullifier_hash }),
+            })
+            const linkData = await linkRes.json()
+            if (linkData.success && linkData.accessToken) {
+              setHandle(linkData.handle)
+              setBoloToken(linkData.accessToken)
+              if (practiceHandle && practiceScopes.length > 0) {
+                await sendPracticeRequest(linkData.handle, linkData.accessToken, practiceHandle, practiceScopes)
+              } else {
+                setStep('dashboard')
+              }
+              setIsVerifying(false)
+              return
+            }
+          } catch { /* fall through to createHandle */ }
 
-          // If we came from a practice QR code, auto-send the request
-          if (practiceHandle && practiceScopes.length > 0 && boloToken) {
-            await sendPracticeRequest(data.handle, boloToken, practiceHandle, practiceScopes)
-          } else {
-            setStep('dashboard')
-          }
-
-          setIsVerifying(false)
+          // Fallback: create handle flow will login via existing account
+          await createHandle(data.nullifier_hash)
         } else {
           await createHandle(data.nullifier_hash)
         }
