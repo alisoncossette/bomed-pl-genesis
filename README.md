@@ -6,7 +6,7 @@
 
 ## Demo
 
-[![BoMed Demo Video](https://img.youtube.com/vi/OA-1iItaHSg/maxresdefault.jpg)](https://www.youtube.com/watch?v=OA-1iItaHSg)
+[![BoMed Demo Video](https://img.youtube.com/vi/OA-1iItaHSg/hqdefault.jpg)](https://www.youtube.com/watch?v=OA-1iItaHSg)
 
 BoMed puts patients in control of their healthcare identity. Scan a QR code, verify your humanity with World ID, grant your provider exactly the access they need — in one tap. No clipboards, no phone tag, no faxes. When the visit ends, revoke access instantly. Nothing cached. Nothing lingering.
 
