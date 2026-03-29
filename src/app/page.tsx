@@ -1242,10 +1242,18 @@ function RequestCard({
               <div className="flex items-center gap-2.5">
                 <span className="text-base">{scopeIcon(scope)}</span>
                 <div>
-                  <p className="text-sm font-medium text-[#02043d]">
-                    {scope.split(':')[0].charAt(0).toUpperCase() + scope.split(':')[0].slice(1)}
-                  </p>
-                  <p className="text-[11px] text-[#9ca3af]">{scope.replace(/[_:]/g, ' ')}</p>
+                  {{
+                    'appointments:read':    <><p className="text-sm font-medium text-[#02043d]">View appointments</p><p className="text-[11px] text-[#9ca3af]">See your upcoming schedule</p></>,
+                    'appointments:request': <><p className="text-sm font-medium text-[#02043d]">Request appointments</p><p className="text-[11px] text-[#9ca3af]">Ask to book new slots</p></>,
+                    'appointments:book':    <><p className="text-sm font-medium text-[#02043d]">Book appointments</p><p className="text-[11px] text-[#9ca3af]">Book directly on your behalf</p></>,
+                    'insurance:read':       <><p className="text-sm font-medium text-[#02043d]">View insurance</p><p className="text-[11px] text-[#9ca3af]">Verify your coverage</p></>,
+                    'insurance:write':      <><p className="text-sm font-medium text-[#02043d]">Update insurance</p><p className="text-[11px] text-[#9ca3af]">Add or change coverage info</p></>,
+                    'demographics:read':    <><p className="text-sm font-medium text-[#02043d]">Address & date of birth</p><p className="text-[11px] text-[#9ca3af]">Name, address, DOB</p></>,
+                    'vitals:write':         <><p className="text-sm font-medium text-[#02043d]">Log health readings</p><p className="text-[11px] text-[#9ca3af]">Track vitals like BP, weight, temp</p></>,
+                    'vitals:read':          <><p className="text-sm font-medium text-[#02043d]">View health readings</p><p className="text-[11px] text-[#9ca3af]">See your logged vitals</p></>,
+                    'labs:read':            <><p className="text-sm font-medium text-[#02043d]">View lab results</p><p className="text-[11px] text-[#9ca3af]">Access test results</p></>,
+                    'medications:read':     <><p className="text-sm font-medium text-[#02043d]">View medications</p><p className="text-[11px] text-[#9ca3af]">See your prescriptions</p></>,
+                  }[scope] || <><p className="text-sm font-medium text-[#02043d]">{scope.split(':')[0].charAt(0).toUpperCase() + scope.split(':')[0].slice(1)}</p><p className="text-[11px] text-[#9ca3af]">{scope.replace(/[_:]/g, ' ')}</p></>}
                 </div>
               </div>
               <label className="bm-toggle">

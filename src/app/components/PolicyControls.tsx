@@ -34,7 +34,7 @@ export function PolicyControls({
   if (!scopeHasAppointments) return null
 
   return (
-    <div className="rounded-xl bg-[#fff8cb] border border-[rgba(180,83,9,0.15)] p-4 flex flex-col gap-4">
+    <div className="rounded-xl bg-[#f0fdfa] border border-[rgba(13,148,136,0.2)] p-4 flex flex-col gap-4">
       <p className="text-[11px] font-bold text-[#0d9488] uppercase tracking-wide">Scheduling policy</p>
 
       <ToggleRow
