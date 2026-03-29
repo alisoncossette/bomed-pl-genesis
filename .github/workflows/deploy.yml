@@ -1,0 +1,52 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t us-central1-docker.pkg.dev/bolo-485301/bolo-repo/bomed-world:${{ github.sha }} \
+            -t us-central1-docker.pkg.dev/bolo-485301/bolo-repo/bomed-world:latest \
+            .
+
+      - name: Push Docker image
+        run: docker push --all-tags us-central1-docker.pkg.dev/bolo-485301/bolo-repo/bomed-world
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy bomed-world \
+            --image us-central1-docker.pkg.dev/bolo-485301/bolo-repo/bomed-world:${{ github.sha }} \
+            --region us-central1 \
+            --platform managed \
+            --allow-unauthenticated \
+            --port 8080 \
+            --memory 512Mi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 3 \
+            --project bolo-485301
