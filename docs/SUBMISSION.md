@@ -59,7 +59,7 @@ World ID solves the foundational problem for **both participants**: **Is this ac
 - **World ID SDK** — `@worldcoin/minikit-js` for Mini App integration
 - **@bolospot/sdk** — TypeScript SDK for Bolospot permission API
 - **Tailwind CSS 4** — Dark glassmorphism theme, mobile-first
-- **Vercel** — Deployment platform
+- **Google Cloud Run** — Deployment platform
 
 ### 🏗 What Was Built During the Hackathon (Fresh Code)
 **Everything.** This was built from scratch for PL Genesis.
@@ -250,7 +250,7 @@ This makes Bolospot's relay actually usable. Spam is solved at the protocol laye
 - **SDK** — `@bolospot/sdk` (TypeScript, open source)
 - **Backend** — Node.js, PostgreSQL, Redis (trust graph cache)
 - **World ID** — `@worldcoin/id` for verification
-- **Deployment** — Vercel (API), Cloudflare Workers (relay)
+- **Deployment** — Google Cloud Run (API), Cloudflare Workers (relay)
 
 ### 🏗 What Was Built During the Hackathon (Existing Code Enhancements)
 Bolospot existed before the hackathon, but **World ID integration was built fresh:**
