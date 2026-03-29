@@ -25,7 +25,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'bomed-world'
+      - 'bomed-web'
       - '--image'
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/bomed-world:$COMMIT_SHA'
       - '--region'
