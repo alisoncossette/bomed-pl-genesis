@@ -193,7 +193,7 @@ function HomeContent() {
       if (data.verified) {
         setNullifierHash(data.nullifier_hash)
         setWorldIdPayload(finalPayload)
-        setWorldIdAction(verifyPayload.action)
+        setWorldIdAction(String(verifyPayload.action))
         if (data.handle) {
           // Returning user — already has a handle
           setHandle(data.handle)
@@ -1047,7 +1047,7 @@ function InsuranceTab() {
         <div className="ios-ic-row">
           <div>
             <div className="ios-ic-field-label">Member ID</div>
-            <div className="ios-ic-field-value">AET4892710</div>
+            <div className="ios-ic-field-value">W0275548</div>
           </div>
           <div>
             <div className="ios-ic-field-label">Group</div>

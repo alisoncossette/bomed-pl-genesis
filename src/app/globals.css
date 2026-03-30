@@ -131,6 +131,32 @@ body {
 .bm-btn-primary:active:not(:disabled) { transform: scale(0.99); }
 .bm-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* Secondary button */
+.bm-btn-secondary {
+  width: 100%;
+  padding: 13px 20px;
+  background: white;
+  color: var(--text-1);
+  font-size: 15px;
+  font-weight: 600;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.bm-btn-secondary:hover:not(:disabled) {
+  border-color: #0ea5e9;
+  background: #f8fafc;
+}
+.bm-btn-secondary:active:not(:disabled) { transform: scale(0.99); }
+.bm-btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
 /* Teal button */
 .bm-btn-teal {
   width: 100%;
