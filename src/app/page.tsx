@@ -465,13 +465,26 @@ function HomeContent() {
     async function handleConnectCalendar() {
       setCalendarConnecting(true)
       try {
-        const res = await fetch(`/api/calendar/authorize?handle=${encodeURIComponent(handle)}`)
-        const data = await res.json()
+        // Get OAuth URL from Bolospot — uses the user's session token
+        // so the calendar gets stored in Bolospot and powers booking API
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BOLO_API_URL || 'https://api.bolospot.com'}/api/connections/google/authorize`, {
+          headers: { Authorization: `Bearer ${boloToken}` },
+        })
 
-        if (data.url) {
-          window.location.href = data.url
+        if (res.ok) {
+          const data = await res.json()
+          if (data.url) {
+            window.location.href = data.url
+            return
+          }
+        }
+
+        // Fallback to our own Google OAuth if Bolospot rejects
+        const fallback = await fetch(`/api/calendar/authorize?handle=${encodeURIComponent(handle)}`)
+        const fallbackData = await fallback.json()
+        if (fallbackData.url) {
+          window.location.href = fallbackData.url
         } else {
-          console.error('No OAuth URL returned:', data)
           setCalendarConnecting(false)
         }
       } catch (error) {
@@ -540,7 +553,7 @@ function HomeContent() {
           </div>
 
           <p className="text-center text-[11px] text-[#9ca3af] leading-relaxed px-4">
-            Your calendar is connected to Google Calendar.<br />
+            Your calendar is stored securely in Bolospot — not BoMed.<br />
             Providers only see when you&apos;re free or busy.
           </p>
 
