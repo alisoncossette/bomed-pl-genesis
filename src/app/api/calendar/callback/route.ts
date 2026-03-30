@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { calendarTokens } from '@/lib/calendar-tokens'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
@@ -8,19 +10,21 @@ export async function GET(req: NextRequest) {
     const state = searchParams.get('state')
     const error = searchParams.get('error')
 
+    const APP_BASE = process.env.NEXT_PUBLIC_APP_URL || 'https://world.bomed.ai'
+
     if (error) {
       console.error('Google OAuth error:', error)
-      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}?calendar=error`)
+      return NextResponse.redirect(`${APP_BASE}?calendar=error`)
     }
 
     if (!code || !state) {
-      return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}?calendar=error`)
+      return NextResponse.redirect(`${APP_BASE}?calendar=error`)
     }
 
     const handle = decodeURIComponent(state)
     const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
     const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
-    const APP_URL = process.env.NEXT_PUBLIC_APP_URL
+    const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://world.bomed.ai'
 
     if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
       console.error('Missing Google OAuth credentials')
@@ -62,6 +66,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.redirect(`${APP_URL}?calendar=connected`)
   } catch (error) {
     console.error('Calendar callback error:', error)
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL}?calendar=error`)
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_APP_URL || 'https://world.bomed.ai'}?calendar=error`)
   }
 }
