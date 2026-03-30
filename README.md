@@ -4,7 +4,15 @@
 
 **Live:** [world.bomed.ai](https://world.bomed.ai) · **Submission:** [devspot.app/projects/1290](https://devspot.app/projects/1290)
 
-## Demo
+## Try It
+
+**Open in World App** — scan with your phone:
+
+[![Open BoMed in World App](https://quickchart.io/qr?text=https%3A%2F%2Fworld.bomed.ai&size=200)](https://world.bomed.ai)
+
+Or visit [world.bomed.ai](https://world.bomed.ai) directly in a browser for demo mode.
+
+## Demo Video
 
 [![BoMed Demo Video](https://img.youtube.com/vi/OA-1iItaHSg/hqdefault.jpg)](https://www.youtube.com/watch?v=OA-1iItaHSg)
 
