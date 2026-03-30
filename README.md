@@ -10,6 +10,8 @@
 
 BoMed puts patients in control of their healthcare identity. Scan a QR code, verify your humanity with World ID, grant your provider exactly the access they need — in one tap. No clipboards, no phone tag, no faxes. When the visit ends, revoke access instantly. Nothing cached. Nothing lingering.
 
+> *"Every permission a patient grants through BoMed is visible and revocable in their Bolospot account. One place to manage everything — not scattered across apps."*
+
 Built on Bolospot — an open trust protocol for the AI age.
 
 ---
