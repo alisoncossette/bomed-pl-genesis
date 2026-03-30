@@ -229,6 +229,13 @@ function HomeContent() {
           setHandle(data.handle)
           if (data.accessToken) setBoloToken(data.accessToken)
 
+          // Auto-send welcome requests from demo practices (non-blocking)
+          fetch('/api/demo/welcome', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ patientHandle: data.handle }),
+          }).catch(() => {}) // fire and forget
+
           // If we came from a practice QR code, auto-send the request
           if (practiceHandle && practiceScopes.length > 0) {
             await sendPracticeRequest(data.handle, data.accessToken, practiceHandle, practiceScopes)
