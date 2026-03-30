@@ -755,7 +755,7 @@ function Dashboard({ handle, isDemoMode, onSignOut }: { handle: string; isDemoMo
       <div className="ios-bnav">
         <NavItem icon={<HomeIcon />} label="Home" active={activeTab === 'home'} onClick={() => setActiveTab('home')} />
         <NavItem icon={<CalendarIcon />} label="Schedule" active={activeTab === 'schedule'} onClick={() => setActiveTab('schedule')} />
-        <NavItem icon={<HeartIcon />} label="Health" active={activeTab === 'health'} onClick={() => setActiveTab('health')} />
+        <NavItem icon={<HeartIcon />} label="Health" active={false} onClick={() => {}} disabled />
         <NavItem icon={<CardIcon />} label="Insurance" active={activeTab === 'insurance'} onClick={() => setActiveTab('insurance')} />
         <NavItem icon={<UserIcon />} label="Profile" active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} />
       </div>
@@ -775,9 +775,13 @@ function Dashboard({ handle, isDemoMode, onSignOut }: { handle: string; isDemoMo
 }
 
 // ─── Nav item ───────────────────────────────────────────────────────────────
-function NavItem({ icon, label, active, onClick }: { icon: React.ReactNode; label: string; active: boolean; onClick: () => void }) {
+function NavItem({ icon, label, active, onClick, disabled }: { icon: React.ReactNode; label: string; active: boolean; onClick: () => void; disabled?: boolean }) {
   return (
-    <div className={`ios-bn-item ${active ? 'active' : ''}`} onClick={onClick}>
+    <div
+      className={`ios-bn-item ${active ? 'active' : ''} ${disabled ? 'opacity-30 cursor-not-allowed' : ''}`}
+      onClick={disabled ? undefined : onClick}
+      title={disabled ? 'Coming soon' : undefined}
+    >
       {active && <div className="ios-bn-dot" />}
       <div className="ios-bn-icon">{icon}</div>
       <div className="ios-bn-label">{label}</div>
@@ -884,8 +888,8 @@ function HomeTab({ isDemoMode, onShowGrant }: { isDemoMode: boolean; onShowGrant
       <div className="ios-quick-actions">
         <QuickActionButton icon="📅" label="Request appt" bg="#e0f2fe" />
         <QuickActionButton icon="💳" label="Insurance" bg="#fef3c7" />
-        <QuickActionButton icon="❤️" label="Health data" bg="#fce7f3" />
-        <QuickActionButton icon="📋" label="Records" bg="#f3e8ff" />
+        <QuickActionButton icon="❤️" label="Health data" bg="#f3f4f6" disabled />
+        <QuickActionButton icon="📋" label="Records" bg="#f3f4f6" disabled />
       </div>
 
       {/* My practices */}
@@ -913,10 +917,10 @@ function HomeTab({ isDemoMode, onShowGrant }: { isDemoMode: boolean; onShowGrant
   )
 }
 
-function QuickActionButton({ icon, label, bg }: { icon: string; label: string; bg: string }) {
+function QuickActionButton({ icon, label, bg, disabled }: { icon: string; label: string; bg: string; disabled?: boolean }) {
   return (
-    <div className="ios-qa">
-      <div className="ios-qa-icon" style={{ background: bg }}>{icon}</div>
+    <div className={`ios-qa ${disabled ? 'opacity-30 cursor-not-allowed' : ''}`} title={disabled ? 'Coming soon' : undefined}>
+      <div className="ios-qa-icon" style={{ background: bg }}>{disabled ? '🔒' : icon}</div>
       <div className="ios-qa-label">{label}</div>
     </div>
   )
