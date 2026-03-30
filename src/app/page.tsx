@@ -43,6 +43,8 @@ function HomeContent() {
   const [step, setStep]               = useState<Step>('welcome')
   const [isVerifying, setIsVerifying] = useState(false)
   const [nullifierHash, setNullifierHash] = useState<string | null>(null)
+  const [worldIdPayload, setWorldIdPayload] = useState<any>(null)
+  const [worldIdAction, setWorldIdAction] = useState<string | null>(null)
   const [handle, setHandle]           = useState('')
   const [boloToken, setBoloToken]     = useState<string | null>(null)
   const [firstName, setFirstName]     = useState('')
@@ -181,6 +183,8 @@ function HomeContent() {
 
       if (data.verified) {
         setNullifierHash(data.nullifier_hash)
+        setWorldIdPayload(finalPayload)
+        setWorldIdAction(verifyPayload.action)
         if (data.handle) {
           // Returning user — already has a handle
           setHandle(data.handle)
@@ -220,7 +224,7 @@ function HomeContent() {
         const res = await fetch('/api/handle/link', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ handle: tryHandle, nullifierHash: hash, displayName, email: email.trim() || undefined }),
+          body: JSON.stringify({ handle: tryHandle, nullifierHash: hash, displayName, email: email.trim() || undefined, worldIdPayload, worldIdAction }),
         })
 
         const data = await res.json()

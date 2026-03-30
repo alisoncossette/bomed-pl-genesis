@@ -53,7 +53,7 @@ async function checkHandleAvailable(handle: string): Promise<boolean> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { handle, nullifierHash, displayName, email: userEmail } = await req.json()
+    const { handle, nullifierHash, displayName, email: userEmail, worldIdPayload, worldIdAction } = await req.json()
 
     if (!handle || !nullifierHash) {
       return NextResponse.json(
@@ -108,10 +108,32 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Link World ID identity to the Bolospot account (non-blocking)
+    // This registers the verified identity in Bolospot so it shows as "World ID verified"
+    if (worldIdPayload && worldIdAction && nullifierHash !== 'demo' && !nullifierHash.startsWith('dev_')) {
+      fetch(`${BASE_URL}/api/identity-verification/verify-world-id`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          merkle_root: worldIdPayload.merkle_root,
+          nullifier_hash: worldIdPayload.nullifier_hash || nullifierHash,
+          proof: worldIdPayload.proof,
+          verification_level: worldIdPayload.verification_level,
+          action: worldIdAction,
+        }),
+      }).then(r => {
+        if (r.ok) console.log(`✓ World ID linked to Bolospot for @${boloHandle}`)
+        else r.text().then(t => console.log(`World ID link note: ${r.status} ${t}`))
+      }).catch(e => console.log('World ID link (non-fatal):', e))
+    }
+
     return NextResponse.json({
       success: true,
       handle: `@${boloHandle}`,
-      accessToken, // return to client for subsequent authenticated calls
+      accessToken,
     })
   } catch (error) {
     console.error('Handle link error:', error)
