@@ -467,7 +467,8 @@ function HomeContent() {
       try {
         // Get OAuth URL from Bolospot — uses the user's session token
         // so the calendar gets stored in Bolospot and powers booking API
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BOLO_API_URL || 'https://api.bolospot.com'}/api/connections/google/authorize`, {
+        const returnUrl = encodeURIComponent(`${process.env.NEXT_PUBLIC_APP_URL || 'https://world.bomed.ai'}`)
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BOLO_API_URL || 'https://api.bolospot.com'}/api/connections/google/authorize?returnUrl=${returnUrl}`, {
           headers: { Authorization: `Bearer ${boloToken}` },
         })
 
