@@ -1,0 +1,23 @@
+{
+  "name": "BoMed",
+  "tagline": "The first healthcare network where identity is sovereign on both sides.",
+  "description": "BoMed gives every patient a permanent health identity — not tied to a hospital, not owned by an insurer. Theirs.\n\nPatients verify their humanity with World ID (orb verification), claim a permanent @handle via Bolospot, and grant providers exactly the access they need — appointments, insurance, demographics — at the scope level. Every permission is revocable instantly. Nothing cached. Nothing lingering.\n\nOn the provider side, a live dashboard populates in real time with verified patient data before the appointment begins. When insurance changes, patients update it once — it propagates everywhere. When the visit ends, one tap removes access entirely.\n\nThe breakthrough: both patient AND provider are verified. World ID proves you're a real human. Bolospot proves who you are. BoMed proves you belong in the network. Three layers of trust, zero clipboard.\n\nEvery permission a patient grants through BoMed is visible and revocable in their Bolospot account. One place to manage everything — not scattered across apps.\n\nBuilt with: Next.js 14, World ID MiniKit, @bolospot/sdk, Tailwind CSS 4, Google Cloud Run, Docker. Fresh code — built from scratch for PL Genesis.",
+  "team": [
+    {
+      "name": "Alison Cossette",
+      "email": "alison@claritrace.com"
+    }
+  ],
+  "demo_url": "https://world.bomed.ai",
+  "video_url": "https://www.youtube.com/watch?v=OA-1iItaHSg",
+  "technologies": [
+    "Next.js",
+    "World ID",
+    "Bolospot",
+    "TypeScript",
+    "Tailwind CSS",
+    "Docker",
+    "Google Cloud Run",
+    "Google Calendar API"
+  ]
+}
