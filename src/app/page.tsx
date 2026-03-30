@@ -611,7 +611,8 @@ function HomeContent() {
 
   // ── DASHBOARD ────────────────────────────────────────────────────────────
   if (step === 'dashboard') {
-    const isDemoMode = !MiniKit.isInstalled()
+    // Demo mode only if no real handle was set (i.e. not logged in via World ID or Google)
+    const isDemoMode = !handle || handle === '@demopatient' || handle === 'demopatient'
     return <Dashboard handle={handle} isDemoMode={isDemoMode} onSignOut={() => setStep('welcome')} />
   }
 
@@ -709,7 +710,7 @@ function Dashboard({ handle, isDemoMode, onSignOut }: { handle: string; isDemoMo
         {activeTab === 'schedule' && <ScheduleTab />}
         {activeTab === 'health' && <HealthTab />}
         {activeTab === 'insurance' && <InsuranceTab />}
-        {activeTab === 'profile' && <ProfileTab onSignOut={onSignOut} />}
+        {activeTab === 'profile' && <ProfileTab onSignOut={onSignOut} handle={userHandle} displayName={displayName} />}
       </div>
 
       {/* Grant access overlay */}
@@ -1097,13 +1098,14 @@ function CoverageRow({ label, value, valueColor, last }: { label: string; value:
 // ═══════════════════════════════════════════════════════════════════════════
 // PROFILE TAB
 // ═══════════════════════════════════════════════════════════════════════════
-function ProfileTab({ onSignOut }: { onSignOut: () => void }) {
+function ProfileTab({ onSignOut, handle, displayName }: { onSignOut: () => void; handle: string; displayName: string }) {
+  const initials = displayName.slice(0, 2).toUpperCase()
   return (
     <>
       <div className="ios-profile-hero">
-        <div className="ios-ph-avatar">DE</div>
-        <div className="ios-ph-name">Dana Ellison</div>
-        <div className="ios-ph-handle">@demopatient · World ID verified ✓</div>
+        <div className="ios-ph-avatar">{initials}</div>
+        <div className="ios-ph-name">{displayName}</div>
+        <div className="ios-ph-handle">{handle} · World ID verified ✓</div>
         <div style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
           <div style={{ flex: 1, background: '#f8fafc', borderRadius: '12px', padding: '10px', textAlign: 'center' }}>
             <div style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>2</div>
