@@ -22,15 +22,21 @@ Or open [world.bomed.ai](https://world.bomed.ai) in any browser — demo works w
 
 ## What BoMed Does
 
-AI agents are already coordinating your healthcare — booking appointments, verifying insurance, requesting records. That's not scary. That's the future.
+Every AI agent in healthcare needs to answer the same question before it can do anything useful: *does this person consent to this, right now?*
 
-What's scary is having no idea it's happening. No visibility into what was shared. No way to take it back.
+Today there's no standard answer. Agents call proprietary APIs, share data through opaque integrations, and patients have no unified view — let alone control — over what's been granted or revoked.
 
-BoMed makes AI healthcare coordination feel like it should — like your banking app. You don't think about the infrastructure. You just manage your life.
+BoMed is a reference implementation of permissioned healthcare coordination built on the [Bolospot](https://bolospot.com) protocol. A patient claims a verified `@handle` (authenticated via World ID), then grants and revokes scoped access to healthcare agents in real time.
 
-**One verified @handle. You see what agents are asking for. You approve it. You revoke it. You're in charge.**
+**The result:** Your PT's scheduling agent finds a time that works. The appointment lands in your calendar. Insurance pre-populates before you arrive. When the visit ends, one tap and they're out.
 
-Your PT's scheduling agent books your session. The appointment appears in your Google Calendar. Your insurance auto-populates before you arrive. When the visit ends, one tap removes everything. Not eventually — now.
+No phone tag. No forms. No wondering what was shared or who still has access. Healthcare that works like your banking app — you don't think about the infrastructure, you just manage your life.
+
+**The protocol layer, not the app layer, is the point.**
+
+Any provider's scheduling agent can request `appointments:read`. Any insurer's verification agent can request `insurance:verify`. The patient approves, sets a policy, revokes in one tap. The agents don't need to know each other — they just need to know the protocol.
+
+Built on: Bolospot · World ID · Next.js · Cloud Run
 
 ---
 
