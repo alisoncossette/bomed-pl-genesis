@@ -365,11 +365,20 @@ function HomeContent() {
               </svg>
             </button>
 
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-[#e5e7eb]" />
+              <span className="text-xs text-[#9ca3af] font-medium">or</span>
+              <div className="flex-1 h-px bg-[#e5e7eb]" />
+            </div>
+
             <button
               onClick={() => setStep('bolo-login')}
-              className="text-sm font-medium text-[#0d9488] hover:text-[#0f766e] transition-colors"
+              className="w-full flex items-center justify-center gap-2.5 py-3 px-4 rounded-xl border border-[#e5e7eb] bg-white text-sm font-semibold text-[#02043d] hover:bg-[#f4f6fb] hover:border-[#d1d5db] transition-all shadow-sm"
             >
-              Already have a Bolo account? Sign in
+              <svg className="w-5 h-5 text-[#0d9488]" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+              </svg>
+              Sign in with Bolospot
             </button>
 
             {!isMiniApp && (
@@ -397,9 +406,9 @@ function HomeContent() {
           <div className="flex flex-col items-center gap-3 text-center">
             <LogoMark size="md" />
             <div>
-              <h2 className="text-2xl font-bold text-[#02043d]">Sign in to BoMed</h2>
+              <h2 className="text-2xl font-bold text-[#02043d]">Sign in with Bolospot</h2>
               <p className="text-sm text-[#6b7280] mt-1">
-                Use your existing Bolo handle
+                Use your existing Bolospot account
               </p>
             </div>
           </div>
