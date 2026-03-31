@@ -1,18 +1,18 @@
 # BoMed
 
-> *Magical access and control for humans in the agentic world.*
+> *AI agents are transforming healthcare coordination. BoMed makes sure the patient is still in charge.*
 
 **Live:** [world.bomed.ai](https://world.bomed.ai) · **Submission:** [devspot.app/projects/1290](https://devspot.app/projects/1290) · **Video:** [YouTube](https://www.youtube.com/watch?v=OA-1iItaHSg)
 
 ---
 
-## Try It Now
+## Try It
 
-Scan with World App on your phone:
+Scan with World App:
 
 [![Open in World App](https://quickchart.io/qr?text=https%3A%2F%2Fworld.bomed.ai&size=180)](https://world.bomed.ai)
 
-Or open [world.bomed.ai](https://world.bomed.ai) in any browser — demo mode works without World App.
+Or open [world.bomed.ai](https://world.bomed.ai) in any browser — demo works without World App.
 
 ---
 
@@ -20,94 +20,76 @@ Or open [world.bomed.ai](https://world.bomed.ai) in any browser — demo mode wo
 
 ---
 
-## The Problem
+## What BoMed Does
 
-We're building the agentic world. Agents that schedule, authorize, access, act.
+AI agents are already coordinating your healthcare — booking appointments, verifying insurance, requesting records. Most patients have no idea it's happening, no visibility into what was shared, and no way to take it back.
 
-And we forgot to build the part where **humans stay in control**.
+BoMed fixes that.
 
-Your PT can't book a single appointment without full access to your medical chart. Your insurer can't verify coverage without seeing everything. Neither side knows if the other is legitimate. Nobody built the permission layer.
+**One verified @handle. You approve what agents can access. You revoke it when you're done.**
+
+Your PT's scheduling agent books your session. The appointment appears in your Google Calendar. Your insurance auto-populates before you arrive. When the visit ends, one tap removes everything. Not eventually — now.
 
 ---
 
-## The Solution
+## The Patient Experience
 
-One World ID verification. One permanent @handle. Providers and their agents request exactly what they need — appointments, insurance, vitals. You see it, you approve it, you revoke it.
-
-Your PT's agent books your session. The appointment appears in your Google Calendar. You never touched a clipboard.
-
-When you revoke — it's gone. **Not eventually. Now.**
-
-> *"Every permission a patient grants through BoMed is visible and revocable in their Bolospot account. One place to manage everything — not scattered across apps."*
+```
+1. Verify with World ID — prove you're a real human, not a bot
+2. Claim your @handle — your permanent health address
+3. Connect your calendar — so agents book around your real availability
+4. Providers request access — you see exactly what they're asking for
+5. You approve by scope — appointments ✅  insurance ✅  records ❌
+6. Agent books appointment — lands in your Google Calendar
+7. Visit ends — one tap revokes everything
+```
 
 ---
 
 ## What Makes It Different
 
-**Both sides are World ID verified.** Patient AND provider. One human, one handle. No bots making decisions about your health.
+**Agents can act. Patients stay in control.**
 
-**Trust follows the person, not the software.** Practice switches EHRs — your grants persist. Because the permission lives with the patient, not the app.
+Every permission request is visible. Every grant is scoped — your PT can see your schedule, not your lab results. Every revocation is instant and complete. No cached tokens. No lingering access.
 
-**Three layers of trust. Zero clipboard.**
-- World ID → proves you're a real human
-- Bolospot → proves who you are
-- BoMed → proves you belong in the network
+Both sides are World ID verified. Your provider is real. You are real. Nobody in this network is a bot.
 
----
-
-## How It Works
-
-```
-Patient verifies with World ID (orb)
-        ↓
-Bolospot @handle created — permanent health address
-        ↓
-Providers send permission requests to your @handle
-        ↓
-You approve scopes: appointments ✅  insurance ✅  records ❌
-        ↓
-Approved → real appointment booked in your Google Calendar
-        ↓
-Visit ends → one tap revokes everything
-```
-
----
-
-## Architecture
-
-| Layer | Technology |
-|-------|-----------|
-| Humanity verification | World ID MiniKit |
-| Permanent identity | Bolospot @handle |
-| Permission protocol | @bolospot/sdk |
-| Calendar integration | Google Calendar API via Bolospot |
-| Frontend | Next.js 14, Tailwind CSS 4 |
-| Deployment | Google Cloud Run, Docker |
-
-**What you ARE is permanent. What you ALLOW is revocable.**
-
-Patient data never touches a decentralized network by design — instant revocation requires real-time control, which is incompatible with on-chain immutability. Provider credentials (NPI, licenses) are the right fit for on-chain: public, permanent, verifiable.
+> *"Every permission granted through BoMed is visible and revocable in your Bolospot account. One place to manage everything — not scattered across apps."*
 
 ---
 
 ## For Protocol Labs
 
-The agentic stack is missing its consent layer.
+Healthcare is the hardest testbed for agent coordination infrastructure — high stakes, strict compliance, real consequences when access control fails.
 
-IPFS stores. World ID verifies. **Bolospot answers: who can reach me, what can they do, and how do I take it back?**
+BoMed proves the model works:
+- **Agent relay** — providers and their agents communicate through a permissioned channel
+- **Scope-based grants** — agents get exactly the access they need, nothing more
+- **Instant revocation** — the access layer is always real-time, always patient-controlled
+- **Bilateral verification** — both sides are cryptographically verified via World ID
 
-BoMed proves it works in the hardest domain — healthcare, where the stakes of getting access control wrong are highest. Same primitives generalize to legal, finance, hiring, any vertical where AI needs human permission to act.
-
-**The protocol is the product. BoMed is the proof.**
+Same primitives, every vertical where AI agents need to act on behalf of humans.
 
 ---
 
-## PL Genesis Tracks
+## Tracks
 
-- ✅ **World Build 3** — World ID MiniKit, orb verification, bilateral human trust
+- ✅ **World Build 3** — World ID MiniKit, orb verification, bilateral trust
 - ✅ **Fresh Code** — ~1,400 lines built from scratch for PL Genesis
-- ✅ **Infrastructure & Digital Rights** — consent protocol, sovereign identity, instant revocation
-- ✅ **AI & Robotics** — agent relay, scheduling policy engine, autonomous appointment booking
+- ✅ **Infrastructure & Digital Rights** — agent permission protocol, sovereign identity
+- ✅ **AI & Robotics** — agent relay, scheduling policy engine, autonomous booking
+
+---
+
+## Stack
+
+| | |
+|--|--|
+| Frontend | Next.js 14, World ID MiniKit, Tailwind CSS 4 |
+| Identity | Bolospot @handle + World ID |
+| Agent coordination | @bolospot/sdk relay + booking API |
+| Calendar | Google Calendar API |
+| Deployment | Google Cloud Run, Docker |
 
 ---
 
@@ -118,18 +100,17 @@ git clone https://github.com/alisoncossette/bomed-pl-genesis.git
 cd bomed-pl-genesis
 npm install
 cp .env.local.example .env.local
-# Add your keys (see Environment Variables below)
 npm run dev
 ```
 
 | Variable | Description |
 |----------|-------------|
-| `BOLO_API_KEY` | Bolospot API key (`bolo_live_...`) |
-| `NEXT_PUBLIC_WORLD_APP_ID` | World Developer Portal app ID |
+| `BOLO_API_KEY` | Bolospot API key |
+| `NEXT_PUBLIC_WORLD_APP_ID` | World Developer Portal app ID (`app_...`) |
 | `NEXT_PUBLIC_WORLD_ACTION` | World ID action (default: `verify-patient`) |
-| `GOOGLE_CLIENT_ID` | Google OAuth for calendar connect |
+| `GOOGLE_CLIENT_ID` | Google OAuth for calendar |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth secret |
 
 ---
 
-*Built with 💚 on [Bolospot](https://bolospot.com) — the open trust protocol for human-forward AI.*
+*Built on [Bolospot](https://bolospot.com) — the permission protocol for the agentic world.*
