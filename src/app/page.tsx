@@ -304,11 +304,11 @@ function HomeContent() {
   // ── WELCOME ──────────────────────────────────────────────────────────────
   if (step === 'welcome') {
     return (
-      <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-12">
-        <div className="w-full max-w-sm mx-auto flex flex-col items-center gap-10">
+      <main className="min-h-screen bg-white flex flex-col items-center justify-between px-6 pt-16 pb-10">
+        <div className="w-full max-w-sm mx-auto flex flex-col items-center gap-8">
 
           {/* Logo + wordmark */}
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-3">
             <LogoMark size="lg" />
             <div className="text-center">
               <h1 className="text-4xl font-bold text-[#02043d] tracking-tight">BoMed</h1>
@@ -317,7 +317,7 @@ function HomeContent() {
           </div>
 
           {/* Feature list */}
-          <div className="w-full flex flex-col gap-4">
+          <div className="w-full flex flex-col gap-3">
             {[
               { title: 'Proof of personhood', desc: 'No passwords, no forms — just you' },
               { title: 'Scoped permissions', desc: 'Share only exactly what you choose' },
@@ -327,16 +327,18 @@ function HomeContent() {
                 <div className="w-[22px] h-[22px] rounded-full bg-[#0d9488] flex items-center justify-center flex-shrink-0 mt-0.5">
                   <CheckIcon />
                 </div>
-                <div>
+                <div className="flex flex-col">
                   <span className="text-sm font-semibold text-[#02043d]">{f.title}</span>
-                  <span className="text-sm text-[#6b7280]"> — {f.desc}</span>
+                  <span className="text-sm text-[#6b7280]">{f.desc}</span>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* CTA */}
-          <div className="w-full flex flex-col gap-3">
+        </div>
+
+        {/* CTA — pinned toward bottom */}
+        <div className="w-full max-w-sm mx-auto flex flex-col gap-3">
             <button
               onClick={() => setStep('setup')}
               className="bm-btn-primary"
@@ -376,8 +378,6 @@ function HomeContent() {
                 </button>
               </>
             )}
-          </div>
-
         </div>
       </main>
     )
