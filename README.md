@@ -1,6 +1,6 @@
 # BoMed
 
-> *AI agents are transforming healthcare coordination. BoMed makes sure the patient is still in charge.*
+> *AI agents are transforming healthcare. BoMed makes that feel empowering, not scary.*
 
 **Live:** [world.bomed.ai](https://world.bomed.ai) · **Submission:** [devspot.app/projects/1290](https://devspot.app/projects/1290) · **Video:** [YouTube](https://www.youtube.com/watch?v=OA-1iItaHSg)
 
@@ -22,11 +22,13 @@ Or open [world.bomed.ai](https://world.bomed.ai) in any browser — demo works w
 
 ## What BoMed Does
 
-AI agents are already coordinating your healthcare — booking appointments, verifying insurance, requesting records. Most patients have no idea it's happening, no visibility into what was shared, and no way to take it back.
+AI agents are already coordinating your healthcare — booking appointments, verifying insurance, requesting records. That's not scary. That's the future.
 
-BoMed fixes that.
+What's scary is having no idea it's happening. No visibility into what was shared. No way to take it back.
 
-**One verified @handle. You approve what agents can access. You revoke it when you're done.**
+BoMed makes AI healthcare coordination feel like it should — like your banking app. You don't think about the infrastructure. You just manage your life.
+
+**One verified @handle. You see what agents are asking for. You approve it. You revoke it. You're in charge.**
 
 Your PT's scheduling agent books your session. The appointment appears in your Google Calendar. Your insurance auto-populates before you arrive. When the visit ends, one tap removes everything. Not eventually — now.
 
