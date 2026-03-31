@@ -30,6 +30,8 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
+      - '--update-env-vars'
+      - 'NEXT_PUBLIC_WORLD_APP_ID=app_bcc263186d9a781025f30224632aa559'
       - '--port'
       - '8080'
       - '--memory'
