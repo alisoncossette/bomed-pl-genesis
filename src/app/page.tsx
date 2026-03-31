@@ -3,9 +3,34 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { MiniKit, VerifyCommandInput, VerificationLevel } from '@worldcoin/minikit-js'
+import { AutoBookFeed } from './components/AutoBookFeed'
 
 type Step = 'welcome' | 'setup' | 'calendar' | 'dashboard' | 'sending-request'
 type Tab = 'home' | 'schedule' | 'health' | 'insurance' | 'profile'
+
+// Policy type for grants
+type Policy = {
+  autoApprove: boolean
+  requireConfirmation: boolean
+  allowRescheduling: boolean
+}
+
+const DEFAULT_POLICY: Policy = {
+  autoApprove: false,
+  requireConfirmation: true,
+  allowRescheduling: true,
+}
+
+// ─── QR Code Scanner ────────────────────────────────────────────────────────
+function decodeQR(imageData: ImageData): string | null {
+  try {
+    const jsQR = require('jsqr')
+    const code = jsQR(imageData.data, imageData.width, imageData.height)
+    return code ? code.data : null
+  } catch {
+    return null
+  }
+}
 
 // ─── Spinner ────────────────────────────────────────────────────────────────
 function Spinner({ dark }: { dark?: boolean }) {
@@ -622,7 +647,7 @@ function HomeContent() {
   if (step === 'dashboard') {
     // Demo mode only if no real handle was set (i.e. not logged in via World ID or Google)
     const isDemoMode = !handle || handle === '@demopatient' || handle === 'demopatient'
-    return <Dashboard handle={handle} isDemoMode={isDemoMode} onSignOut={() => setStep('welcome')} />
+    return <Dashboard handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} onSignOut={() => setStep('welcome')} />
   }
 
   return null
@@ -631,7 +656,7 @@ function HomeContent() {
 // ═══════════════════════════════════════════════════════════════════════════
 // DASHBOARD (iOS-style with bottom nav)
 // ═══════════════════════════════════════════════════════════════════════════
-function Dashboard({ handle, isDemoMode, onSignOut }: { handle: string; isDemoMode: boolean; onSignOut: () => void }) {
+function Dashboard({ handle, boloToken, isDemoMode, onSignOut }: { handle: string; boloToken: string | null; isDemoMode: boolean; onSignOut: () => void }) {
   const [activeTab, setActiveTab] = useState<Tab>('home')
   const [tapCount, setTapCount] = useState(0)
   const [showDemo, setShowDemo] = useState(false)
@@ -715,8 +740,8 @@ function Dashboard({ handle, isDemoMode, onSignOut }: { handle: string; isDemoMo
 
       {/* Scrollable content */}
       <div className="ios-content">
-        {activeTab === 'home' && <HomeTab isDemoMode={isDemoMode} onShowGrant={() => setShowGrantSheet(true)} />}
-        {activeTab === 'schedule' && <ScheduleTab />}
+        {activeTab === 'home' && <HomeTab handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} onShowGrant={() => setShowGrantSheet(true)} />}
+        {activeTab === 'schedule' && <ScheduleTab handle={handle} boloToken={boloToken} />}
         {activeTab === 'health' && <HealthTab />}
         {activeTab === 'insurance' && <InsuranceTab />}
         {activeTab === 'profile' && <ProfileTab onSignOut={onSignOut} handle={userHandle} displayName={displayName} />}
@@ -872,7 +897,7 @@ function PermissionRow({ icon, bg, title, desc, checked }: { icon: string; bg: s
 // ═══════════════════════════════════════════════════════════════════════════
 // HOME TAB
 // ═══════════════════════════════════════════════════════════════════════════
-function HomeTab({ isDemoMode, onShowGrant }: { isDemoMode: boolean; onShowGrant: () => void }) {
+function HomeTab({ handle, boloToken, isDemoMode, onShowGrant }: { handle: string; boloToken: string | null; isDemoMode: boolean; onShowGrant: () => void }) {
   return (
     <>
       {/* Hero card - next appointment */}
@@ -902,27 +927,12 @@ function HomeTab({ isDemoMode, onShowGrant }: { isDemoMode: boolean; onShowGrant
         <QuickActionButton icon="📋" label="Records" bg="#f3f4f6" disabled />
       </div>
 
-      {/* My practices */}
-      <div className="ios-slabel">My Practices</div>
-      <div className="ios-practices-scroll">
-        <PracticeCard icon="🏃" bg="#e0f2fe" name="Greenfield PT" sub="Next: Apr 1 · 2:30 PM" badgeType="active" />
-        <PracticeCard icon="🏥" bg="#fef3c7" name="City Family Med" sub="Requesting access" badgeType="pending" onClick={onShowGrant} />
-        <div className="ios-practice-add">
-          <div className="ios-practice-add-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" strokeWidth="2.5">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-          </div>
-          <div className="ios-practice-add-label">Connect practice</div>
-        </div>
-      </div>
-
-      {/* Recent activity */}
-      <div className="ios-slabel">Recent</div>
-      <ActivityItem icon="✅" bg="#dcfce7" title="PT Session confirmed" sub="Greenfield PT · Apr 1" time="2h ago" badge="Confirmed" badgeClass="badge-confirmed" />
-      <ActivityItem icon="💊" bg="#e0f2fe" title="Insurance updated" sub="Aetna POS II propagated" time="Yesterday" badge="Sent" badgeClass="badge-new" />
-      <ActivityItem icon="❤️" bg="#fce7f3" title="Vitals logged" sub="BP 118/76 · Weight 142 lbs" time="Mar 25" badge="Via Greenfield" badgeClass="badge-new" />
+      {/* REAL COMPONENTS BELOW */}
+      <div style={{ marginTop: '16px' }} />
+      <AutoBookFeed handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
+      <ConnectPractice handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
+      <PendingRequests handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
+      <ActiveGrants handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
     </>
   )
 }
@@ -968,7 +978,7 @@ function ActivityItem({ icon, bg, title, sub, time, badge, badgeClass }: { icon:
 // ═══════════════════════════════════════════════════════════════════════════
 // SCHEDULE TAB
 // ═══════════════════════════════════════════════════════════════════════════
-function ScheduleTab() {
+function ScheduleTab({ handle, boloToken }: { handle: string; boloToken: string | null }) {
   return (
     <>
       <div className="ios-slabel">Upcoming</div>
@@ -979,6 +989,10 @@ function ScheduleTab() {
       <div style={{ opacity: 0.6 }}>
         <AppointmentItem month="MAR" day="25" title="Initial eval" meta="11:00 AM · Dr. Sarah Kim · 60 min" status="Done" />
       </div>
+
+      {/* REAL APPOINTMENTS (relay inbox messages) */}
+      <div style={{ marginTop: '16px' }} />
+      <Appointments handle={handle} boloToken={boloToken} />
     </>
   )
 }
@@ -1045,6 +1059,911 @@ function VitalRow({ icon, bg, name, sub, value, unit, trend, trendClass }: { ico
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+// ─── Section wrapper ────────────────────────────────────────────────────────
+function Section({
+  title,
+  badge,
+  children,
+  live,
+}: {
+  title: string
+  badge?: string
+  children: React.ReactNode
+  live?: boolean
+}) {
+  return (
+    <section className="bm-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-[#f1f3f8]">
+        <div className="flex items-center gap-2">
+          {live && <div className="w-2 h-2 rounded-full bg-[#0d9488] animate-pulse" />}
+          <h3 className="text-sm font-bold text-[#02043d]">{title}</h3>
+        </div>
+        {badge && (
+          <span className="text-[11px] font-semibold text-[#0d9488] bg-[#ccfbf1] border border-[rgba(13,148,136,0.2)] rounded-full px-2 py-0.5">
+            {badge}
+          </span>
+        )}
+      </div>
+      {children}
+    </section>
+  )
+}
+
+function LoadingRows() {
+  return (
+    <div className="divide-y divide-[#f1f3f8]">
+      {[1, 2, 3].map(i => (
+        <div key={i} className="flex items-center gap-3 px-4 py-3 animate-pulse">
+          <div className="w-9 h-9 rounded-full bg-[#f1f3f8] shrink-0" />
+          <div className="flex-1 space-y-2">
+            <div className="h-3 bg-[#f1f3f8] rounded w-2/3" />
+            <div className="h-2 bg-[#f1f3f8] rounded w-1/2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function EmptyState({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
+  return (
+    <div className="flex flex-col items-center py-10 px-6 text-center">
+      <div className="w-11 h-11 rounded-xl bg-[#f4f6fb] flex items-center justify-center mb-3">
+        {icon}
+      </div>
+      <p className="text-sm font-semibold text-[#02043d] mb-1">{title}</p>
+      <p className="text-xs text-[#9ca3af] leading-relaxed max-w-[220px]">{desc}</p>
+    </div>
+  )
+}
+
+function PolicyControls({
+  policy,
+  onChange,
+  scopeHasAppointments,
+}: {
+  policy: Policy
+  onChange: (p: Policy) => void
+  scopeHasAppointments: boolean
+}) {
+  if (!scopeHasAppointments) return null
+  return (
+    <div className="mt-3 pt-3 border-t border-[#f1f3f8] space-y-2">
+      <p className="text-[11px] font-semibold text-[#9ca3af] uppercase tracking-wide mb-1">Appointment policy</p>
+      {(
+        [
+          { key: 'autoApprove', label: 'Auto-approve future requests' },
+          { key: 'requireConfirmation', label: 'Require confirmation' },
+          { key: 'allowRescheduling', label: 'Allow rescheduling' },
+        ] as { key: keyof Policy; label: string }[]
+      ).map(({ key, label }) => (
+        <label key={key} className="flex items-center justify-between gap-2 cursor-pointer">
+          <span className="text-xs text-[#4b5563]">{label}</span>
+          <input
+            type="checkbox"
+            className="sr-only peer"
+            checked={policy[key] as boolean}
+            onChange={e => onChange({ ...policy, [key]: e.target.checked })}
+          />
+          <span className="relative w-9 h-5 bg-[#e5e7eb] peer-checked:bg-[#0d9488] rounded-full transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:bg-white after:rounded-full after:transition-transform peer-checked:after:translate-x-4" />
+        </label>
+      ))}
+    </div>
+  )
+}
+
+// PATIENT PROFILE (insurance, DOB, address)
+// ═══════════════════════════════════════════════════════════════════════════
+function PatientProfile() {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [profile, setProfile] = useState({
+    dob: '',
+    address: '',
+    city: '',
+    state: '',
+    zip: '',
+    insuranceProvider: '',
+    memberId: '',
+    groupNumber: '',
+    insurancePhone: '',
+  })
+
+  function handleChange(field: string, value: string) {
+    setProfile(prev => ({ ...prev, [field]: value }))
+    setSaved(false)
+  }
+
+  function handleSave() {
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2500)
+  }
+
+  const hasInsurance = profile.insuranceProvider || profile.memberId
+
+  return (
+    <section className="bm-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-bold text-[#02043d]">My Profile</h3>
+          {hasInsurance && (
+            <span className="text-[11px] font-semibold text-[#0d9488] bg-[#ccfbf1] border border-[rgba(13,148,136,0.2)] rounded-full px-2 py-0.5">
+              Insurance on file
+            </span>
+          )}
+        </div>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-7 h-7 rounded-lg bg-[#f4f6fb] hover:bg-[#e5e7eb] transition-colors flex items-center justify-center text-[#6b7280]"
+        >
+          <svg className="w-4 h-4 transition-transform" style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+            viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 6l4 4 4-4" />
+          </svg>
+        </button>
+      </div>
+
+      {!isExpanded && (
+        <div className="px-4 pb-4 flex gap-4">
+          {[
+            { icon: '📋', label: 'Insurance', filled: !!profile.insuranceProvider },
+            { icon: '🎂', label: 'Date of birth', filled: !!profile.dob },
+            { icon: '🏠', label: 'Address', filled: !!profile.address },
+          ].map(item => (
+            <button key={item.label} onClick={() => setIsExpanded(true)}
+              className="flex-1 flex flex-col items-center gap-1.5 py-2.5 rounded-xl border border-dashed border-[#e5e7eb] hover:border-[#0d9488] hover:bg-[#f0fdfa] transition-all">
+              <span className="text-lg">{item.icon}</span>
+              <span className={`text-[10px] font-semibold ${item.filled ? 'text-[#0d9488]' : 'text-[#9ca3af]'}`}>
+                {item.filled ? '✓ ' : '+ '}{item.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {isExpanded && (
+        <div className="px-4 pb-4 flex flex-col gap-5 border-t border-[#f1f3f8] pt-4">
+
+          {/* Date of birth */}
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] mb-1.5">🎂 Date of birth</label>
+            <input type="date" value={profile.dob}
+              onChange={e => handleChange('dob', e.target.value)}
+              className="bm-input w-full" />
+          </div>
+
+          {/* Address */}
+          <div className="flex flex-col gap-2">
+            <label className="block text-xs font-semibold text-[#6b7280]">🏠 Home address</label>
+            <input type="text" value={profile.address} placeholder="Street address"
+              onChange={e => handleChange('address', e.target.value)}
+              className="bm-input w-full" />
+            <div className="grid grid-cols-3 gap-2">
+              <input type="text" value={profile.city} placeholder="City"
+                onChange={e => handleChange('city', e.target.value)}
+                className="bm-input col-span-1" />
+              <input type="text" value={profile.state} placeholder="State" maxLength={2}
+                onChange={e => handleChange('state', e.target.value.toUpperCase())}
+                className="bm-input col-span-1" />
+              <input type="text" value={profile.zip} placeholder="ZIP"
+                onChange={e => handleChange('zip', e.target.value)}
+                className="bm-input col-span-1" />
+            </div>
+          </div>
+
+          {/* Insurance */}
+          <div className="flex flex-col gap-2">
+            <label className="block text-xs font-semibold text-[#6b7280]">🏥 Insurance</label>
+            <input type="text" value={profile.insuranceProvider} placeholder="Provider (e.g. Blue Cross)"
+              onChange={e => handleChange('insuranceProvider', e.target.value)}
+              className="bm-input w-full" />
+            <div className="grid grid-cols-2 gap-2">
+              <input type="text" value={profile.memberId} placeholder="Member ID"
+                onChange={e => handleChange('memberId', e.target.value)}
+                className="bm-input" />
+              <input type="text" value={profile.groupNumber} placeholder="Group #"
+                onChange={e => handleChange('groupNumber', e.target.value)}
+                className="bm-input" />
+            </div>
+            <input type="tel" value={profile.insurancePhone} placeholder="Insurance phone (optional)"
+              onChange={e => handleChange('insurancePhone', e.target.value)}
+              className="bm-input w-full" />
+          </div>
+
+          <button onClick={handleSave}
+            className={`bm-btn-primary transition-all ${saved ? 'bg-[#16a34a] border-[#16a34a]' : ''}`}>
+            {saved ? '✓ Saved' : 'Save profile'}
+          </button>
+
+        </div>
+      )}
+    </section>
+  )
+}
+
+const CONNECT_SCOPES = [
+  { id: 'appointments:read',    label: 'Appointments', icon: '📅', desc: 'View & book appointments' },
+  { id: 'insurance:read',       label: 'Insurance',    icon: '🏥', desc: 'Verify coverage' },
+  { id: 'demographics:read',    label: 'Address & DOB', icon: '👤', desc: 'Name, address, date of birth' },
+  { id: 'vitals:write',         label: 'Vitals',       icon: '💓', desc: 'Send readings to provider' },
+]
+
+function ConnectPractice({ handle, boloToken, isDemoMode }: { handle: string; boloToken: string | null; isDemoMode: boolean }) {
+  const [isExpanded, setIsExpanded]       = useState(false)
+  const [practiceHandleInput, setPracticeHandleInput] = useState('')
+  const [isConnecting, setIsConnecting]   = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+  const [errorMessage, setErrorMessage]   = useState('')
+  const [isScanning, setIsScanning]       = useState(false)
+  const [selectedScopes, setSelectedScopes] = useState<Set<string>>(new Set(['appointments:read']))
+
+  function toggleConnectScope(id: string) {
+    setSelectedScopes(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  async function handleConnect() {
+    if (!practiceHandleInput.trim()) return
+
+    setIsConnecting(true)
+    setErrorMessage('')
+    setSuccessMessage('')
+
+    // Demo mode — no API needed
+    if (isDemoMode || !boloToken) {
+      await new Promise(r => setTimeout(r, 800))
+      setSuccessMessage(`✓ Connected to @${practiceHandleInput.replace(/^@/, '')} (demo)`)
+      setPracticeHandleInput('')
+      setTimeout(() => { setSuccessMessage(''); setIsExpanded(false) }, 2500)
+      setIsConnecting(false)
+      return
+    }
+
+    try {
+      const res = await fetch('/api/practice/connect', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          practiceHandle: practiceHandleInput,
+          patientHandle: handle,
+          boloToken,
+          scopes: Array.from(selectedScopes),
+        }),
+      })
+
+      const data = await res.json()
+
+      if (data.success) {
+        setSuccessMessage(`✓ Connected to @${practiceHandleInput.replace(/^@/, '')}`)
+        setPracticeHandleInput('')
+        setTimeout(() => {
+          setSuccessMessage('')
+          setIsExpanded(false)
+        }, 3000)
+      } else {
+        setErrorMessage(data.error || 'Failed to connect')
+      }
+    } catch (error) {
+      setErrorMessage('Network error. Please try again.')
+    } finally {
+      setIsConnecting(false)
+    }
+  }
+
+  async function handleQRScan(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setIsScanning(true)
+    setErrorMessage('')
+
+    try {
+      const img = new Image()
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+
+      img.onload = async () => {
+        canvas.width = img.width
+        canvas.height = img.height
+        ctx?.drawImage(img, 0, 0)
+
+        const imageData = ctx?.getImageData(0, 0, canvas.width, canvas.height)
+        if (!imageData) {
+          setErrorMessage('Failed to read image')
+          setIsScanning(false)
+          return
+        }
+
+        const qrData = decodeQR(imageData)
+        if (!qrData) {
+          setErrorMessage('No QR code found in image')
+          setIsScanning(false)
+          return
+        }
+
+        // Extract practice handle from URL
+        // Expected format: https://bomed.world/?practice=greenfieldpt&scopes=...
+        try {
+          const url = new URL(qrData)
+          const practice = url.searchParams.get('practice')
+          const scopesParam = url.searchParams.get('scopes')
+
+          if (!practice) {
+            setErrorMessage('Invalid QR code: no practice handle found')
+            setIsScanning(false)
+            return
+          }
+
+          const scopes = scopesParam ? scopesParam.split(',') : undefined
+
+          // Auto-connect
+          const res = await fetch('/api/practice/connect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              practiceHandle: practice,
+              patientHandle: handle,
+              boloToken,
+              scopes,
+            }),
+          })
+
+          const data = await res.json()
+
+          if (data.success) {
+            setSuccessMessage(`✓ Connected to @${practice}`)
+            setTimeout(() => {
+              setSuccessMessage('')
+              setIsExpanded(false)
+            }, 3000)
+          } else {
+            setErrorMessage(data.error || 'Failed to connect')
+          }
+        } catch {
+          setErrorMessage('Invalid QR code format')
+        } finally {
+          setIsScanning(false)
+        }
+      }
+
+      img.onerror = () => {
+        setErrorMessage('Failed to load image')
+        setIsScanning(false)
+      }
+
+      img.src = URL.createObjectURL(file)
+    } catch {
+      setErrorMessage('Failed to process image')
+      setIsScanning(false)
+    }
+  }
+
+  return (
+    <section className="bm-card overflow-hidden">
+      <div className="flex items-center justify-between px-4 pt-4 pb-3">
+        <h3 className="text-sm font-bold text-[#02043d]">Connect a Practice</h3>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-7 h-7 rounded-lg bg-[#0d9488] hover:bg-[#0f766e] transition-colors flex items-center justify-center text-white"
+          aria-label={isExpanded ? 'Collapse' : 'Expand'}
+        >
+          <svg
+            className="w-4 h-4 transition-transform"
+            style={{ transform: isExpanded ? 'rotate(45deg)' : 'rotate(0deg)' }}
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M8 3v10M3 8h10" />
+          </svg>
+        </button>
+      </div>
+
+      {isExpanded && (
+        <div className="px-4 pb-4 flex flex-col gap-4 border-t border-[#f1f3f8] pt-4">
+          {/* Success message */}
+          {successMessage && (
+            <div className="px-3 py-2.5 rounded-lg bg-[#f0fdf4] border border-[#86efac] text-sm text-[#15803d] font-medium">
+              {successMessage}
+            </div>
+          )}
+
+          {/* Error message */}
+          {errorMessage && (
+            <div className="px-3 py-2.5 rounded-lg bg-[#fef2f2] border border-[#fca5a5] text-sm text-[#dc2626] font-medium">
+              {errorMessage}
+            </div>
+          )}
+
+          {/* Example practices */}
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] mb-2">
+              Quick connect
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { name: 'Greenfield PT', handle: 'greenfieldpt' },
+                { name: 'Lang Family Practice', handle: 'langfamilypractice' },
+                { name: 'GM Orthopedic', handle: 'gmorthopedic' },
+              ].map(p => (
+                <button
+                  key={p.handle}
+                  onClick={() => setPracticeHandleInput(p.handle)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                    practiceHandleInput === p.handle
+                      ? 'bg-[#0d9488] text-white border-[#0d9488]'
+                      : 'bg-white text-[#4b5563] border-[#e5e7eb] hover:border-[#0d9488] hover:text-[#0d9488]'
+                  }`}
+                >
+                  {p.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Scope selection */}
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] mb-2">
+              What to share
+            </label>
+            <div className="flex flex-col divide-y divide-[#f1f3f8] rounded-xl border border-[#e5e7eb] overflow-hidden">
+              {CONNECT_SCOPES.map(scope => (
+                <label key={scope.id} className="flex items-center justify-between px-3 py-2.5 bg-white cursor-pointer hover:bg-[#f9fafb] transition-colors">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-base">{scope.icon}</span>
+                    <div>
+                      <p className="text-sm font-medium text-[#02043d]">{scope.label}</p>
+                      <p className="text-[11px] text-[#9ca3af]">{scope.desc}</p>
+                    </div>
+                  </div>
+                  <label className="bm-toggle">
+                    <input
+                      type="checkbox"
+                      checked={selectedScopes.has(scope.id)}
+                      onChange={() => toggleConnectScope(scope.id)}
+                    />
+                    <span className="bm-toggle-track" />
+                  </label>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Type handle */}
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] mb-2">
+              Or type handle
+            </label>
+            <div className="flex gap-2">
+              <div className="flex-1 flex rounded-xl border border-[#e5e7eb] focus-within:border-[#0d9488] focus-within:ring-2 focus-within:ring-[#0d9488]/10 overflow-hidden">
+                <span className="flex items-center px-3 bg-[#f4f6fb] border-r border-[#e5e7eb] text-sm font-semibold text-[#9ca3af] select-none">
+                  @
+                </span>
+                <input
+                  type="text"
+                  value={practiceHandleInput}
+                  onChange={e => setPracticeHandleInput(e.target.value.replace(/^@/, ''))}
+                  onKeyDown={e => e.key === 'Enter' && handleConnect()}
+                  placeholder="greenfieldpt"
+                  className="flex-1 px-3 py-2.5 bg-white text-sm font-medium text-[#02043d] outline-none placeholder-[#9ca3af]/60"
+                  disabled={isConnecting}
+                />
+              </div>
+              <button
+                onClick={handleConnect}
+                disabled={!practiceHandleInput.trim() || isConnecting}
+                className="bm-btn-teal px-4 py-2.5 text-sm whitespace-nowrap"
+              >
+                {isConnecting ? (
+                  <>
+                    <Spinner />
+                    Connecting...
+                  </>
+                ) : (
+                  'Connect'
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* OR divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px bg-[#e5e7eb]" />
+            <span className="text-xs text-[#9ca3af] font-medium">or</span>
+            <div className="flex-1 h-px bg-[#e5e7eb]" />
+          </div>
+
+          {/* Scan QR */}
+          <div>
+            <label className="block text-xs font-semibold text-[#6b7280] mb-2">
+              Scan QR code
+            </label>
+            <label className="bm-btn-teal w-full flex items-center justify-center gap-2 cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleQRScan}
+                className="hidden"
+                disabled={isScanning || !boloToken}
+              />
+              {isScanning ? (
+                <>
+                  <Spinner />
+                  Scanning...
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                  </svg>
+                  Scan with Camera
+                </>
+              )}
+            </label>
+          </div>
+        </div>
+      )}
+    </section>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PENDING REQUESTS
+// ═══════════════════════════════════════════════════════════════════════════
+const DEMO_REQUESTS = [
+  {
+    id: 'demo-req-1',
+    fromName: 'Greenfield Physical Therapy',
+    fromHandle: '@greenfieldpt',
+    widgetName: 'BoMed Scheduling',
+    reason: 'Book PT sessions and receive appointment reminders',
+    scopes: ['appointments:read', 'appointments:request', 'vitals:write'],
+  },
+  {
+    id: 'demo-req-2',
+    fromName: 'City Dental Associates',
+    fromHandle: '@citydental',
+    widgetName: 'BoMed Check-In',
+    reason: 'Verify insurance and manage appointment scheduling',
+    scopes: ['appointments:read', 'insurance:read'],
+  },
+]
+
+function PendingRequests({ handle, boloToken, isDemoMode }: { handle: string; boloToken: string | null; isDemoMode: boolean }) {
+  const [requests, setRequests] = useState<any[]>(isDemoMode ? DEMO_REQUESTS : [])
+  const [loading, setLoading]   = useState(!isDemoMode)
+
+  useEffect(() => {
+    if (!isDemoMode) {
+      fetchRequests()
+    }
+  }, [handle, boloToken, isDemoMode])
+
+  async function fetchRequests() {
+    try {
+      const headers: Record<string, string> = {}
+      if (boloToken) headers['x-bolo-token'] = boloToken
+      const res  = await fetch(`/api/requests?handle=${encodeURIComponent(handle)}`, { headers })
+      const data = await res.json()
+      setRequests(data.requests || [])
+    } catch { /* silent */ } finally { setLoading(false) }
+  }
+
+  async function handleRespond(requestId: string, approved: boolean, scopes: string[], policy?: Policy) {
+    if (isDemoMode) {
+      // In demo mode, just remove from local state
+      setRequests(prev => prev.filter(r => r.id !== requestId))
+      return
+    }
+
+    try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (boloToken) headers['x-bolo-token'] = boloToken
+      await fetch('/api/requests/respond', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ requestId, approved, scopes, handle, policy }),
+      })
+      fetchRequests()
+    } catch { /* silent */ }
+  }
+
+  function handleReset() {
+    setRequests(DEMO_REQUESTS)
+  }
+
+  return (
+    <Section
+      title="Incoming Requests"
+      badge={requests.length > 0 ? `${requests.length} pending` : undefined}
+    >
+      {loading ? <LoadingRows /> : requests.length === 0 ? (
+        <div className="flex flex-col items-center py-10 px-6 text-center">
+          <div className="w-11 h-11 rounded-xl bg-[#f4f6fb] flex items-center justify-center mb-3">
+            <svg className="w-5 h-5 text-[#9ca3af]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+          </div>
+          <p className="text-sm font-semibold text-[#02043d] mb-1">All clear</p>
+          <p className="text-xs text-[#9ca3af] leading-relaxed max-w-[220px] mb-3">No pending permission requests</p>
+          {isDemoMode && (
+            <button
+              onClick={handleReset}
+              className="text-xs font-medium text-[#0d9488] hover:text-[#0f766e] underline"
+            >
+              Reset demo requests
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="divide-y divide-[#f1f3f8]">
+          {requests.map(req => (
+            <RequestCard key={req.id} request={req} onRespond={handleRespond} />
+          ))}
+        </div>
+      )}
+    </Section>
+  )
+}
+
+// ─── Request card ───────────────────────────────────────────────────────────
+function RequestCard({
+  request,
+  onRespond,
+}: {
+  request: any
+  onRespond: (id: string, approved: boolean, scopes: string[], policy?: Policy) => void
+}) {
+  const [selectedScopes, setSelectedScopes] = useState<Set<string>>(new Set(request.scopes || []))
+  const [policy, setPolicy]                 = useState<Policy>(DEFAULT_POLICY)
+
+  function toggleScope(scope: string) {
+    const next = new Set(selectedScopes)
+    next.has(scope) ? next.delete(scope) : next.add(scope)
+    setSelectedScopes(next)
+  }
+
+  const hasAppointmentScopes = Array.from(selectedScopes).some(s => s.startsWith('appointments:'))
+
+  function scopeIcon(scope: string) {
+    if (scope.startsWith('appointments')) return '📅'
+    if (scope.startsWith('demographics')) return '👤'
+    if (scope.startsWith('vitals'))       return '💓'
+    if (scope.startsWith('lab'))          return '🔬'
+    if (scope.startsWith('medications'))  return '💊'
+    return '📋'
+  }
+
+  return (
+    <div className="p-4 flex flex-col gap-4">
+
+      {/* Provider row */}
+      <div className="flex items-start gap-3">
+        <div className="w-10 h-10 rounded-xl bg-[#e0f2fe] flex items-center justify-center text-xl flex-shrink-0">🏥</div>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold text-[#02043d]">{request.fromName || request.fromHandle}</p>
+          <p className="text-xs text-[#9ca3af] mt-0.5">{request.widgetName || request.widget}</p>
+        </div>
+        <span className="badge-pending text-[11px] px-2.5 py-1 rounded-full whitespace-nowrap">Pending</span>
+      </div>
+
+      {/* Reason */}
+      {request.reason && (
+        <div className="px-3 py-2.5 rounded-lg bg-[#f9fafb] border border-[#f1f3f8]">
+          <p className="text-xs text-[#4b5563] italic leading-relaxed">&ldquo;{request.reason}&rdquo;</p>
+        </div>
+      )}
+
+      {/* Scopes */}
+      <div>
+        <p className="text-[11px] font-semibold text-[#9ca3af] uppercase tracking-wide mb-2">Requested access</p>
+        <div className="flex flex-col gap-0 divide-y divide-[#f1f3f8]">
+          {(request.scopes || []).map((scope: string) => (
+            <label key={scope} className="flex items-center justify-between py-2.5 cursor-pointer">
+              <div className="flex items-center gap-2.5">
+                <span className="text-base">{scopeIcon(scope)}</span>
+                <div>
+                  {{
+                    'appointments:read':    <><p className="text-sm font-medium text-[#02043d]">View appointments</p><p className="text-[11px] text-[#9ca3af]">See your upcoming schedule</p></>,
+                    'appointments:request': <><p className="text-sm font-medium text-[#02043d]">Request appointments</p><p className="text-[11px] text-[#9ca3af]">Ask to book new slots</p></>,
+                    'appointments:book':    <><p className="text-sm font-medium text-[#02043d]">Book appointments</p><p className="text-[11px] text-[#9ca3af]">Book directly on your behalf</p></>,
+                    'insurance:read':       <><p className="text-sm font-medium text-[#02043d]">View insurance</p><p className="text-[11px] text-[#9ca3af]">Verify your coverage</p></>,
+                    'insurance:write':      <><p className="text-sm font-medium text-[#02043d]">Update insurance</p><p className="text-[11px] text-[#9ca3af]">Add or change coverage info</p></>,
+                    'demographics:read':    <><p className="text-sm font-medium text-[#02043d]">Address & date of birth</p><p className="text-[11px] text-[#9ca3af]">Name, address, DOB</p></>,
+                    'vitals:write':         <><p className="text-sm font-medium text-[#02043d]">Log health readings</p><p className="text-[11px] text-[#9ca3af]">Track vitals like BP, weight, temp</p></>,
+                    'vitals:read':          <><p className="text-sm font-medium text-[#02043d]">View health readings</p><p className="text-[11px] text-[#9ca3af]">See your logged vitals</p></>,
+                    'labs:read':            <><p className="text-sm font-medium text-[#02043d]">View lab results</p><p className="text-[11px] text-[#9ca3af]">Access test results</p></>,
+                    'medications:read':     <><p className="text-sm font-medium text-[#02043d]">View medications</p><p className="text-[11px] text-[#9ca3af]">See your prescriptions</p></>,
+                  }[scope] || <><p className="text-sm font-medium text-[#02043d]">{scope.split(':')[0].charAt(0).toUpperCase() + scope.split(':')[0].slice(1)}</p><p className="text-[11px] text-[#9ca3af]">{scope.replace(/[_:]/g, ' ')}</p></>}
+                </div>
+              </div>
+              <label className="bm-toggle">
+                <input
+                  type="checkbox"
+                  checked={selectedScopes.has(scope)}
+                  onChange={() => toggleScope(scope)}
+                />
+                <span className="bm-toggle-track" />
+              </label>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Policy controls */}
+      <PolicyControls
+        policy={policy}
+        onChange={setPolicy}
+        scopeHasAppointments={hasAppointmentScopes}
+      />
+
+      {/* Actions */}
+      <div className="flex gap-2 pt-1">
+        <button
+          onClick={() => onRespond(request.id, true, Array.from(selectedScopes), policy)}
+          disabled={selectedScopes.size === 0}
+          className="bm-btn-teal flex-1 text-sm py-2.5"
+        >
+          Grant access
+        </button>
+        <button
+          onClick={() => onRespond(request.id, false, [])}
+          className="bm-btn-danger"
+        >
+          Deny
+        </button>
+      </div>
+
+    </div>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ACTIVE GRANTS
+// ═══════════════════════════════════════════════════════════════════════════
+function ActiveGrants({ handle, boloToken, isDemoMode }: { handle: string; boloToken: string | null; isDemoMode: boolean }) {
+  const [grants, setGrants]   = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => { fetchGrants() }, [handle, boloToken])
+
+  async function fetchGrants() {
+    try {
+      const headers: Record<string, string> = {}
+      if (boloToken) headers['x-bolo-token'] = boloToken
+      const res  = await fetch(`/api/grants?handle=${encodeURIComponent(handle)}`, { headers })
+      const data = await res.json()
+      setGrants(data.grants || [])
+    } catch { /* silent */ } finally { setLoading(false) }
+  }
+
+  async function handleRevoke(grantId: string) {
+    try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (boloToken) headers['x-bolo-token'] = boloToken
+      await fetch('/api/grants/revoke', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ grantId, handle }),
+      })
+      fetchGrants()
+    } catch { /* silent */ }
+  }
+
+  return (
+    <Section
+      title="Active Grants"
+      badge={grants.length > 0 ? `${grants.length} active` : undefined}
+    >
+      {loading ? <LoadingRows /> : grants.length === 0 ? (
+        <EmptyState
+          icon={<svg className="w-5 h-5 text-[#9ca3af]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>}
+          title="No active grants"
+          desc="You haven't shared access with anyone yet"
+        />
+      ) : (
+        <div className="divide-y divide-[#f1f3f8]">
+          {grants.map(grant => (
+            <div key={grant.id} className="p-4 flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-[#f0fdf4] flex items-center justify-center text-xl flex-shrink-0">🏥</div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-2 mb-1.5">
+                  <p className="text-sm font-bold text-[#02043d] truncate">@{(grant.granteeHandle || '').replace(/^@+/, '')}</p>
+                  <span className="badge-granted text-[11px] px-2.5 py-0.5 rounded-full whitespace-nowrap">Active</span>
+                </div>
+                <p className="text-xs text-[#9ca3af] mb-2">{grant.widgetName || grant.widget || 'BoMed'}</p>
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {(grant.scopes || []).map((scope: string) => {
+                    const labels: Record<string, string> = {
+                      'appointments:read': '📅 Appointments',
+                      'appointments:request': '📅 Appt requests',
+                      'appointments:book': '📅 Booking',
+                      'insurance:read': '🏥 Insurance',
+                      'demographics:read': '👤 Demographics',
+                      'vitals:write': '💓 Vitals',
+                      'vitals:read': '💓 Vitals (read)',
+                      'patients:read': '👤 Patient info',
+                      'labs:read': '🔬 Labs',
+                      'medications:read': '💊 Medications',
+                    }
+                    return <span key={scope} className="scope-tag">{labels[scope] || scope.replace(/[_:]/g, ' ')}</span>
+                  })}
+                </div>
+                <button
+                  onClick={() => handleRevoke(grant.id)}
+                  className="bm-btn-danger text-xs py-1.5 px-3"
+                >
+                  Revoke access
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </Section>
+  )
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// APPOINTMENTS / MESSAGES
+// ═══════════════════════════════════════════════════════════════════════════
+function Appointments({ handle, boloToken }: { handle: string; boloToken: string | null }) {
+  const [messages, setMessages] = useState<any[]>([])
+  const [loading, setLoading]   = useState(true)
+
+  useEffect(() => { fetchMessages() }, [handle, boloToken])
+
+  async function fetchMessages() {
+    try {
+      const headers: Record<string, string> = {}
+      if (boloToken) headers['x-bolo-token'] = boloToken
+      const res  = await fetch(`/api/relay/inbox?handle=${encodeURIComponent(handle)}`, { headers })
+      const data = await res.json()
+      setMessages(data.messages || [])
+    } catch { /* silent */ } finally { setLoading(false) }
+  }
+
+  return (
+    <Section title="Messages & Appointments">
+      {loading ? <LoadingRows /> : messages.length === 0 ? (
+        <EmptyState
+          icon={<svg className="w-5 h-5 text-[#9ca3af]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>}
+          title="No messages"
+          desc="Appointment confirmations will appear here"
+        />
+      ) : (
+        <div className="divide-y divide-[#f1f3f8]">
+          {messages.map(msg => (
+            <div key={msg.id} className="p-4">
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <p className="text-sm font-bold text-[#02043d]">{msg.senderHandle}</p>
+                <span className="text-xs text-[#9ca3af] whitespace-nowrap">
+                  {new Date(msg.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                </span>
+              </div>
+              <p className="text-sm text-[#4b5563] leading-relaxed mb-2">{msg.content}</p>
+              {msg.widgetSlug && (
+                <span className="text-[11px] font-medium text-[#9ca3af] bg-[#f4f6fb] px-2 py-1 rounded-md">
+                  via {msg.widgetSlug}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </Section>
+  )
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════
 // INSURANCE TAB
 // ═══════════════════════════════════════════════════════════════════════════
 function InsuranceTab() {
@@ -1091,6 +2010,10 @@ function InsuranceTab() {
         <CoverageRow label="PT visits covered" value="20 remaining" valueColor="#16a34a" />
         <CoverageRow label="Plan year" value="Jan 2026 – Dec 2026" last />
       </div>
+
+      {/* REAL PATIENT PROFILE */}
+      <div style={{ marginTop: '16px' }} />
+      <PatientProfile />
     </>
   )
 }
