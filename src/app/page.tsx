@@ -304,52 +304,46 @@ function HomeContent() {
   // ── WELCOME ──────────────────────────────────────────────────────────────
   if (step === 'welcome') {
     return (
-      <main className="min-h-screen bg-white flex flex-col items-center justify-between px-6 pt-16 pb-10">
-        <div className="w-full max-w-sm mx-auto flex flex-col items-center gap-8">
+      <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-6">
+        <div className="w-full max-w-sm mx-auto flex flex-col items-center gap-5">
 
           {/* Logo + wordmark */}
-          <div className="flex flex-col items-center gap-3">
-            <LogoMark size="lg" />
+          <div className="flex flex-col items-center gap-2">
+            <LogoMark size="md" />
             <div className="text-center">
-              <h1 className="text-4xl font-bold text-[#02043d] tracking-tight">BoMed</h1>
-              <p className="text-base text-[#6b7280] mt-1">Patient Identity Portal</p>
+              <h1 className="text-3xl font-bold text-[#02043d] tracking-tight">BoMed</h1>
+              <p className="text-sm text-[#6b7280] mt-0.5">Patient Identity Portal</p>
             </div>
           </div>
 
           {/* Feature list */}
-          <div className="w-full flex flex-col gap-3">
+          <div className="w-full flex flex-col gap-2">
             {[
               { title: 'Proof of personhood', desc: 'No passwords, no forms — just you' },
               { title: 'Scoped permissions', desc: 'Share only exactly what you choose' },
               { title: 'Instant revocation', desc: 'Always in control of your data' },
             ].map(f => (
-              <div key={f.title} className="flex items-start gap-3">
-                <div className="w-[22px] h-[22px] rounded-full bg-[#0d9488] flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div key={f.title} className="flex items-center gap-3">
+                <div className="w-5 h-5 rounded-full bg-[#0d9488] flex items-center justify-center flex-shrink-0">
                   <CheckIcon />
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-[#02043d]">{f.title}</span>
-                  <span className="text-sm text-[#6b7280]">{f.desc}</span>
-                </div>
+                <span className="text-sm text-[#4b5563]">
+                  <span className="font-semibold text-[#02043d]">{f.title}</span> — {f.desc}
+                </span>
               </div>
             ))}
           </div>
 
-        </div>
+          {/* CTA */}
+          <div className="w-full flex flex-col gap-2.5">
 
-        {/* CTA — pinned toward bottom */}
-        <div className="w-full max-w-sm mx-auto flex flex-col gap-3">
-
-            {/* Not in World App — show context banner */}
+            {/* Not in World App — compact notice */}
             {!isMiniApp && (
-              <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[#fef3c7] border border-[#fde68a] mb-1">
-                <span className="text-lg flex-shrink-0">⌀</span>
-                <div>
-                  <p className="text-xs font-semibold text-[#92400e]">Not running in World App</p>
-                  <p className="text-xs text-[#78350f] mt-0.5 leading-relaxed">
-                    World ID verification requires the World App. Try the demo below to see how it works.
-                  </p>
-                </div>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#fef3c7] border border-[#fde68a]">
+                <span className="text-sm flex-shrink-0">⌀</span>
+                <p className="text-xs text-[#78350f]">
+                  Open in World App for real verification, or try the demo below.
+                </p>
               </div>
             )}
 
@@ -380,7 +374,7 @@ function HomeContent() {
                   Continue with Google
                 </a>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <div className="flex-1 h-px bg-[#e5e7eb]" />
                   <span className="text-xs text-[#9ca3af] font-medium">or</span>
                   <div className="flex-1 h-px bg-[#e5e7eb]" />
@@ -397,6 +391,8 @@ function HomeContent() {
                 </button>
               </>
             )}
+          </div>
+
         </div>
       </main>
     )
