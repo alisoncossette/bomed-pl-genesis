@@ -304,7 +304,7 @@ function HomeContent() {
   // ── WELCOME ──────────────────────────────────────────────────────────────
   if (step === 'welcome') {
     return (
-      <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-4">
+      <main className="min-h-screen bg-white flex flex-col items-center justify-start px-6 pt-12 pb-6">
         <div className="w-full max-w-sm mx-auto flex flex-col items-center gap-4">
 
           {/* Logo + wordmark */}
