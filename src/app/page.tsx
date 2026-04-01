@@ -339,15 +339,35 @@ function HomeContent() {
 
         {/* CTA — pinned toward bottom */}
         <div className="w-full max-w-sm mx-auto flex flex-col gap-3">
+
+            {/* Not in World App — show context banner */}
+            {!isMiniApp && (
+              <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[#fef3c7] border border-[#fde68a] mb-1">
+                <span className="text-lg flex-shrink-0">⌀</span>
+                <div>
+                  <p className="text-xs font-semibold text-[#92400e]">Not running in World App</p>
+                  <p className="text-xs text-[#78350f] mt-0.5 leading-relaxed">
+                    World ID verification requires the World App. Try the demo below to see how it works.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <button
               onClick={() => setStep('setup')}
               className="bm-btn-primary"
             >
-              Create my account
-              <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none"
-                stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 8h10M9 4l4 4-4 4" />
-              </svg>
+              {isMiniApp ? (
+                <>
+                  Create my account
+                  <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none"
+                    stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 8h10M9 4l4 4-4 4" />
+                  </svg>
+                </>
+              ) : (
+                <>⌀ Verify with World ID</>
+              )}
             </button>
 
             {!isMiniApp && (
@@ -368,13 +388,12 @@ function HomeContent() {
 
                 <button
                   onClick={() => {
-                    // Demo mode — skip to dashboard with demo account
                     setHandle('@demopatient')
                     setStep('dashboard')
                   }}
-                  className="text-center text-sm text-[#9ca3af] py-1 hover:text-[#6b7280] transition-colors"
+                  className="bm-btn-secondary flex items-center justify-center gap-2"
                 >
-                  🎭 Try the demo
+                  🎭 Try the demo — no account needed
                 </button>
               </>
             )}
