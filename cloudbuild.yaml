@@ -6,6 +6,14 @@ steps:
       - 'build'
       - '-t'
       - 'us-central1-docker.pkg.dev/$PROJECT_ID/bolo-repo/bomed-world:latest'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_WORLD_APP_ID=app_bcc263186d9a781025f30224632aa559'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_WORLD_ACTION=verify-patient'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_APP_URL=https://world.bomed.ai'
+      - '--build-arg'
+      - 'NEXT_PUBLIC_BOLO_API_URL=https://api.bolospot.com'
       - '.'
 
   # Push to Artifact Registry
