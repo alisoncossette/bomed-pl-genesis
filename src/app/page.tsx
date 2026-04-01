@@ -304,8 +304,8 @@ function HomeContent() {
   // ── WELCOME ──────────────────────────────────────────────────────────────
   if (step === 'welcome') {
     return (
-      <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-6">
-        <div className="w-full max-w-sm mx-auto flex flex-col items-center gap-5">
+      <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-4">
+        <div className="w-full max-w-sm mx-auto flex flex-col items-center gap-4">
 
           {/* Logo + wordmark */}
           <div className="flex flex-col items-center gap-2">
@@ -317,7 +317,7 @@ function HomeContent() {
           </div>
 
           {/* Feature list */}
-          <div className="w-full flex flex-col gap-2">
+          <div className="w-full flex flex-col gap-1.5">
             {[
               { title: 'Proof of personhood', desc: 'No passwords, no forms — just you' },
               { title: 'Scoped permissions', desc: 'Share only exactly what you choose' },
@@ -335,7 +335,7 @@ function HomeContent() {
           </div>
 
           {/* CTA */}
-          <div className="w-full flex flex-col gap-2.5">
+          <div className="w-full flex flex-col gap-2">
 
             {/* Not in World App — compact notice */}
             {!isMiniApp && (
