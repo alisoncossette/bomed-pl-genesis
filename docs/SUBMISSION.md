@@ -67,7 +67,7 @@ World ID solves the foundational problem for **both participants**: **Is this ac
 - **World ID integration** — Mini App with orb verification flow
 - **Permission dashboard** — View active grants, incoming requests, relay inbox
 - **Granular scope control** — 8 scopes (appointments, insurance, records, labs, imaging, billing, notes, vitals)
-- **Instant revocation** — No cached tokens, live trust graph
+- **Instant revocation** — Not "before the next block." Not "if the agent cooperates first." One tap, and it's done. The trust graph is checked live on every request — no cached tokens, no cooperative behavior required from the agent.
 - **Agent relay** — Appointment reminders & insurance questions routed through trust boundary
 - **@handle linking** — Connect verified World ID to Bolospot address
 
@@ -133,7 +133,7 @@ Your PT has a @handle. Their scheduling agent inherits that @handle. When you gr
 
 But the agent **cannot** access your insurance data, lab results, or clinical notes. You control the scope.
 
-**Crucially:** If your PT switches from Epic to Cerner, the trust relationship persists. The new EHR inherits the same @handle. Grants don't break. This is **the actual IP**.
+**Crucially:** If your PT switches from Epic to Cerner, the trust relationship persists. And if something goes wrong — if a practice is compromised, if a provider loses your trust — you revoke instantly. Not "after the next block." Not "if the agent stops cooperating." The trust graph is checked live on every single request. One tap. Done. The new EHR inherits the same @handle. Grants don't break. This is **the actual IP**.
 
 **Why World ID on both sides?**
 
