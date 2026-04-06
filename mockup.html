@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BoMed Mini App – Design Guidelines Mockup</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background: radial-gradient(ellipse at center, #1e2154 0%, #0d0d1a 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .label {
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  /* Phone frame */
+  .phone {
+    position: relative;
+    flex-shrink: 0;
+    width: 390px;
+    height: 844px;
+  }
+  .phone-body {
+    position: absolute;
+    inset: 0;
+    border-radius: 52px;
+    background: #1a1a1a;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.08);
+    overflow: hidden;
+  }
+  .phone-btn-l1 { position: absolute; left: -3px; top: 120px; width: 3px; height: 36px; background: #2a2a2a; border-radius: 2px 0 0 2px; }
+  .phone-btn-l2 { position: absolute; left: -3px; top: 170px; width: 3px; height: 64px; background: #2a2a2a; border-radius: 2px 0 0 2px; }
+  .phone-btn-l3 { position: absolute; left: -3px; top: 248px; width: 3px; height: 64px; background: #2a2a2a; border-radius: 2px 0 0 2px; }
+  .phone-btn-r  { position: absolute; right: -3px; top: 160px; width: 3px; height: 80px; background: #2a2a2a; border-radius: 0 2px 2px 0; }
+  .screen {
+    position: absolute;
+    inset: 4px;
+    border-radius: 48px;
+    overflow: hidden;
+    background: #f2f4f7;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Status bar */
+  .statusbar {
+    height: 50px;
+    padding: 14px 28px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f2f4f7;
+    flex-shrink: 0;
+  }
+  .statusbar-time { font-size: 15px; font-weight: 700; color: #0f172a; }
+  .notch {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 12px;
+    width: 120px;
+    height: 34px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 5;
+  }
+
+  /* Top bar – 24px horizontal padding per guidelines */
+  .topbar {
+    padding: 6px 24px 16px;
+    background: #f2f4f7;
+    flex-shrink: 0;
+  }
+  .topbar-main { display: flex; align-items: center; justify-content: space-between; }
+  .topbar-title { font-size: 26px; font-weight: 800; color: #0f172a; letter-spacing: -0.8px; }
+  .topbar-sub { font-size: 13px; color: #94a3b8; margin-top: 1px; font-weight: 500; }
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, #0ea5e9, #0369a1);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 13px; font-weight: 700;
+  }
+  .verified-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #dcfce7; border-radius: 20px; padding: 2px 8px;
+    font-size: 10px; font-weight: 700; color: #16a34a;
+  }
+  .verified-pill::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: #16a34a; display: block;
+  }
+
+  /* Scrollable content – 24px horizontal padding, 32px bottom space before nav */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 24px 120px;
+  }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* ── Spacing guide overlays ── */
+  .spacing-guide {
+    position: absolute;
+    right: -4px;
+    border-right: 2px solid rgba(255, 80, 80, 0.6);
+    display: flex;
+    align-items: center;
+    z-index: 50;
+  }
+  .spacing-guide span {
+    position: absolute;
+    right: 6px;
+    font-size: 9px;
+    font-weight: 700;
+    color: #ff5050;
+    white-space: nowrap;
+    background: rgba(0,0,0,0.7);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  /* Hero card – 24px padding */
+  .hero {
+    background: linear-gradient(135deg, #0f2744, #0369a1);
+    border-radius: 22px;
+    padding: 24px;
+    color: #fff;
+    margin-bottom: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -60px; right: -60px;
+    width: 180px; height: 180px; border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .hero-eyebrow {
+    font-size: 11px; font-weight: 700; opacity: 0.6;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
+    position: relative; z-index: 1;
+  }
+  .hero-pulse {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #34d399; animation: pulse 2s ease infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(0.8); }
+  }
+  .hero-time { font-size: 34px; font-weight: 800; letter-spacing: -1px; line-height: 1; position: relative; z-index: 1; }
+  .hero-date { font-size: 14px; opacity: 0.75; margin-top: 4px; font-weight: 500; position: relative; z-index: 1; }
+  .hero-divider { height: 1px; background: rgba(255,255,255,0.1); margin: 14px 0; position: relative; z-index: 1; }
+  .hero-provider { display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
+  .hero-provider-av {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+  .hero-provider-name { font-size: 14px; font-weight: 600; }
+  .hero-provider-role { font-size: 12px; opacity: 0.65; margin-top: 1px; }
+  .hero-actions { display: flex; gap: 8px; margin-left: auto; }
+  .hero-btn {
+    padding: 7px 14px; border-radius: 10px; font-size: 12px;
+    font-weight: 600; border: none; cursor: pointer;
+  }
+  .hero-btn-primary { background: #fff; color: #0369a1; }
+  .hero-btn-secondary { background: rgba(255,255,255,0.15); color: #fff; }
+
+  /* Quick actions */
+  .quick-actions {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; margin-bottom: 16px;
+  }
+  .qa {
+    background: #fff; border-radius: 16px;
+    padding: 14px 8px 12px;
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .qa-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .qa-label { font-size: 11px; font-weight: 600; color: #475569; text-align: center; }
+
+  /* Section label – 32px top margin (between-section), 16px bottom (to content) */
+  .slabel {
+    font-size: 11px; font-weight: 700; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    margin: 32px 0 16px; padding: 0 2px;
+  }
+  .slabel:first-child { margin-top: 0; }
+
+  /* Cards / rows – 16px between elements */
+  .card {
+    background: #fff; border-radius: 16px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 4px rgba(2,4,61,0.05);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px 12px;
+    border-bottom: 1px solid #f1f3f8;
+  }
+  .card-title { font-size: 14px; font-weight: 700; color: #02043d; }
+  .card-badge {
+    font-size: 11px; font-weight: 600; color: #0d9488;
+    background: #ccfbf1; border: 1px solid rgba(13,148,136,0.2);
+    border-radius: 20px; padding: 2px 8px;
+  }
+
+  .activity-item {
+    background: #fff; border-radius: 14px;
+    padding: 16px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .ai-icon {
+    width: 38px; height: 38px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0;
+  }
+  .ai-title { font-size: 14px; font-weight: 600; color: #0f172a; }
+  .ai-sub { font-size: 12px; color: #94a3b8; margin-top: 1px; font-weight: 500; }
+  .ai-right { margin-left: auto; text-align: right; flex-shrink: 0; }
+  .ai-badge {
+    padding: 3px 8px; border-radius: 20px;
+    font-size: 10px; font-weight: 700; display: inline-block;
+  }
+  .badge-confirmed { background: #dcfce7; color: #16a34a; }
+  .badge-pending { background: #fef3c7; color: #d97706; }
+  .badge-new { background: #e0f2fe; color: #0369a1; }
+
+  /* Empty state – middle aligned per guidelines */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; min-height: 200px;
+    padding: 24px; text-align: center;
+  }
+  .empty-icon {
+    width: 44px; height: 44px; border-radius: 12px;
+    background: #f4f6fb; display: flex; align-items: center;
+    justify-content: center; margin-bottom: 12px; font-size: 20px;
+  }
+  .empty-title { font-size: 14px; font-weight: 600; color: #02043d; margin-bottom: 4px; }
+  .empty-desc { font-size: 12px; color: #9ca3af; max-width: 220px; line-height: 1.5; }
+
+  /* Bottom nav – 12px from system bottom bar */
+  .bnav {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    padding: 10px 0 12px;
+    z-index: 100;
+  }
+  .bn-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 3px; padding: 2px 0; position: relative;
+  }
+  .bn-item.active .bn-dot {
+    width: 4px; height: 4px; border-radius: 50%;
+    background: #0369a1; position: absolute; top: 2px;
+  }
+  .bn-icon { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; }
+  .bn-icon svg { stroke: #94a3b8; }
+  .bn-item.active .bn-icon svg { stroke: #0369a1; }
+  .bn-label { font-size: 10px; font-weight: 600; color: #94a3b8; }
+  .bn-item.active .bn-label { color: #0369a1; }
+
+  /* Practice cards scroll */
+  .practices-scroll {
+    display: flex; gap: 10px; overflow-x: auto;
+    padding-bottom: 4px; margin: 0 -24px;
+    padding-left: 24px; padding-right: 24px;
+  }
+  .practices-scroll::-webkit-scrollbar { display: none; }
+  .practice-card {
+    background: #fff; border-radius: 18px; padding: 16px;
+    min-width: 200px; flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .pc-icon {
+    width: 44px; height: 44px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; margin-bottom: 10px;
+  }
+  .pc-name { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 2px; }
+  .pc-sub { font-size: 11px; color: #94a3b8; font-weight: 500; }
+  .pc-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-top: 10px; padding: 3px 8px; border-radius: 20px;
+    font-size: 10px; font-weight: 700;
+  }
+  .pc-badge.active { background: #dcfce7; color: #16a34a; }
+  .pc-badge.active::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: #16a34a; display: block;
+  }
+
+  /* Sheet / drawer – 12px from bottom bar */
+  .overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.45); z-index: 300;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    backdrop-filter: blur(6px); border-radius: 48px; overflow: hidden;
+  }
+  .sheet {
+    background: #fff; border-radius: 28px 28px 0 0;
+    max-height: 75%; overflow-y: auto;
+    padding-bottom: 12px;
+  }
+  .sheet::-webkit-scrollbar { display: none; }
+  .sheet-drag {
+    width: 36px; height: 4px; background: #e2e8f0;
+    border-radius: 2px; margin: 14px auto 4px;
+  }
+  .sheet-section { padding: 0 24px; }
+  .sheet-practice-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 24px; border-bottom: 1px solid #f8fafc;
+  }
+  .spr-icon {
+    width: 50px; height: 50px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+  }
+  .spr-name { font-size: 16px; font-weight: 700; color: #0f172a; }
+  .spr-sub { font-size: 12px; color: #94a3b8; margin-top: 1px; }
+  .sheet-quote {
+    margin: 12px 24px 4px; padding: 12px 16px;
+    background: #f8fafc; border-radius: 12px;
+    font-size: 13px; color: #475569; line-height: 1.55;
+    font-style: italic; border-left: 3px solid #0ea5e9;
+  }
+  .perm-label {
+    font-size: 10px; font-weight: 700; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    padding: 16px 24px 8px;
+  }
+  .perm-row {
+    display: flex; align-items: center;
+    padding: 12px 24px; border-bottom: 1px solid #f8fafc;
+  }
+  .pr-ico {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; flex-shrink: 0; margin-right: 12px;
+  }
+  .pr-name { font-size: 14px; font-weight: 600; color: #0f172a; }
+  .pr-desc { font-size: 11px; color: #94a3b8; margin-top: 1px; }
+  .toggle {
+    width: 46px; height: 28px; border-radius: 14px;
+    position: relative; cursor: pointer; flex-shrink: 0; margin-left: auto;
+  }
+  .toggle.on { background: #0ea5e9; }
+  .toggle.off { background: #e2e8f0; }
+  .toggle::after {
+    content: ''; position: absolute; width: 22px; height: 22px;
+    border-radius: 50%; background: #fff; top: 3px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .toggle.on::after { left: 21px; }
+  .toggle.off::after { left: 3px; }
+  .sheet-cta {
+    padding: 16px 24px 12px; display: flex; gap: 10px;
+  }
+  .btn-grant {
+    flex: 1; padding: 15px; background: #0369a1; color: #fff;
+    border: none; border-radius: 16px; font-size: 15px;
+    font-weight: 700; cursor: pointer;
+  }
+  .btn-deny {
+    padding: 15px 20px; background: #fff; color: #ef4444;
+    border: 1.5px solid #fecaca; border-radius: 16px;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+
+  /* Dimension annotations */
+  .anno {
+    position: absolute;
+    z-index: 200;
+    pointer-events: none;
+  }
+  .anno-line {
+    background: rgba(255,80,80,0.5);
+  }
+  .anno-label {
+    font-size: 9px; font-weight: 700; color: #ff5050;
+    background: rgba(0,0,0,0.75); padding: 1px 5px;
+    border-radius: 3px; white-space: nowrap;
+  }
+
+  /* Home indicator */
+  .home-indicator {
+    height: 34px; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .home-indicator-bar {
+    width: 134px; height: 5px; background: #0f172a; border-radius: 3px; opacity: 0.2;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 1: DASHBOARD (Home tab)
+     ═══════════════════════════════════════════════════ -->
+<div>
+  <div class="label">Home — Dashboard</div>
+  <div class="phone">
+    <div class="phone-body">
+      <div class="phone-btn-l1"></div>
+      <div class="phone-btn-l2"></div>
+      <div class="phone-btn-l3"></div>
+      <div class="phone-btn-r"></div>
+      <div class="screen">
+        <div class="notch"></div>
+
+        <!-- Status bar -->
+        <div class="statusbar">
+          <span class="statusbar-time">9:41</span>
+          <span style="font-size:12px;color:#0f172a;font-weight:600;">&#x1F50B;</span>
+        </div>
+
+        <!-- Top bar (24px padding) -->
+        <div class="topbar">
+          <div class="topbar-main">
+            <div>
+              <div class="topbar-title">Good morning, Dana</div>
+              <div class="topbar-sub">@demopatient</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px;">
+              <div class="avatar">DA</div>
+              <div class="verified-pill">World ID</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content (24px padding) -->
+        <div class="content">
+
+          <!-- Hero card (24px internal padding) -->
+          <div class="hero">
+            <div class="hero-eyebrow"><div class="hero-pulse"></div> Next appointment</div>
+            <div class="hero-time">2:30 PM</div>
+            <div class="hero-date">Tuesday, April 1 &middot; 45 min &middot; In person</div>
+            <div class="hero-divider"></div>
+            <div class="hero-provider">
+              <div class="hero-provider-av">SK</div>
+              <div>
+                <div class="hero-provider-name">Dr. Sarah Kim</div>
+                <div class="hero-provider-role">Physical Therapy</div>
+              </div>
+              <div class="hero-actions">
+                <button class="hero-btn hero-btn-secondary">Reschedule</button>
+                <button class="hero-btn hero-btn-primary">Directions</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick actions (16px gap from hero) -->
+          <div class="quick-actions">
+            <div class="qa"><div class="qa-icon" style="background:#e0f2fe;">&#x1F4C5;</div><div class="qa-label">Request appt</div></div>
+            <div class="qa"><div class="qa-icon" style="background:#fef3c7;">&#x1F4B3;</div><div class="qa-label">Insurance</div></div>
+            <div class="qa" style="opacity:0.3"><div class="qa-icon" style="background:#f3f4f6;">&#x1F512;</div><div class="qa-label">Health data</div></div>
+            <div class="qa" style="opacity:0.3"><div class="qa-icon" style="background:#f3f4f6;">&#x1F512;</div><div class="qa-label">Records</div></div>
+          </div>
+
+          <!-- 32px section gap (via slabel) -->
+          <div class="slabel">Your practices</div>
+          <div class="practices-scroll">
+            <div class="practice-card">
+              <div class="pc-icon" style="background:#e0f2fe;">&#x1F3C3;</div>
+              <div class="pc-name">Greenfield PT</div>
+              <div class="pc-sub">3 permissions</div>
+              <div class="pc-badge active">Active</div>
+            </div>
+            <div class="practice-card">
+              <div class="pc-icon" style="background:#fef3c7;">&#x1F3E5;</div>
+              <div class="pc-name">City Family Med</div>
+              <div class="pc-sub">Pending review</div>
+              <div class="pc-badge" style="background:#fef3c7;color:#d97706;">Review &rarr;</div>
+            </div>
+          </div>
+
+          <!-- 32px section gap -->
+          <div class="slabel">Recent activity</div>
+
+          <!-- 16px between items -->
+          <div class="activity-item">
+            <div class="ai-icon" style="background:#dcfce7;">&#x2705;</div>
+            <div>
+              <div class="ai-title">Access granted</div>
+              <div class="ai-sub">Greenfield PT &middot; Appointments</div>
+            </div>
+            <div class="ai-right">
+              <div style="font-size:11px;color:#cbd5e1;font-weight:500;">2h ago</div>
+              <div class="ai-badge badge-confirmed">Confirmed</div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="ai-icon" style="background:#fef3c7;">&#x1F4CB;</div>
+            <div>
+              <div class="ai-title">New request</div>
+              <div class="ai-sub">City Dental &middot; Insurance</div>
+            </div>
+            <div class="ai-right">
+              <div style="font-size:11px;color:#cbd5e1;font-weight:500;">5h ago</div>
+              <div class="ai-badge badge-pending">Pending</div>
+            </div>
+          </div>
+
+          <div class="activity-item">
+            <div class="ai-icon" style="background:#e0f2fe;">&#x1F4C5;</div>
+            <div>
+              <div class="ai-title">Appointment booked</div>
+              <div class="ai-sub">Dr. Sarah Kim &middot; Apr 1</div>
+            </div>
+            <div class="ai-right">
+              <div style="font-size:11px;color:#cbd5e1;font-weight:500;">1d ago</div>
+              <div class="ai-badge badge-new">New</div>
+            </div>
+          </div>
+
+          <!-- 32px before bottom bar content ends -->
+        </div>
+
+        <!-- Bottom nav (12px from bottom bar) -->
+        <div class="bnav">
+          <div class="bn-item active">
+            <div class="bn-dot" style="width:4px;height:4px;border-radius:50%;background:#0369a1;position:absolute;top:2px;"></div>
+            <div class="bn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+            <div class="bn-label">Home</div>
+          </div>
+          <div class="bn-item">
+            <div class="bn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            <div class="bn-label">Schedule</div>
+          </div>
+          <div class="bn-item" style="opacity:0.3">
+            <div class="bn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+            <div class="bn-label">Health</div>
+          </div>
+          <div class="bn-item">
+            <div class="bn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+            <div class="bn-label">Insurance</div>
+          </div>
+          <div class="bn-item">
+            <div class="bn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <div class="bn-label">Profile</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 2: GRANT SHEET (Drawer)
+     ═══════════════════════════════════════════════════ -->
+<div>
+  <div class="label">Grant Access — Sheet / Drawer</div>
+  <div class="phone">
+    <div class="phone-body">
+      <div class="phone-btn-l1"></div>
+      <div class="phone-btn-l2"></div>
+      <div class="phone-btn-l3"></div>
+      <div class="phone-btn-r"></div>
+      <div class="screen">
+        <div class="notch"></div>
+        <div class="statusbar">
+          <span class="statusbar-time">9:41</span>
+          <span style="font-size:12px;color:#0f172a;font-weight:600;">&#x1F50B;</span>
+        </div>
+
+        <!-- Dimmed background content -->
+        <div class="topbar" style="opacity:0.3">
+          <div class="topbar-main">
+            <div><div class="topbar-title">Good morning, Dana</div></div>
+          </div>
+        </div>
+
+        <!-- Overlay + Sheet -->
+        <div class="overlay">
+          <div class="sheet">
+            <div class="sheet-drag"></div>
+            <div class="sheet-section" style="padding-top:10px;">
+              <div style="font-size:11px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:0.6px;">Access Request</div>
+              <div style="font-size:13px;color:#94a3b8;margin-top:2px;">Review what this practice is asking for</div>
+            </div>
+            <div class="sheet-practice-row">
+              <div class="spr-icon" style="background:#fef3c7;">&#x1F3E5;</div>
+              <div>
+                <div class="spr-name">City Family Medicine</div>
+                <div class="spr-sub">BoMed Scheduling &middot; @cityfamilymed</div>
+              </div>
+            </div>
+            <div class="sheet-quote">"Schedule check-ups and share visit records with your care team"</div>
+            <div class="perm-label">Requested access</div>
+            <div class="perm-row">
+              <div class="pr-ico" style="background:#e0f2fe;">&#x1F4C5;</div>
+              <div style="flex:1"><div class="pr-name">View appointments</div><div class="pr-desc">See your upcoming schedule</div></div>
+              <div class="toggle on"></div>
+            </div>
+            <div class="perm-row">
+              <div class="pr-ico" style="background:#f3e8ff;">&#x1F4CB;</div>
+              <div style="flex:1"><div class="pr-name">Request appointments</div><div class="pr-desc">Propose new booking times</div></div>
+              <div class="toggle on"></div>
+            </div>
+            <div class="perm-row">
+              <div class="pr-ico" style="background:#fce7f3;">&#x1F9EA;</div>
+              <div style="flex:1"><div class="pr-name">Share visit records</div><div class="pr-desc">Visit summaries and notes</div></div>
+              <div class="toggle off"></div>
+            </div>
+            <div class="sheet-cta">
+              <button class="btn-grant">Grant access</button>
+              <button class="btn-deny">Deny</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 3: EMPTY STATE (centered)
+     ═══════════════════════════════════════════════════ -->
+<div>
+  <div class="label">Empty State — Middle Aligned</div>
+  <div class="phone">
+    <div class="phone-body">
+      <div class="phone-btn-l1"></div>
+      <div class="phone-btn-l2"></div>
+      <div class="phone-btn-l3"></div>
+      <div class="phone-btn-r"></div>
+      <div class="screen">
+        <div class="notch"></div>
+        <div class="statusbar">
+          <span class="statusbar-time">9:41</span>
+          <span style="font-size:12px;color:#0f172a;font-weight:600;">&#x1F50B;</span>
+        </div>
+        <div class="topbar">
+          <div class="topbar-main">
+            <div><div class="topbar-title">Messages</div><div class="topbar-sub">Inbox</div></div>
+          </div>
+        </div>
+
+        <div class="content" style="display:flex;flex-direction:column;">
+          <div class="card" style="flex:1;display:flex;flex-direction:column;margin-bottom:0;">
+            <div class="card-header">
+              <div class="card-title">Messages & Appointments</div>
+            </div>
+            <div class="empty-state" style="flex:1;">
+              <div class="empty-icon">&#x1F4EC;</div>
+              <div class="empty-title">No messages</div>
+              <div class="empty-desc">Appointment confirmations will appear here</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bnav">
+          <div class="bn-item">
+            <div class="bn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+            <div class="bn-label">Home</div>
+          </div>
+          <div class="bn-item active">
+            <div class="bn-dot" style="width:4px;height:4px;border-radius:50%;background:#0369a1;position:absolute;top:2px;"></div>
+            <div class="bn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+            <div class="bn-label">Schedule</div>
+          </div>
+          <div class="bn-item" style="opacity:0.3">
+            <div class="bn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+            <div class="bn-label">Health</div>
+          </div>
+          <div class="bn-item">
+            <div class="bn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+            <div class="bn-label">Insurance</div>
+          </div>
+          <div class="bn-item">
+            <div class="bn-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+            <div class="bn-label">Profile</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
