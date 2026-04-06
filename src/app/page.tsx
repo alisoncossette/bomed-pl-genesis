@@ -639,8 +639,8 @@ function HomeContent() {
   // ── SENDING REQUEST ──────────────────────────────────────────────────────
   if (step === 'sending-request') {
     return (
-      <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-12">
-        <div className="w-full max-w-sm mx-auto flex flex-col items-center gap-6">
+      <main className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-24">
+        <div className="w-full max-w-sm mx-auto flex flex-col items-center justify-center flex-1 gap-6">
           <LogoMark size="md" />
           <div className="flex flex-col items-center gap-3 text-center">
             <Spinner dark />
@@ -796,7 +796,7 @@ function Dashboard({ handle, boloToken, isDemoMode, onSignOut }: { handle: strin
               <button className="ios-btn-grant" onClick={() => setShowGrantSheet(false)}>Grant access</button>
               <button className="ios-btn-deny" onClick={() => setShowGrantSheet(false)}>Deny</button>
             </div>
-            <div style={{ height: '16px' }} />
+            <div style={{ height: '12px' }} />
           </div>
         </div>
       )}
@@ -943,11 +943,13 @@ function HomeTab({ handle, boloToken, isDemoMode, onShowGrant }: { handle: strin
       </div>
 
       {/* REAL COMPONENTS BELOW */}
-      <div style={{ marginTop: '16px' }} />
-      <AutoBookFeed handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
-      <ConnectPractice handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
-      <PendingRequests handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
-      <ActiveGrants handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
+      <div style={{ marginTop: '32px' }} />
+      <div className="flex flex-col gap-[32px]">
+        <AutoBookFeed handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
+        <ConnectPractice handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
+        <PendingRequests handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
+        <ActiveGrants handle={handle} boloToken={boloToken} isDemoMode={isDemoMode} />
+      </div>
     </>
   )
 }
@@ -1000,13 +1002,13 @@ function ScheduleTab({ handle, boloToken }: { handle: string; boloToken: string 
       <AppointmentItem month="APR" day="1" title="PT Session" meta="2:30 PM · Dr. Sarah Kim · 45 min" status="Confirmed" />
       <AppointmentItem month="APR" day="8" title="Follow-up" meta="10:00 AM · Dr. Sarah Kim · 30 min" status="Confirmed" />
       <AppointmentItem month="APR" day="15" title="Evaluation" meta="2:00 PM · Dr. Sarah Kim · 60 min" status="Pending" />
-      <div className="ios-slabel" style={{ marginTop: '6px' }}>Past</div>
+      <div className="ios-slabel">Past</div>
       <div style={{ opacity: 0.6 }}>
         <AppointmentItem month="MAR" day="25" title="Initial eval" meta="11:00 AM · Dr. Sarah Kim · 60 min" status="Done" />
       </div>
 
       {/* REAL APPOINTMENTS (relay inbox messages) */}
-      <div style={{ marginTop: '16px' }} />
+      <div style={{ marginTop: '32px' }} />
       <Appointments handle={handle} boloToken={boloToken} />
     </>
   )
@@ -1047,7 +1049,7 @@ function HealthTab() {
       <ActivityItem icon="📄" bg="#e0f2fe" title="Initial Evaluation" sub="Greenfield PT · Mar 25" time="" badge="View" badgeClass="badge-new" />
       <ActivityItem icon="📋" bg="#f3e8ff" title="Treatment Plan" sub="Greenfield PT · Mar 25" time="" badge="View" badgeClass="badge-new" />
 
-      <div style={{ background: '#fff', borderRadius: '16px', padding: '16px', marginTop: '4px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div style={{ background: '#fff', borderRadius: '16px', padding: '16px', marginTop: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
         <div style={{ fontSize: '13px', color: '#94a3b8', textAlign: 'center', lineHeight: 1.5 }}>
           Your health data is shared only with practices you&apos;ve explicitly granted access to.
         </div>
@@ -1124,7 +1126,7 @@ function LoadingRows() {
 
 function EmptyState({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
   return (
-    <div className="flex flex-col items-center py-10 px-6 text-center">
+    <div className="flex flex-col items-center justify-center py-12 px-6 text-center min-h-[200px]">
       <div className="w-11 h-11 rounded-xl bg-[#f4f6fb] flex items-center justify-center mb-3">
         {icon}
       </div>
@@ -1702,7 +1704,7 @@ function PendingRequests({ handle, boloToken, isDemoMode }: { handle: string; bo
       badge={requests.length > 0 ? `${requests.length} pending` : undefined}
     >
       {loading ? <LoadingRows /> : requests.length === 0 ? (
-        <div className="flex flex-col items-center py-10 px-6 text-center">
+        <div className="flex flex-col items-center justify-center py-12 px-6 text-center min-h-[200px]">
           <div className="w-11 h-11 rounded-xl bg-[#f4f6fb] flex items-center justify-center mb-3">
             <svg className="w-5 h-5 text-[#9ca3af]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
           </div>
@@ -2027,7 +2029,7 @@ function InsuranceTab() {
       </div>
 
       {/* REAL PATIENT PROFILE */}
-      <div style={{ marginTop: '16px' }} />
+      <div style={{ marginTop: '32px' }} />
       <PatientProfile />
     </>
   )
