@@ -1,7 +1,9 @@
 {
-  "name": "BoMed",
-  "tagline": "The first healthcare network where identity is sovereign on both sides.",
-  "description": "BoMed gives every patient a permanent health identity — not tied to a hospital, not owned by an insurer. Theirs.\n\nPatients verify their humanity with World ID (orb verification), claim a permanent @handle via Bolospot, and grant providers exactly the access they need — appointments, insurance, demographics — at the scope level. Every permission is revocable instantly. Nothing cached. Nothing lingering.\n\nOn the provider side, a live dashboard populates in real time with verified patient data before the appointment begins. When insurance changes, patients update it once — it propagates everywhere. When the visit ends, one tap removes access entirely.\n\nThe breakthrough: both patient AND provider are verified. World ID proves you're a real human. Bolospot proves who you are. BoMed proves you belong in the network. Three layers of trust, zero clipboard.\n\nEvery permission a patient grants through BoMed is visible and revocable in their Bolospot account. One place to manage everything — not scattered across apps.\n\nBuilt with: Next.js 14, World ID MiniKit, @bolospot/sdk, Tailwind CSS 4, Google Cloud Run, Docker. Fresh code — built from scratch for PL Genesis.",
+  "name": "BoMed Healthcare Autonomy Platform",
+  "tagline": "Permission-gated MCP tools and A2A agents for patient-controlled healthcare — every operation checked against a live trust graph, every resource in FHIR.",
+  "description": "BoMed gives healthcare AI agents a permission layer they've been missing. 10 MCP tools expose patient-controlled operations — grants, vitals, appointments, insurance — all returning FHIR R4 resources. An A2A-compliant AutoBook Agent schedules autonomously within patient-defined policy constraints. SHARP context propagation passes patient identity and FHIR tokens through multi-agent chains on Prompt Opinion. Bilateral World ID verification ensures both patients AND providers are cryptographically verified. Revocation is instant — checked live on every request, no caching, no cooperative behavior required.",
+  "hackathon": "Agents Assemble: The Healthcare AI Endgame",
+  "track": "Both — Superpower (MCP) + Agent (A2A)",
   "team": [
     {
       "name": "Alison Cossette",
@@ -10,14 +12,45 @@
   ],
   "demo_url": "https://world.bomed.ai",
   "video_url": "https://www.youtube.com/watch?v=OA-1iItaHSg",
+  "agent_card_url": "https://world.bomed.ai/.well-known/agent.json",
   "technologies": [
-    "Next.js",
+    "MCP (Model Context Protocol)",
+    "A2A (Agent-to-Agent Protocol)",
+    "FHIR R4",
+    "SHARP Extension Specs",
+    "Next.js 14",
     "World ID",
     "Bolospot",
     "TypeScript",
-    "Tailwind CSS",
+    "Tailwind CSS 4",
     "Docker",
     "Google Cloud Run",
-    "Google Calendar API"
+    "Solidity / World Chain"
+  ],
+  "mcp_tools": [
+    "get_patient",
+    "list_grants",
+    "create_grant",
+    "revoke_grant",
+    "respond_to_request",
+    "read_vitals",
+    "record_vital",
+    "book_appointment",
+    "get_scheduling_policy",
+    "check_permission"
+  ],
+  "a2a_skills": [
+    "schedule-appointment",
+    "manage-permissions",
+    "monitor-vitals",
+    "propagate-insurance"
+  ],
+  "fhir_resources": [
+    "Patient",
+    "Observation",
+    "Appointment",
+    "Consent",
+    "Coverage",
+    "Bundle"
   ]
 }

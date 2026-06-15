@@ -1,0 +1,65 @@
+{
+  "name": "BoMed AutoBook Agent",
+  "description": "Autonomous healthcare appointment scheduling agent. Finds optimal appointment slots based on patient-defined scheduling policies (allowed hours, days, buffer time, weekly limits). Manages permission requests, monitors vital signs, and coordinates between patients and healthcare providers. All operations are permission-gated through Bolospot's live trust graph — patients retain full control with instant revocation.",
+  "url": "https://world.bomed.ai/a2a",
+  "provider": {
+    "organization": "BoMed",
+    "url": "https://bomed.ai"
+  },
+  "version": "1.0.0",
+  "documentationUrl": "https://github.com/alisoncossette/bomed-pl-genesis",
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": true
+  },
+  "authentication": {
+    "schemes": ["bearer"],
+    "credentials": "Bolospot API key (practice-side) or patient JWT"
+  },
+  "defaultInputModes": ["text", "data"],
+  "defaultOutputModes": ["text", "data"],
+  "skills": [
+    {
+      "id": "schedule-appointment",
+      "name": "Schedule Appointment",
+      "description": "Find the next available appointment slot matching the patient's scheduling policy and book it. Respects constraints: min buffer time, allowed hours/days, weekly max. Returns a FHIR Appointment resource.",
+      "tags": ["healthcare", "scheduling", "fhir", "autonomous"],
+      "examples": [
+        "Book a PT session for @patient within their policy constraints",
+        "Find the next available slot for a follow-up with Acme Physical Therapy"
+      ]
+    },
+    {
+      "id": "manage-permissions",
+      "name": "Manage Healthcare Permissions",
+      "description": "Handle permission grants and revocations between patients and providers. Supports granular scopes: appointments, vitals, insurance, demographics, records. Returns FHIR Consent resources.",
+      "tags": ["healthcare", "permissions", "consent", "fhir"],
+      "examples": [
+        "Grant @acme-pt read access to appointments and vitals",
+        "Revoke all permissions for @old-provider",
+        "Check if @provider has vitals:write access"
+      ]
+    },
+    {
+      "id": "monitor-vitals",
+      "name": "Monitor Vital Signs",
+      "description": "Read and record patient vital signs through the permission-gated relay. Supports temperature, heart rate, SpO2, and blood pressure. Returns FHIR Observation resources.",
+      "tags": ["healthcare", "vitals", "monitoring", "fhir"],
+      "examples": [
+        "Read latest vital signs for @patient",
+        "Record temperature reading of 98.6°F from Ladybug.bot"
+      ]
+    },
+    {
+      "id": "propagate-insurance",
+      "name": "Propagate Insurance Information",
+      "description": "Share insurance coverage details with authorized providers. Requires insurance:transmit grant. Returns FHIR Coverage resource.",
+      "tags": ["healthcare", "insurance", "fhir"],
+      "examples": [
+        "Share insurance info with @new-specialist",
+        "Get current coverage details for @patient"
+      ]
+    }
+  ]
+}

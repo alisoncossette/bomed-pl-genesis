@@ -9,6 +9,10 @@
     "lint": "next lint",
     "agent:autobook": "tsx agents/autobook-agent.ts",
     "agent:ladybug": "tsx agents/ladybug-bot.ts",
+    "agent:a2a": "tsx agents/a2a-autobook/server.ts",
+    "mcp:dev": "tsx mcp-server/src/index.ts",
+    "mcp:build": "cd mcp-server && npm run build",
+    "mcp:start": "node mcp-server/dist/index.js",
     "setup": "tsx scripts/setup.ts"
   },
   "dependencies": {
